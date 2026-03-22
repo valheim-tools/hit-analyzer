@@ -1,0 +1,42 @@
+[
+  { "id": "boar",                   "label": "Boar",                       "biome": "Meadows",       "rawDamage": 10  },
+  { "id": "neck",                   "label": "Neck",                       "biome": "Meadows",       "rawDamage": 6   },
+  { "id": "greyling",               "label": "Greyling",                   "biome": "Meadows",       "rawDamage": 5   },
+
+  { "id": "greydwarf_slash",        "label": "Greydwarf — Slash",          "biome": "Black Forest",  "rawDamage": 14  },
+  { "id": "greydwarf_throw",        "label": "Greydwarf — Rock throw",     "biome": "Black Forest",  "rawDamage": 10  },
+  { "id": "greydwarf_brute",        "label": "Greydwarf brute",            "biome": "Black Forest",  "rawDamage": 30  },
+  { "id": "skeleton_slash",         "label": "Skeleton — Slash",           "biome": "Black Forest",  "rawDamage": 25  },
+  { "id": "skeleton_pierce",        "label": "Skeleton — Pierce",          "biome": "Black Forest",  "rawDamage": 20  },
+  { "id": "troll_log_horizontal",   "label": "Troll — Log horizontal",     "biome": "Black Forest",  "rawDamage": 70  },
+  { "id": "troll_log_vertical",     "label": "Troll — Log vertical",       "biome": "Black Forest",  "rawDamage": 60  },
+  { "id": "troll_punch",            "label": "Troll — Punch",              "biome": "Black Forest",  "rawDamage": 50  },
+
+  { "id": "draugr_slash",           "label": "Draugr — Slash",             "biome": "Swamp",         "rawDamage": 48  },
+  { "id": "draugr_pierce",          "label": "Draugr — Pierce",            "biome": "Swamp",         "rawDamage": 48  },
+  { "id": "draugr_elite",           "label": "Draugr elite",               "biome": "Swamp",         "rawDamage": 58  },
+  { "id": "wraith",                 "label": "Wraith",                     "biome": "Swamp",         "rawDamage": 60  },
+  { "id": "abomination_1",          "label": "Abomination — Smash 1",      "biome": "Swamp",         "rawDamage": 60  },
+  { "id": "abomination_2",          "label": "Abomination — Smash 2",      "biome": "Swamp",         "rawDamage": 80  },
+
+  { "id": "wolf",                   "label": "Wolf",                       "biome": "Mountain",      "rawDamage": 70  },
+  { "id": "fenring_claw",           "label": "Fenring — Claw",             "biome": "Mountain",      "rawDamage": 85  },
+  { "id": "fenring_leap",           "label": "Fenring — Leap",             "biome": "Mountain",      "rawDamage": 95  },
+  { "id": "stone_golem_blunt",      "label": "Stone Golem — Blunt",        "biome": "Mountain",      "rawDamage": 110 },
+  { "id": "stone_golem_pierce",     "label": "Stone Golem — Pierce",       "biome": "Mountain",      "rawDamage": 110 },
+
+  { "id": "deathsquito",            "label": "Deathsquito",                "biome": "Plains",        "rawDamage": 90  },
+  { "id": "fuling_melee",           "label": "Fuling — Melee",             "biome": "Plains",        "rawDamage": 85  },
+  { "id": "fuling_torch",           "label": "Fuling — Torch throw",       "biome": "Plains",        "rawDamage": 45  },
+  { "id": "fuling_berserker",       "label": "Fuling Berserker",           "biome": "Plains",        "rawDamage": 130 },
+  { "id": "lox_bite",               "label": "Lox — Bite",                 "biome": "Plains",        "rawDamage": 130 },
+  { "id": "lox_stomp",              "label": "Lox — Stomp",                "biome": "Plains",        "rawDamage": 120 },
+
+  { "id": "seeker_pierce_1",        "label": "Seeker — Pierce 1",          "biome": "Mistlands",     "rawDamage": 90  },
+  { "id": "seeker_pierce_2",        "label": "Seeker — Pierce 2",          "biome": "Mistlands",     "rawDamage": 120 },
+  { "id": "seeker_blunt",           "label": "Seeker — Blunt",             "biome": "Mistlands",     "rawDamage": 100 },
+  { "id": "seeker_soldier_blunt_1", "label": "Seeker Soldier — Blunt 1",   "biome": "Mistlands",     "rawDamage": 100 },
+  { "id": "seeker_soldier_blunt_2", "label": "Seeker Soldier — Blunt 2",   "biome": "Mistlands",     "rawDamage": 120 },
+  { "id": "seeker_soldier_slash",   "label": "Seeker Soldier — Slash",     "biome": "Mistlands",     "rawDamage": 100 }
+]
+

@@ -50,6 +50,7 @@ public class WebServer {
             case "html" -> "text/html; charset=utf-8";
             case "js"   -> "application/javascript";
             case "css"  -> "text/css";
+            case "json" -> "application/json; charset=utf-8";
             default     -> "application/octet-stream";
         };
 

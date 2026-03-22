@@ -153,7 +153,7 @@
         .stagger-yes  { color: #e06060; font-weight: bold; }
         .stagger-block .stagger-kw { color: #e08830; }
         .stagger-armor .stagger-kw { color: #6090e0; }
-        .stagger-kw   { font-weight: bold; text-decoration: underline; text-underline-offset: 2px; }
+        .stagger-kw   { font-weight: bold; }
         .stagger-no   { color: #60a060; }
 
         /* ── Button row ── */
@@ -211,7 +211,16 @@
             color: #c8a850;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 0.7rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .physical-note {
+            font-size: 0.78rem;
+            color: #c8a850;
+            font-style: italic;
+            border-left: 2px solid #c8a850;
+            padding-left: 0.5rem;
+            margin-bottom: 0.9rem;
         }
 
         .pipeline {
@@ -373,7 +382,8 @@
             padding: 0.4rem 0.65rem;
             font-size: 0.75rem;
             white-space: normal;
-            width: 400px;
+            width: max-content;
+            max-width: 400px;
             position: absolute;
             z-index: 20;
             bottom: 140%;
@@ -397,6 +407,7 @@
 
     <div class="calc-summary">
         <h3>How damage taken is calculated</h3>
+        <p class="physical-note">Damage refers to physical damage.</p>
         <div class="pipeline">
             <div class="pipe-step">
                 <span class="pipe-num">1</span>
@@ -671,9 +682,9 @@
     function fmt(n) { return Number(n).toFixed(3); }
 
     function staggerState(s) {
-        if (s.stagger === 'ON_BLOCK') return '<span class="stagger-yes stagger-block">Staggered on <span class="stagger-kw">block</span></span>';
-        if (s.stagger === 'ON_ARMOR') return '<span class="stagger-yes stagger-armor">Staggered on <span class="stagger-kw">armor</span></span>';
-        return '<span class="stagger-no">Not staggered</span>';
+        if (s.stagger === 'ON_BLOCK') return '<span class="stagger-yes stagger-block"><span class="stagger-kw">blocking</span><span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">Stagger was determined against the effective blocking armor, which means that blocking damage reduction is not applied.</span></span></span>';
+        if (s.stagger === 'ON_ARMOR') return '<span class="stagger-yes stagger-armor"><span class="stagger-kw">body</span><span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">Stagger was determined against body armor.</span></span></span>';
+        return '<span class="stagger-no">none</span>';
     }
 
     function render(data, inputs) {
@@ -708,15 +719,15 @@
 
         // Per-scenario rows
         const BLOCKING_TIP  = 'Remaining damage after the shield / blocking-armor reduction is applied to the effective (scaled) raw damage — before body armor is factored in.';
-        const FINAL_TIP     = 'The final damage after both the blocking and body-armor physical damage reductions have been applied to the raw damage.';
+        const FINAL_TIP     = 'The final damage after both the blocking and body-armor damage reductions have been applied to the raw damage.';
         const mkTip = txt => `<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${txt}</span></span>`;
-        const STAGGER_TIP = 'Shows whether the player is staggered by the damage, and at which step of the physical damage reduction calculation the stagger occurred.';
+        const STAGGER_TIP = 'Shows whether the player is staggered by the damage, and at which step of the damage reduction calculation the stagger occurred.';
         const rows = [
             { label: `Blocking-Reduced Damage ${mkTip(BLOCKING_TIP)}`,         fn: s => fmt(s.blockingReducedDamage) },
             { label: `Final/Armor-Reduced Damage ${mkTip(FINAL_TIP)}`,         fn: s => fmt(s.finalReducedDamage)    },
             { label: 'Remaining Health',  fn: s => fmt(s.remainingHealth) },
             null,
-            { label: `Stagger ${mkTip(STAGGER_TIP)}`, fn: s => staggerState(s) },
+            { label: `Staggered on armor ${mkTip(STAGGER_TIP)}`, fn: s => staggerState(s) },
         ];
 
         document.getElementById('tbody').innerHTML = rows.map(row => {

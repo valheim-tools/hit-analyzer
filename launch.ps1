@@ -35,11 +35,11 @@ if (-not (Test-Path $JarPath)) {
 # ── Start server ─────────────────────────────────────────────────────────────
 Write-Host ">> Starting server..." -ForegroundColor Cyan
 $serverProcess = Start-Process `
-    -FilePath       "java" `
-    -ArgumentList   "-jar", $JarPath, "--server" `
+    -FilePath         "java" `
+    -ArgumentList     "-jar", $JarPath, "--server" `
     -WorkingDirectory $ProjectRoot `
     -PassThru `
-    -WindowStyle    Minimized
+    -NoNewWindow
 
 # ── Poll health ───────────────────────────────────────────────────────────────
 Write-Host ">> Waiting for server (up to ${TimeoutSeconds}s)..." -ForegroundColor Cyan
@@ -68,7 +68,19 @@ if (-not $ready) {
 # ── Open browser ──────────────────────────────────────────────────────────────
 Write-Host ">> Server ready. Opening browser..." -ForegroundColor Green
 Write-Host "   URL        : $AppUrl" -ForegroundColor DarkGray
-Write-Host "   Server PID : $($serverProcess.Id)  (Stop-Process -Id $($serverProcess.Id) to shut down)" -ForegroundColor DarkGray
+Write-Host "   Server PID : $($serverProcess.Id)" -ForegroundColor DarkGray
+Write-Host ""
+Write-Host ">> Press Ctrl+C or close this window to stop the server." -ForegroundColor Yellow
 
 Start-Process $AppUrl
+
+# ── Keep alive — stop server on Ctrl+C or terminal close ─────────────────────
+try {
+    $serverProcess.WaitForExit()
+} finally {
+    Write-Host ""
+    Write-Host ">> Stopping server (PID $($serverProcess.Id))..." -ForegroundColor Cyan
+    Stop-Process -Id $serverProcess.Id -ErrorAction SilentlyContinue
+    Write-Host ">> Server stopped." -ForegroundColor Green
+}
 

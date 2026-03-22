@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valheim Damage Calculator</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #141210;
+            color: #e0d0b0;
+            font-family: Georgia, 'Times New Roman', serif;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.6rem;
+            color: #c8a850;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .container { max-width: 860px; margin: 0 auto; }
+
+        /* ── Form ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .section {
+            background: #1e1b14;
+            border: 1px solid #3e3018;
+            border-radius: 6px;
+            padding: 1.2rem 1.4rem;
+        }
+
+        .section h2 {
+            font-size: 0.8rem;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 1px solid #3e3018;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .field { margin-bottom: 0.8rem; }
+        .field:last-child { margin-bottom: 0; }
+
+        label {
+            display: block;
+            font-size: 0.78rem;
+            color: #8a7a5a;
+            margin-bottom: 0.25rem;
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            background: #0e0c08;
+            border: 1px solid #3e3018;
+            color: #e0d0b0;
+            padding: 0.38rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            transition: border-color 0.15s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #c8a850;
+        }
+
+        select option { background: #1e1b14; }
+
+        button[type="submit"] {
+            width: 100%;
+            background: #2a2010;
+            color: #c8a850;
+            border: 1px solid #c8a850;
+            padding: 0.65rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            transition: background 0.15s;
+        }
+
+        button[type="submit"]:hover { background: #3a3020; }
+
+        /* ── Error banner ── */
+        #error {
+            display: none;
+            background: #3a1010;
+            border: 1px solid #a03030;
+            color: #e08080;
+            padding: 0.7rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.4rem;
+            font-size: 0.88rem;
+        }
+
+        /* ── Results table ── */
+        #results { display: none; }
+
+        .modifier-line {
+            font-size: 0.82rem;
+            color: #8a7a5a;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .modifier-line span { color: #c8a850; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+        thead th {
+            background: #2a2010;
+            color: #c8a850;
+            padding: 0.55rem 1rem;
+            text-align: left;
+            font-weight: normal;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #3e3018;
+        }
+
+        thead th:first-child { width: 38%; }
+
+        tbody td {
+            padding: 0.48rem 1rem;
+            border-bottom: 1px solid #1e1b14;
+            color: #d0c090;
+        }
+
+        tbody tr:nth-child(even) td { background: #181510; }
+
+        .divider td {
+            padding: 0;
+            height: 1px;
+            background: #3e3018;
+        }
+
+        .stagger-yes  { color: #e06060; font-weight: bold; }
+        .stagger-block .stagger-kw { color: #e08830; }
+        .stagger-armor .stagger-kw { color: #6090e0; }
+        .stagger-kw   { font-weight: bold; text-decoration: underline; text-underline-offset: 2px; }
+        .stagger-no   { color: #60a060; }
+
+        /* ── Button row ── */
+        .btn-row { display: flex; gap: 0.8rem; margin-bottom: 2rem; }
+        .btn-row button[type="submit"] { flex: 1; margin-bottom: 0; }
+
+        #resetBtn {
+            background: #1e1510;
+            color: #c06060;
+            border: 1px solid #804040;
+            padding: 0.65rem 1.4rem;
+            font-size: 0.95rem;
+            font-family: inherit;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        #resetBtn:hover { background: #2a1a1a; }
+
+        /* ── History label field ── */
+        .label-field {
+            margin-top: 0.6rem;
+        }
+        .label-field label { color: #5a5040; }
+
+        /* ── Per-entry delete button ── */
+        .delete-btn {
+            background: none;
+            border: 1px solid #804040;
+            color: #c06060;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.78rem;
+            font-family: inherit;
+            cursor: pointer;
+            border-radius: 3px;
+            line-height: 1;
+            flex-shrink: 0;
+            transition: background 0.15s;
+        }
+        .delete-btn:hover { background: #2a1a1a; }
+
+        /* ── Damage pipeline summary ── */
+        .calc-summary {
+            background: #1a1710;
+            border: 1px solid #3e3018;
+            border-radius: 6px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .calc-summary h3 {
+            font-size: 0.72rem;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.7rem;
+        }
+
+        .pipeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .pipe-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+        }
+
+        .pipe-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 1px solid #c8a850;
+            color: #c8a850;
+            font-size: 0.62rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .pipe-text {
+            font-size: 0.78rem;
+            color: #8a7a5a;
+            line-height: 1.4;
+        }
+
+        .pipe-text strong { color: #d0c090; }
+
+
+        /* ── Raw damage summary ── */
+        .raw-summary {
+            font-size: 0.82rem;
+            color: #8a7a5a;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        .raw-summary span { color: #c8a850; }
+
+        /* ── History ── */
+        #history {
+            display: none;
+            background: #1e1b14;
+            border: 1px solid #3e3018;
+            border-radius: 6px;
+            padding: 1.2rem 1.4rem;
+            margin-top: 1.4rem;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3e3018;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .history-header h2 {
+            font-size: 0.8rem;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #clearHistoryBtn {
+            background: none;
+            border: 1px solid #804040;
+            color: #c06060;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            font-family: inherit;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.15s;
+        }
+        #clearHistoryBtn:hover { background: #2a1a1a; }
+
+        .history-entry {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2a2515;
+        }
+        .history-entry:last-child { border-bottom: none; }
+
+        .history-label {
+            flex: 1;
+            font-size: 0.78rem;
+            color: #8a7a5a;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-meta {
+            font-size: 0.72rem;
+            color: #5a5040;
+            white-space: nowrap;
+        }
+
+        .load-btn {
+            background: none;
+            border: 1px solid #c8a850;
+            color: #c8a850;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            font-family: inherit;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.15s;
+        }
+        .load-btn:hover { background: #2a2010; }
+
+        /* ── Inline tooltip ── */
+        .tip-wrap {
+            position: relative;
+            display: inline-block;
+        }
+        .tip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 1px solid #8a7a5a;
+            color: #8a7a5a;
+            font-size: 0.65rem;
+            line-height: 1;
+            cursor: help;
+            margin-left: 4px;
+            font-style: normal;
+            vertical-align: middle;
+        }
+        .tip-text {
+            visibility: hidden;
+            opacity: 0;
+            background: #2a2010;
+            color: #e0d0b0;
+            border: 1px solid #c8a850;
+            border-radius: 4px;
+            padding: 0.4rem 0.65rem;
+            font-size: 0.75rem;
+            white-space: normal;
+            width: 400px;
+            position: absolute;
+            z-index: 20;
+            bottom: 140%;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: opacity 0.15s;
+            pointer-events: none;
+            line-height: 1.4;
+        }
+        .tip-wrap:hover .tip-text,
+        .tip-wrap:focus-within .tip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <h1>⚔ Valheim Damage Taken Calculator</h1>
+
+    <div class="calc-summary">
+        <h3>How damage taken is calculated</h3>
+        <div class="pipeline">
+            <div class="pipe-step">
+                <span class="pipe-num">1</span>
+                <span class="pipe-text">Raw damage is scaled by difficulty &amp; star bonuses → <strong>Effective Damage</strong></span>
+            </div>
+            <div class="pipe-step">
+                <span class="pipe-num">2</span>
+                <span class="pipe-text">Effective damage is reduced by shield / blocking armor → <strong>Blocking-Reduced Damage</strong></span>
+            </div>
+            <div class="pipe-step">
+                <span class="pipe-num">3</span>
+                <span class="pipe-text">Remaining damage is reduced by body armor → <strong>Final Damage</strong></span>
+            </div>
+            <div class="pipe-step">
+                <span class="pipe-num">4</span>
+                <span class="pipe-text">Final damage is subtracted from Max Health → <strong>Remaining Health</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <form id="calcForm">
+        <div class="form-grid">
+
+            <div class="section">
+                <h2>Mob Stats</h2>
+                <div class="field">
+                    <label>Raw Damage (0 – 1000)</label>
+                    <input type="number" id="rawDamage" value="60" min="0" max="1000" step="0.1" required>
+                </div>
+                <div class="field">
+                    <label>Star Level — Physical +50% per star</label>
+                    <select id="starLevel">
+                        <option value="0">0★ — no bonus</option>
+                        <option value="1">1★ — Physical +50%</option>
+                        <option value="2">2★ — Physical +100%</option>
+                        <option value="3">3★ — Physical +150%</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Game Difficulty — Physical damage bonus</label>
+                    <select id="difficulty">
+                        <option value="NORMAL">Normal — no bonus</option>
+                        <option value="HARD">Hard — Physical +50%</option>
+                        <option value="VERY_HARD">Very Hard — Physical +100%</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Player Stats</h2>
+                <div class="field">
+                    <label>Max Health (0 – 1000)</label>
+                    <input type="number" id="maxHealth" value="100" min="0" max="1000" step="0.1" required>
+                </div>
+                <div class="field">
+                    <label>Blocking Skill (0 – 100)</label>
+                    <input type="number" id="blockingSkill" value="0" min="0" max="100" step="0.1" required>
+                </div>
+                <div class="field">
+                    <label>Blocking Armor (0 – 500)</label>
+                    <input type="number" id="blockingArmor" value="0" min="0" max="500" step="0.1" required>
+                </div>
+                <div class="field">
+                    <label>Armor (0 – 500)</label>
+                    <input type="number" id="armor" value="0" min="0" max="500" step="0.1" required>
+                </div>
+                <div class="field">
+                    <label>Parry Bonus — shield parry multiplier</label>
+                    <select id="parryBonus">
+                        <option value="X1">×1 — no bonus</option>
+                        <option value="X1_5" selected>×1.5</option>
+                        <option value="X2">×2</option>
+                        <option value="X2_5">×2.5</option>
+                        <option value="X4">×4</option>
+                        <option value="X6">×6</option>
+                    </select>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="btn-row">
+            <button type="submit">Calculate</button>
+            <button type="button" id="resetBtn">Reset</button>
+        </div>
+        <div class="field label-field">
+            <label for="entryLabel">History label (optional — leave empty for auto-label)</label>
+            <input type="text" id="entryLabel" placeholder="e.g. Fuling vs iron armour" maxlength="80">
+        </div>
+    </form>
+
+    <div id="error"></div>
+
+    <div id="results">
+        <p class="raw-summary" id="rawSummary"></p>
+        <p class="modifier-line" id="modifierLine"></p>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th id="col0"></th>
+                    <th id="col1"></th>
+                    <th id="col2"></th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+
+    <div id="history">
+        <div class="history-header">
+            <h2>Calculation History</h2>
+            <button type="button" id="clearHistoryBtn">Clear</button>
+        </div>
+        <div id="historyList"></div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { calculate } from './calculator-core.js';
+
+    /* ── Constants ── */
+    const DEFAULTS = {
+        rawDamage: 60, starLevel: 0, difficulty: 'NORMAL',
+        maxHealth: 100, blockingSkill: 0, blockingArmor: 0, armor: 0, parryBonus: 'X1_5',
+    };
+    const LS_FORM    = 'valheim-form';
+    const LS_HISTORY = 'valheim-history';
+    const MAX_HISTORY = 10;
+
+    const form      = document.getElementById('calcForm');
+    const errBox    = document.getElementById('error');
+    const results   = document.getElementById('results');
+    const historyEl = document.getElementById('history');
+
+    /* ── Form persistence ── */
+    function applyForm(values) {
+        document.getElementById('rawDamage').value       = values.rawDamage       ?? DEFAULTS.rawDamage;
+        document.getElementById('starLevel').value       = values.starLevel       ?? DEFAULTS.starLevel;
+        document.getElementById('difficulty').value      = values.difficulty      ?? DEFAULTS.difficulty;
+        document.getElementById('maxHealth').value       = values.maxHealth       ?? DEFAULTS.maxHealth;
+        document.getElementById('blockingSkill').value   = values.blockingSkill   ?? DEFAULTS.blockingSkill;
+        document.getElementById('blockingArmor').value   = values.blockingArmor   ?? DEFAULTS.blockingArmor;
+        document.getElementById('armor').value           = values.armor           ?? DEFAULTS.armor;
+        document.getElementById('parryBonus').value        = values.parryBonus        ?? DEFAULTS.parryBonus;
+    }
+
+    function collectInputs() {
+        return {
+            rawDamage:       parseFloat(document.getElementById('rawDamage').value),
+            starLevel:       parseInt(document.getElementById('starLevel').value, 10),
+            difficulty:      document.getElementById('difficulty').value,
+            maxHealth:       parseFloat(document.getElementById('maxHealth').value),
+            blockingSkill:   parseFloat(document.getElementById('blockingSkill').value),
+            blockingArmor:   parseFloat(document.getElementById('blockingArmor').value),
+            armor:           parseFloat(document.getElementById('armor').value),
+            parryBonus:      document.getElementById('parryBonus').value,
+        };
+    }
+
+    function saveForm() {
+        localStorage.setItem(LS_FORM, JSON.stringify(collectInputs()));
+    }
+
+    function resetForm() {
+        applyForm(DEFAULTS);
+        localStorage.removeItem(LS_FORM);
+        results.style.display = 'none';
+        errBox.style.display  = 'none';
+    }
+
+    // Restore saved form on load
+    try { applyForm(JSON.parse(localStorage.getItem(LS_FORM)) ?? {}); } catch { /* ignore */ }
+
+    form.addEventListener('input', saveForm);
+    document.getElementById('resetBtn').addEventListener('click', resetForm);
+
+    /* ── Submit ── */
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errBox.style.display = 'none';
+        const inputs = collectInputs();
+        try {
+            const data = await calculate(inputs);
+            render(data, inputs);
+            const customLabel = document.getElementById('entryLabel').value.trim();
+            pushHistory({ inputs, results: data, label: customLabel || compressLabel(inputs), timestamp: Date.now() });
+            document.getElementById('entryLabel').value = '';
+            renderHistory();
+        } catch (err) {
+            errBox.textContent = 'Error: ' + err.message;
+            errBox.style.display = 'block';
+            results.style.display = 'none';
+        }
+    });
+
+    /* ── History ── */
+    function loadHistory() {
+        try { return JSON.parse(localStorage.getItem(LS_HISTORY)) ?? []; } catch { return []; }
+    }
+
+    function pushHistory(entry) {
+        const history = loadHistory();
+        history.unshift(entry);
+        localStorage.setItem(LS_HISTORY, JSON.stringify(history.slice(0, MAX_HISTORY)));
+    }
+
+    function deleteHistory(index) {
+        const history = loadHistory();
+        history.splice(index, 1);
+        localStorage.setItem(LS_HISTORY, JSON.stringify(history));
+        renderHistory();
+    }
+
+    function compressLabel(inputs) {
+        const diffMap  = { NORMAL: 'Normal', HARD: 'Hard', VERY_HARD: 'Very Hard' };
+        const parryMap = { X1: '×1', X1_5: '×1.5', X2: '×2', X2_5: '×2.5', X4: '×4', X6: '×6' };
+        return [
+            `${inputs.rawDamage} dmg`,
+            `${inputs.starLevel}★`,
+            diffMap[inputs.difficulty] ?? inputs.difficulty,
+            `HP ${inputs.maxHealth}`,
+            `Armor ${inputs.armor}`,
+            `Block ${inputs.blockingArmor} / Skill ${inputs.blockingSkill}`,
+            `Parry ${parryMap[inputs.parryBonus] ?? inputs.parryBonus}`,
+        ].join(' · ');
+    }
+
+    function renderHistory() {
+        const history = loadHistory();
+        if (!history.length) { historyEl.style.display = 'none'; return; }
+        historyEl.style.display = 'block';
+        const list = document.getElementById('historyList');
+        list.innerHTML = history.map((entry, i) => `
+            <div class="history-entry">
+                <span class="history-label">${entry.label ?? compressLabel(entry.inputs)}</span>
+                <span class="history-meta">${new Date(entry.timestamp).toLocaleString()}</span>
+                <button class="load-btn" data-index="${i}">Load</button>
+                <button class="delete-btn" data-index="${i}" title="Delete entry">×</button>
+            </div>
+        `).join('');
+        list.querySelectorAll('.load-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const e = loadHistory()[parseInt(btn.dataset.index, 10)];
+                if (e) loadEntry(e);
+            });
+        });
+        list.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => deleteHistory(parseInt(btn.dataset.index, 10)));
+        });
+    }
+
+    function loadEntry(entry) {
+        applyForm(entry.inputs);
+        localStorage.setItem(LS_FORM, JSON.stringify(entry.inputs));
+        render(entry.results, entry.inputs);
+        errBox.style.display = 'none';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+        if (!confirm('Clear all calculation history?')) return;
+        localStorage.removeItem(LS_HISTORY);
+        renderHistory();
+    });
+
+    // Show any saved history on initial page load
+    renderHistory();
+
+    /* ── Rendering ── */
+    function fmt(n) { return Number(n).toFixed(3); }
+
+    function staggerState(s) {
+        if (s.stagger === 'ON_BLOCK') return '<span class="stagger-yes stagger-block">Staggered on <span class="stagger-kw">block</span></span>';
+        if (s.stagger === 'ON_ARMOR') return '<span class="stagger-yes stagger-armor">Staggered on <span class="stagger-kw">armor</span></span>';
+        return '<span class="stagger-no">Not staggered</span>';
+    }
+
+    function render(data, inputs) {
+        const scenarios = [data.noShield, data.block, data.parry];
+
+        // Column headers
+        document.getElementById('col0').textContent = data.noShield.scenarioName;
+        document.getElementById('col1').textContent = data.block.scenarioName;
+        document.getElementById('col2').textContent = data.parry.scenarioName;
+
+        // Base / effective raw damage — shared across all scenarios, now top-level on response
+        const base      = data.baseRawDamage;
+        const effective = data.effectiveRawDamage;
+
+        // Line 1 — damage modifier breakdown
+        const diffBonus  = { NORMAL: 0, HARD: 50, VERY_HARD: 100 }[inputs.difficulty] ?? 0;
+        const starBonus  = inputs.starLevel * 50;
+        const totalBonus = diffBonus + starBonus;
+        const parts      = [];
+        const diffLabel  = document.getElementById('difficulty').selectedOptions[0].text.split(' —')[0];
+        if (diffBonus) parts.push(`${diffLabel} +${diffBonus}%`);
+        if (starBonus) parts.push(`${inputs.starLevel}★ +${starBonus}%`);
+
+        document.getElementById('rawSummary').innerHTML = parts.length
+            ? `Damage modifier: <span>${parts.join(' | ')}  (+${totalBonus}% total)</span>`
+            : `No damage modifier`;
+
+        // Line 2 — effective damage calculation
+        document.getElementById('modifierLine').innerHTML = effective !== base
+            ? `Effective Damage = ${fmt(base)} → <span>${fmt(effective)}</span>`
+            : `Effective Damage = <span>${fmt(base)}</span>`;
+
+        // Per-scenario rows
+        const BLOCKING_TIP  = 'Remaining damage after the shield / blocking-armor reduction is applied to the effective (scaled) raw damage — before body armor is factored in.';
+        const FINAL_TIP     = 'The final damage after both the blocking and body-armor physical damage reductions have been applied to the raw damage.';
+        const mkTip = txt => `<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${txt}</span></span>`;
+        const STAGGER_TIP = 'Shows whether the player is staggered by the damage, and at which step of the physical damage reduction calculation the stagger occurred.';
+        const rows = [
+            { label: `Blocking-Reduced Damage ${mkTip(BLOCKING_TIP)}`,         fn: s => fmt(s.blockingReducedDamage) },
+            { label: `Final/Armor-Reduced Damage ${mkTip(FINAL_TIP)}`,         fn: s => fmt(s.finalReducedDamage)    },
+            { label: 'Remaining Health',  fn: s => fmt(s.remainingHealth) },
+            null,
+            { label: `Stagger ${mkTip(STAGGER_TIP)}`, fn: s => staggerState(s) },
+        ];
+
+        document.getElementById('tbody').innerHTML = rows.map(row => {
+            if (!row) return '<tr class="divider"><td colspan="4"></td></tr>';
+            const cells = scenarios.map(s => `<td>${row.fn(s)}</td>`).join('');
+            return `<tr><td>${row.label}</td>${cells}</tr>`;
+        }).join('');
+
+        results.style.display = 'block';
+    }
+</script>
+</body>
+</html>
+

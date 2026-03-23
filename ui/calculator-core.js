@@ -1,8 +1,9 @@
 /**
- * Core API client — the only layer that knows about the Java backend.
- * All calculation logic lives in DamageCalculator.java; this module is
- * purely a thin transport wrapper so the UI (and any future desktop shell)
- * has a single clean call to make.
+ * Core calculator bridge — the only layer the UI imports for calculations.
+ *
+ * Previously this was a thin fetch wrapper that POSTed to the Java backend.
+ * Now all game math runs client-side via damage-calculator.js, so the app
+ * can be served as pure static files with no backend.
  *
  * @param {Object} inputs
  * @param {number} inputs.rawDamage
@@ -17,18 +18,9 @@
  *
  * @returns {Promise<{noShield: DamageResult, block: DamageResult, parry: DamageResult}>}
  */
+import { calculate as calcLocal } from './damage-calculator.js';
+
 export async function calculate(inputs) {
-    const response = await fetch("http://localhost:8080/calculate", {
-        method:  "POST",
-        headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify(inputs),
-    });
-
-    if (!response.ok) {
-        const err = await response.json().catch(() => ({ error: response.statusText }));
-        throw new Error(err.error ?? "Calculation failed");
-    }
-
-    return response.json();
+    return calcLocal(inputs);
 }
 

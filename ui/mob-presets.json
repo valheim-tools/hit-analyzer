@@ -16,6 +16,32 @@
     "difficulty": "HARD",
     "extraDamagePercent": 0,
     "extraDamageEnabled": "no"
+  },
+  {
+    "id": "abomination-swing",
+    "label": "Abomination — Swing (60 Blunt)",
+    "rawDamage": 60,
+    "starLevel": 0,
+    "difficulty": "HARD",
+    "extraDamagePercent": 0,
+    "extraDamageEnabled": "no"
+  },
+  {
+    "id": "abomination-slam",
+    "label": "Abomination — Slam (80 Blunt)",
+    "rawDamage": 80,
+    "starLevel": 0,
+    "difficulty": "HARD",
+    "extraDamagePercent": 0,
+    "extraDamageEnabled": "no"
+  },
+  {
+    "id": "abomination-ground-slam",
+    "label": "Abomination — Ground Slam (80 Blunt)",
+    "rawDamage": 80,
+    "starLevel": 0,
+    "difficulty": "HARD",
+    "extraDamagePercent": 0,
+    "extraDamageEnabled": "no"
   }
 ]
-

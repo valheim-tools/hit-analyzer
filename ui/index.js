@@ -52,6 +52,34 @@ const resetBtnEl = document.getElementById('resetBtn');
 const clearHistoryBtnEl = document.getElementById('clearHistoryBtn');
 const mobPresetEl = document.getElementById('mobPreset');
 
+/* ── Tab DOM refs ── */
+const tabSimulatorEl   = document.getElementById('tab-simulator');
+const tabCalculatorEl  = document.getElementById('tab-calculator');
+
+function switchTab(name) {
+    const isSimulator = name === 'simulator';
+    tabSimulatorEl.hidden  = !isSimulator;
+    tabCalculatorEl.hidden = isSimulator;
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === name;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+}
+
+/* ── Hit Simulator DOM refs ── */
+const hitSimulatorEl      = document.getElementById('hitSimulator');
+const simTakeHitBtnEl     = document.getElementById('simTakeHitBtn');
+const simResetBtnEl       = document.getElementById('simResetBtn');
+const simClearLogBtnEl    = document.getElementById('simClearLogBtn');
+const simBarFillEl        = document.getElementById('simBarFill');
+const simHpCurrentEl      = document.getElementById('simHpCurrent');
+const simHpMaxEl          = document.getElementById('simHpMax');
+const simDeathIconEl      = document.getElementById('simDeathIcon');
+const simErrorEl          = document.getElementById('simError');
+const simLogEl            = document.getElementById('simLog');
+const simScenarioRadios   = () => document.querySelectorAll('input[name="simScenario"]');
+
 function sanitizeExtraDamagePercent(value, fallback = DEFAULTS.extraDamagePercent) {
     const parsed = Number(value);
     return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
@@ -165,6 +193,72 @@ function collectFormState() {
     };
 }
 
+/* ── Hit Simulator state ── */
+let simState = null; // { maxHealth, currentHp, hitCount }
+
+function getSelectedSimScenario() {
+    for (const radio of simScenarioRadios()) {
+        if (radio.checked) return radio.value;
+    }
+    return 'noShield';
+}
+
+const SIM_SCENARIO_LABELS = { noShield: 'No Shield', block: 'Block', parry: 'Parry' };
+
+/**
+ * Initialise (or re-initialise) the simulator from the current form values.
+ * Does NOT require Calculate to have been run first.
+ */
+function initHitSimulator() {
+    const maxHp = parseFloat(maxHealthEl.value) || 0;
+    simState = { maxHealth: maxHp, currentHp: maxHp, hitCount: 0 };
+    simLogEl.innerHTML = '';
+    simErrorEl.hidden = true;
+    renderHitSimulator();
+}
+
+function renderHitSimulator() {
+    if (!simState) return;
+    const { maxHealth, currentHp } = simState;
+    const isDead = currentHp <= 0;
+    const pct = maxHealth > 0 ? Math.max(0, (currentHp / maxHealth) * 100) : 0;
+
+    simHpMaxEl.textContent = fmt(maxHealth);
+    simHpCurrentEl.textContent = isDead ? '0.000' : fmt(currentHp);
+    simDeathIconEl.hidden = !isDead;
+
+    simBarFillEl.style.width = pct + '%';
+    simBarFillEl.classList.remove('sim-bar-warning', 'sim-bar-critical', 'sim-bar-dead');
+    if (isDead) {
+        simBarFillEl.classList.add('sim-bar-dead');
+    } else if (pct <= 20) {
+        simBarFillEl.classList.add('sim-bar-critical');
+    } else if (pct <= 50) {
+        simBarFillEl.classList.add('sim-bar-warning');
+    }
+
+    simTakeHitBtnEl.disabled = isDead;
+}
+
+function appendSimLogEntry(hitNum, scenarioKey, damage, hpAfter, staggered, rawHpAfter) {
+    const isDead = hpAfter <= 0;
+    const hpText = isDead
+        ? `<span class="sim-log-hp sim-log-dead tip-wrap">0.000 💀<span class="tip-text">${fmt(rawHpAfter)}</span></span>`
+        : `<span class="sim-log-hp">${fmt(hpAfter)} HP</span>`;
+    const staggerBadge = staggered ? `<span class="sim-log-stagger">⚠ Staggered</span>` : '';
+    const scenarioLabel = SIM_SCENARIO_LABELS[scenarioKey] ?? scenarioKey;
+
+    const li = document.createElement('li');
+    li.className = 'sim-log-entry';
+    li.innerHTML = `<span class="sim-log-hit-num">Hit #${hitNum}</span>`
+        + `<span class="sim-log-scenario">[${scenarioLabel}]</span>`
+        + `<span class="sim-log-dmg">−${fmt(damage)}</span>`
+        + hpText
+        + staggerBadge;
+    simLogEl.appendChild(li);
+    simLogEl.scrollTop = simLogEl.scrollHeight;
+}
+
 /* ── Form persistence ── */
 function applyForm(values) {
     rawDamageEl.value = values.rawDamage ?? DEFAULTS.rawDamage;
@@ -195,6 +289,7 @@ function resetForm() {
     errBox.style.display = 'none';
     formulaDetailsEl.hidden = true;
     formulaDetailsEl.open = false;
+    initHitSimulator();
 }
 
 function loadSavedForm(fallback = DEFAULTS) {
@@ -418,6 +513,7 @@ function render(data, inputs) {
 
     results.style.display = 'block';
     renderFormula(data, inputs);
+    initHitSimulator();
 }
 
 /* ── Formula breakdown ── */
@@ -637,7 +733,7 @@ function renderFormula(data, inputs) {
 async function initialize() {
     let presets = [];
     try {
-        const resp = await fetch('./mob-presets.json?v=2');
+        const resp = await fetch('./mob-presets.json?v=3');
         if (resp.ok) presets = await resp.json();
         populateMobPresets(presets);
     } catch (e) {
@@ -651,6 +747,8 @@ async function initialize() {
     loadSavedForm(firstVisitDefaults);
 
     form.addEventListener('input', saveForm);
+    form.addEventListener('input', initHitSimulator);
+    form.addEventListener('change', initHitSimulator);
     resetBtnEl.addEventListener('click', resetForm);
     extraDamageToggleEl.addEventListener('change', () => {
         if (extraDamageToggleEl.value === 'yes') {
@@ -699,7 +797,44 @@ async function initialize() {
         renderHistory();
     });
 
+    simTakeHitBtnEl.addEventListener('click', () => {
+        if (!simState || simState.currentHp <= 0) return;
+        simErrorEl.hidden = true;
+        try {
+            const data = calculate(collectInputs());
+            const key = getSelectedSimScenario();
+            const scenarioData = data[key];
+            const damage = scenarioData.finalReducedDamage;
+            const staggered = scenarioData.stagger === 'YES';
+            const rawHpAfter = simState.currentHp - damage;
+            simState.currentHp = Math.max(0, rawHpAfter);
+            simState.hitCount += 1;
+            appendSimLogEntry(simState.hitCount, key, damage, simState.currentHp, staggered, rawHpAfter);
+            renderHitSimulator();
+        } catch (e) {
+            simErrorEl.textContent = 'Error: ' + e.message;
+            simErrorEl.hidden = false;
+        }
+    });
+
+    simResetBtnEl.addEventListener('click', () => {
+        initHitSimulator();
+    });
+
+    simClearLogBtnEl.addEventListener('click', () => {
+        simLogEl.innerHTML = '';
+    });
+
+    simScenarioRadios().forEach(radio => {
+        radio.addEventListener('change', () => renderHitSimulator());
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
     renderHistory();
+    initHitSimulator();
 }
 
 initialize();

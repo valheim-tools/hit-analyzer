@@ -1,4 +1,4 @@
-het# AGENTS.md — Valheim Damage Calculator
+# AGENTS.md — Valheim Damage Calculator
 
 ## Architecture Overview
 
@@ -7,7 +7,7 @@ Two-layer application sharing a single damage model:
 - **Backend** (`src/main/java/valheim/calculator/`): Java 21 fat-jar with **two runtime modes**:
   - `--server` flag → `web.WebServer` starts a `com.sun.net.httpserver.HttpServer` on port 8080 (no Spring, no Jakarta EE — JDK built-in only)
   - No flag → interactive console via `InputReader`
-- **Frontend** (`ui/`): Plain HTML + vanilla JS (`index.html`, `calculator-core.js`). Served as static files from the `ui/` directory by `WebServer`. Uses ES module `export` — no bundler.
+- **Frontend** (`ui/`): Plain HTML + vanilla JS/CSS (`index.html`, `index.js`, `index.css`, `calculator-core.js`). Served as static files from the `ui/` directory by `WebServer`. Uses ES module `export` — no bundler.
 
 All calculation logic lives exclusively in `core/DamageCalculator.java`. The web handler (`web/CalculateHandler`) and console (`Main`) are thin wrappers around it.
 
@@ -46,6 +46,8 @@ java -jar target\valheim-damage-calculator-1.0-SNAPSHOT.jar --server
 ```
 
 > `launch.ps1` **must be run from the project root** — `WebServer` resolves static files relative to `ui/` from the JVM working directory.
+
+> Be pragmatic: do not overthink straightforward changes. Make the sensible edit, stage the relevant files, use a simple commit message, and push once the change is verified.
 
 ## Damage Pipeline
 
@@ -108,6 +110,9 @@ Tests are data-driven via `src/test/resources/damage-calculator-test-cases.json`
 | `web/CalculateResponse.java` | HTTP response record wrapping 3 `DamageResult`s |
 | `console/InputReader.java` | Prompts + validation for interactive console mode |
 | `console/ResultPrinter.java` | Formats and logs the three-scenario results table |
+| `ui/index.html` | Main static UI markup |
+| `ui/index.css` | Calculator page styling |
+| `ui/index.js` | Calculator page behavior and rendering |
 | `ui/calculator-core.js` | Sole frontend-to-backend bridge (`fetch` POST to `/calculate`) |
 | `damage-calculator-test-cases.json` | All test fixtures — extend here first |
 

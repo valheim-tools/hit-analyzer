@@ -53,7 +53,7 @@ effectiveRawDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5 + extr
                      ← bonuses are ADDITIVE, not multiplicative
 ```
 
-Armor reduction formula (used for both blocking and body armor phases):
+Armor reduction formula (used for both block and body armor phases):
 - If `armor < damage / 2` → `reduced = damage − armor`
 - Else → `reduced = damage² / (armor × 4)`
 
@@ -77,7 +77,7 @@ Tests are data-driven via `ui/test-cases.json`. To add a new scenario, add a JSO
 {
   "name": "descriptive label shown in test output",
   "mob":    { "rawDamage": 60.0, "starLevel": 1 },
-  "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockingArmor": 20.0, "armor": 30.0, "parryMultiplier": 1.5 },
+  "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 20.0, "armor": 30.0, "parryMultiplier": 1.5 },
   "difficulty": "HARD",
   "useShield": true,
   "isParry": false,

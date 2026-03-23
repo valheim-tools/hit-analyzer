@@ -44,6 +44,12 @@ h1 {
     margin-bottom: 1rem;
 }
 
+.preset-row {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #3a3424;
+}
+
 .field { margin-bottom: 0.8rem; }
 .field:last-child { margin-bottom: 0; }
 

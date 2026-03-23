@@ -1,4 +1,4 @@
-import { calculate } from './damage-calculator.js?v=3';
+import { calculate } from './damage-calculator.js?v=4';
 
 /* ── Constants ── */
 const DEFAULTS = Object.freeze({
@@ -50,6 +50,7 @@ const parryCustomFieldEl = document.getElementById('customParryMultiplierField')
 const parryCustomInputEl = document.getElementById('parryMultiplier');
 const resetBtnEl = document.getElementById('resetBtn');
 const clearHistoryBtnEl = document.getElementById('clearHistoryBtn');
+const mobPresetEl = document.getElementById('mobPreset');
 
 function sanitizeExtraDamagePercent(value, fallback = DEFAULTS.extraDamagePercent) {
     const parsed = Number(value);
@@ -196,12 +197,33 @@ function resetForm() {
     formulaDetailsEl.open = false;
 }
 
-function loadSavedForm() {
+function loadSavedForm(fallback = DEFAULTS) {
     try {
-        applyForm(JSON.parse(localStorage.getItem(LS_FORM)) ?? {});
+        const saved = JSON.parse(localStorage.getItem(LS_FORM));
+        applyForm(saved ?? fallback);
     } catch {
-        applyForm(DEFAULTS);
+        applyForm(fallback);
     }
+}
+
+/* ── Mob presets ── */
+function extractMobFields(preset) {
+    return {
+        rawDamage:          preset.rawDamage,
+        starLevel:          preset.starLevel,
+        difficulty:         preset.difficulty,
+        extraDamagePercent: preset.extraDamagePercent ?? 0,
+        extraDamageEnabled: preset.extraDamageEnabled ?? 'no',
+    };
+}
+
+function populateMobPresets(presets) {
+    presets.forEach(preset => {
+        const option = document.createElement('option');
+        option.value = preset.id;
+        option.textContent = preset.label;
+        mobPresetEl.appendChild(option);
+    });
 }
 
 /* ── Submit ── */
@@ -612,8 +634,21 @@ function renderFormula(data, inputs) {
     formulaDetailsEl.open = true;
 }
 
-function initialize() {
-    loadSavedForm();
+async function initialize() {
+    let presets = [];
+    try {
+        const resp = await fetch('./mob-presets.json?v=1');
+        if (resp.ok) presets = await resp.json();
+        populateMobPresets(presets);
+    } catch (e) {
+        console.warn('Failed to load mob-presets.json', e);
+    }
+
+    const trollVertical = presets.find(p => p.id === 'troll-log-vertical');
+    const firstVisitDefaults = trollVertical
+        ? { ...DEFAULTS, ...extractMobFields(trollVertical) }
+        : DEFAULTS;
+    loadSavedForm(firstVisitDefaults);
 
     form.addEventListener('input', saveForm);
     resetBtnEl.addEventListener('click', resetForm);
@@ -649,10 +684,17 @@ function initialize() {
         }
         saveForm();
     });
-    clearHistoryBtnEl.addEventListener('click', () => {
-        if (!confirm('Clear all calculation history?')) {
-            return;
+    mobPresetEl.addEventListener('change', () => {
+        const selectedId = mobPresetEl.value;
+        if (!selectedId) return;
+        const preset = presets.find(p => p.id === selectedId);
+        if (preset) {
+            applyForm({ ...collectFormState(), ...extractMobFields(preset) });
+            saveForm();
         }
+        mobPresetEl.value = '';
+    });
+    clearHistoryBtnEl.addEventListener('click', () => {
         localStorage.removeItem(LS_HISTORY);
         renderHistory();
     });

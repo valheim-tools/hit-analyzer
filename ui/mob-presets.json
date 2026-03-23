@@ -1,0 +1,21 @@
+[
+  {
+    "id": "troll-log-vertical",
+    "label": "Troll — Log Slam (Vertical)",
+    "rawDamage": 70,
+    "starLevel": 0,
+    "difficulty": "NORMAL",
+    "extraDamagePercent": 0,
+    "extraDamageEnabled": "no"
+  },
+  {
+    "id": "troll-log-horizontal",
+    "label": "Troll — Log Swing (Horizontal)",
+    "rawDamage": 60,
+    "starLevel": 0,
+    "difficulty": "NORMAL",
+    "extraDamagePercent": 0,
+    "extraDamageEnabled": "no"
+  }
+]
+

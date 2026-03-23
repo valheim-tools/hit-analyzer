@@ -11,29 +11,6 @@
 
     <h1>⚔ Valheim Damage Taken Calculator</h1>
 
-    <div class="calc-summary">
-        <h3>How damage taken is calculated</h3>
-        <p class="damage-note">Damage refers to the maximum amount of damage a mob can deal. In reality, mob damage varies within a range rather than being a fixed value. Stagger is only applied by <span class="tip-wrap tip-underlined">physical<span class="tip-text">Blunt, Pierce, Slash</span></span> and/or lightning damage.</p>
-        <div class="pipeline">
-            <div class="pipe-step">
-                <span class="pipe-num">1</span>
-                <span class="pipe-text">Raw damage is scaled by difficulty, star &amp; extra damage bonuses → <strong>Effective Damage</strong></span>
-            </div>
-            <div class="pipe-step">
-                <span class="pipe-num">2</span>
-                <span class="pipe-text">Effective damage is reduced by block armor → <strong>Block-Reduced Damage</strong></span>
-            </div>
-            <div class="pipe-step">
-                <span class="pipe-num">3</span>
-                <span class="pipe-text">Block reduced damage is reduced by body armor → <strong>Final Damage</strong></span>
-            </div>
-            <div class="pipe-step">
-                <span class="pipe-num">4</span>
-                <span class="pipe-text">Final damage is subtracted from Max Health → <strong>Remaining Health</strong></span>
-            </div>
-        </div>
-    </div>
-
     <form id="calcForm">
         <div class="form-grid">
 
@@ -118,46 +95,122 @@
             </div>
 
         </div>
+    </form>
+
+    <nav class="tab-nav" role="tablist">
+        <button class="tab-btn active" data-tab="simulator" role="tab" aria-selected="true">⚔ Hit Simulator</button>
+        <button class="tab-btn" data-tab="calculator" role="tab" aria-selected="false">Damage Calculator</button>
+    </nav>
+
+    <!-- ── Tab: Hit Simulator ── -->
+    <div id="tab-simulator" class="tab-panel">
+        <div id="hitSimulator">
+            <div class="sim-header">
+                <h2>⚔ Hit Simulator</h2>
+                <button type="button" id="simResetBtn">Reset HP</button>
+            </div>
+
+            <div class="sim-main-row">
+                <div class="sim-scenario-row">
+                    <label class="sim-radio-label">
+                        <input type="radio" name="simScenario" value="noShield" checked> No Shield
+                    </label>
+                    <label class="sim-radio-label">
+                        <input type="radio" name="simScenario" value="block"> Block
+                    </label>
+                    <label class="sim-radio-label">
+                        <input type="radio" name="simScenario" value="parry"> Parry
+                    </label>
+                </div>
+                <div class="sim-health-section">
+                    <div class="sim-bar-track">
+                        <div class="sim-bar-fill" id="simBarFill"></div>
+                    </div>
+                    <div class="sim-hp-readout">
+                        <span id="simHpCurrent"></span><span class="sim-hp-sep"> / </span><span id="simHpMax"></span><span class="sim-hp-label"> HP</span>
+                        <span id="simDeathIcon" hidden> 💀</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="simError" class="sim-error" hidden></div>
+
+            <button type="button" id="simTakeHitBtn" class="sim-take-hit-btn">Take Hit</button>
+
+            <div class="sim-log-header">
+                <span class="sim-log-title">Hit Log</span>
+                <button type="button" id="simClearLogBtn">Clear Log</button>
+            </div>
+            <ul id="simLog" class="sim-log"></ul>
+        </div>
+    </div>
+
+    <!-- ── Tab: Damage Calculator ── -->
+    <div id="tab-calculator" class="tab-panel" hidden>
+
+        <div class="calc-summary">
+            <h3>How damage taken is calculated</h3>
+            <p class="damage-note">Damage refers to the maximum amount of damage a mob can deal. In reality, mob damage varies within a range rather than being a fixed value. Stagger is only applied by <span class="tip-wrap tip-underlined">physical<span class="tip-text">Blunt, Pierce, Slash</span></span> and/or lightning damage.</p>
+            <div class="pipeline">
+                <div class="pipe-step">
+                    <span class="pipe-num">1</span>
+                    <span class="pipe-text">Raw damage is scaled by difficulty, star &amp; extra damage bonuses → <strong>Effective Damage</strong></span>
+                </div>
+                <div class="pipe-step">
+                    <span class="pipe-num">2</span>
+                    <span class="pipe-text">Effective damage is reduced by block armor → <strong>Block-Reduced Damage</strong></span>
+                </div>
+                <div class="pipe-step">
+                    <span class="pipe-num">3</span>
+                    <span class="pipe-text">Block reduced damage is reduced by body armor → <strong>Final Damage</strong></span>
+                </div>
+                <div class="pipe-step">
+                    <span class="pipe-num">4</span>
+                    <span class="pipe-text">Final damage is subtracted from Max Health → <strong>Remaining Health</strong></span>
+                </div>
+            </div>
+        </div>
 
         <div class="btn-row">
-            <button type="submit">Calculate</button>
+            <button type="submit" form="calcForm">Calculate Damage Taken</button>
             <button type="button" id="resetBtn">Reset</button>
         </div>
         <div class="field label-field">
             <label for="entryLabel">History label (optional — leave empty for auto-label)</label>
             <input type="text" id="entryLabel" placeholder="e.g. Fuling vs iron armour" maxlength="80">
         </div>
-    </form>
 
-    <div id="error"></div>
+        <div id="error"></div>
 
-    <div id="results">
-        <p class="raw-summary" id="rawSummary"></p>
-        <p class="modifier-line" id="modifierLine"></p>
-        <table>
-            <thead>
-                <tr>
-                    <th></th>
-                    <th id="col0"></th>
-                    <th id="col1"></th>
-                    <th id="col2"></th>
-                </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-        </table>
-    </div>
-
-    <details id="formulaDetails" class="formula-details" hidden>
-        <summary class="formula-toggle">Step-by-step formula with values</summary>
-        <div class="formula-body" id="formula"></div>
-    </details>
-
-    <div id="history">
-        <div class="history-header">
-            <h2>Calculation History</h2>
-            <button type="button" id="clearHistoryBtn">Clear</button>
+        <div id="results">
+            <p class="raw-summary" id="rawSummary"></p>
+            <p class="modifier-line" id="modifierLine"></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th id="col0"></th>
+                        <th id="col1"></th>
+                        <th id="col2"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+            </table>
         </div>
-        <div id="historyList"></div>
+
+        <details id="formulaDetails" class="formula-details" hidden>
+            <summary class="formula-toggle">Step-by-step formula with values</summary>
+            <div class="formula-body" id="formula"></div>
+        </details>
+
+        <div id="history">
+            <div class="history-header">
+                <h2>Calculation History</h2>
+                <button type="button" id="clearHistoryBtn">Clear</button>
+            </div>
+            <div id="historyList"></div>
+        </div>
+
     </div>
 
 </div>

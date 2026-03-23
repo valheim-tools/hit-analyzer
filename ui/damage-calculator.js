@@ -66,8 +66,8 @@ function calculateStaggerBar(maxHealth) {
     return 0.40 * maxHealth;
 }
 
-function calculateBlockingArmor(blockingSkill, blockingArmor, parryMultiplier) {
-    return (blockingSkill * 0.005 * blockingArmor + blockingArmor) * parryMultiplier;
+function calculateBlockArmor(blockingSkill, blockArmor, parryMultiplier) {
+    return (blockingSkill * 0.005 * blockArmor + blockArmor) * parryMultiplier;
 }
 
 function applyArmorReduction(damage, armor) {
@@ -83,29 +83,29 @@ function calculateScenario(player, mob, difficulty, useShield, isParry) {
     const effectiveRawDamage = mob.effectiveRawDamage;
     const staggerBar = calculateStaggerBar(player.maxHealth);
 
-    // --- Blocking phase ---
-    let blockingReducedDamage = effectiveRawDamage;
+    // --- Block phase ---
+    let blockReducedDamage = effectiveRawDamage;
     let staggeredOnBlock = false;
     let bindingStaggerDamage = 0;
 
     if (useShield) {
         const parryMultiplier = isParry ? player.parryMultiplier : 1.0;
-        const effectiveBlockArmor = calculateBlockingArmor(
-            player.blockingSkill, player.blockingArmor, parryMultiplier);
+        const effectiveBlockArmor = calculateBlockArmor(
+            player.blockingSkill, player.blockArmor, parryMultiplier);
 
         const afterBlock = applyArmorReduction(effectiveRawDamage, effectiveBlockArmor);
         bindingStaggerDamage = afterBlock;
 
         if (afterBlock > staggerBar) {
-            blockingReducedDamage = effectiveRawDamage;
+            blockReducedDamage = effectiveRawDamage;
             staggeredOnBlock = true;
         } else {
-            blockingReducedDamage = afterBlock;
+            blockReducedDamage = afterBlock;
         }
     }
 
     // --- Armor phase ---
-    const afterArmor = applyArmorReduction(blockingReducedDamage, player.armor);
+    const afterArmor = applyArmorReduction(blockReducedDamage, player.armor);
     if (!useShield) {
         bindingStaggerDamage = afterArmor;
     }
@@ -127,7 +127,7 @@ function calculateScenario(player, mob, difficulty, useShield, isParry) {
 
     return {
         scenarioName,
-        blockingReducedDamage,
+        blockReducedDamage,
         finalReducedDamage: afterArmor,
         remainingHealth,
         stagger,
@@ -199,7 +199,7 @@ export function calculate(inputs) {
     const player = {
         maxHealth:     Number(inputs.maxHealth),
         blockingSkill: Number(inputs.blockingSkill),
-        blockingArmor: Number(inputs.blockingArmor),
+        blockArmor: Number(inputs.blockArmor),
         armor:         Number(inputs.armor),
         parryMultiplier,
     };
@@ -217,4 +217,3 @@ export function calculate(inputs) {
         parry,
     };
 }
-

@@ -39,7 +39,7 @@ for (const tc of cases) {
         difficulty:         tc.difficulty,
         maxHealth:          tc.player.maxHealth,
         blockingSkill:      tc.player.blockingSkill,
-        blockingArmor:      tc.player.blockingArmor,
+        blockArmor:         tc.player.blockArmor,
         armor:              tc.player.armor,
     };
 
@@ -69,7 +69,7 @@ for (const tc of cases) {
     const checks = [
         approxEqual(data.baseRawDamage,             exp.baseRawDamage,           'baseRawDamage'),
         approxEqual(data.effectiveRawDamage,         exp.effectiveRawDamage,      'effectiveRawDamage'),
-        approxEqual(result.blockingReducedDamage,    exp.blockingReducedDamage,   'blockingReducedDamage'),
+        approxEqual(result.blockReducedDamage,    exp.blockReducedDamage,   'blockReducedDamage'),
         approxEqual(result.finalReducedDamage,       exp.finalReducedDamage,      'finalReducedDamage'),
         approxEqual(result.remainingHealth,           exp.remainingHealth,         'remainingHealth'),
     ];

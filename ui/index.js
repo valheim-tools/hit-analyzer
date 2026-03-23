@@ -7,7 +7,7 @@ const DEFAULTS = Object.freeze({
     difficulty: 'NORMAL',
     maxHealth: 100,
     blockingSkill: 0,
-    blockingArmor: 0,
+    blockArmor: 0,
     armor: 0,
     parryMultiplier: 1.5,
     extraDamagePercent: 0,
@@ -40,7 +40,7 @@ const starLevelEl = document.getElementById('starLevel');
 const difficultyEl = document.getElementById('difficulty');
 const maxHealthEl = document.getElementById('maxHealth');
 const blockingSkillEl = document.getElementById('blockingSkill');
-const blockingArmorEl = document.getElementById('blockingArmor');
+const blockArmorEl = document.getElementById('blockArmor');
 const armorEl = document.getElementById('armor');
 const extraDamageToggleEl = document.getElementById('extraDamageEnabled');
 const extraDamageFieldEl = document.getElementById('customExtraDamageField');
@@ -157,7 +157,7 @@ function collectFormState() {
         difficulty: difficultyEl.value,
         maxHealth: parseFloat(maxHealthEl.value),
         blockingSkill: parseFloat(blockingSkillEl.value),
-        blockingArmor: parseFloat(blockingArmorEl.value),
+        blockArmor: parseFloat(blockArmorEl.value),
         armor: parseFloat(armorEl.value),
         parryMultiplier: getParryMultiplierFromUi(),
         parryMultiplierMode: parryPresetEl.value === 'custom' ? 'custom' : 'preset',
@@ -172,7 +172,7 @@ function applyForm(values) {
     difficultyEl.value = values.difficulty ?? DEFAULTS.difficulty;
     maxHealthEl.value = values.maxHealth ?? DEFAULTS.maxHealth;
     blockingSkillEl.value = values.blockingSkill ?? DEFAULTS.blockingSkill;
-    blockingArmorEl.value = values.blockingArmor ?? DEFAULTS.blockingArmor;
+    blockArmorEl.value = values.blockArmor ?? DEFAULTS.blockArmor;
     armorEl.value = values.armor ?? DEFAULTS.armor;
     syncParryMultiplierUi(values);
 }
@@ -262,7 +262,7 @@ function compressLabel(inputs) {
         diffMap[inputs.difficulty] ?? inputs.difficulty,
         `HP ${inputs.maxHealth}`,
         `Armor ${inputs.armor}`,
-        `Block ${inputs.blockingArmor} / Skill ${inputs.blockingSkill}`,
+        `Block ${inputs.blockArmor} / Skill ${inputs.blockingSkill}`,
         `Parry ${formatParryMultiplier(resolveParryMultiplierValue(inputs))}`,
     ].filter(Boolean).join(' · ');
 }
@@ -315,7 +315,7 @@ function staggerState(scenario) {
     if (scenario.stagger === 'YES') {
         const isShielded = scenario.scenarioName === 'Block' || scenario.scenarioName === 'Parry';
         if (isShielded) {
-            return '<span class="stagger-yes">yes<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">-> Blocking damage reduction was not applied.</span></span></span>';
+            return '<span class="stagger-yes">yes<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">-> Block armor damage reduction was not applied.</span></span></span>';
         }
         return '<span class="stagger-yes">yes</span>';
     }
@@ -356,11 +356,11 @@ function render(data, inputs) {
         ? `Effective Damage = ${fmt(base)} → <span>${fmt(effective)}</span>`
         : `Effective Damage = <span>${fmt(base)}</span>`;
 
-    const BLOCK_TIP = 'Remaining damage after the block armor reduction is applied to the effective raw damage — before body armor is factored in.';
+    const BLOCK_TIP = 'Remaining damage after the block armor DMG reduction is applied to the effective raw damage — before body armor is factored in.';
     const FINAL_TIP = 'The final damage after the body armor damage reduction is applied to the block reduced damage.';
     const mkTip = text => `<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${text}</span></span>`;
     const rows = [
-        { label: `Block-Reduced Damage ${mkTip(BLOCK_TIP)}`, fn: scenario => fmt(scenario.blockingReducedDamage) },
+        { label: `Block-Reduced Damage ${mkTip(BLOCK_TIP)}`, fn: scenario => fmt(scenario.blockReducedDamage) },
         { label: `Final/Armor-Reduced Damage ${mkTip(FINAL_TIP)}`, fn: scenario => fmt(scenario.finalReducedDamage) },
         {
             label: 'Remaining Health',
@@ -457,7 +457,7 @@ function renderFormula(data, inputs) {
 
     const bonusStr = `1 + ${diffBonus} + ${starBonus} + (${fmt(extraDamagePercent)} ÷ 100)`;
     const step1Html = `
-        <div class="f-shared-label">${stepLabelContent('Step 1 — ', 'Effective Damage')}
+        <div class="f-shared-label">${stepLabelContent('1 — ', 'Effective Damage')}
             <span class="f-shared-note">(all scenarios)</span>
         </div>
         <div class="f-eq">${fmt(raw)} × (${bonusStr}) = ${fmt(raw)} × ${fmt(totalMult)} = ${hoverResult(
@@ -468,29 +468,29 @@ function renderFormula(data, inputs) {
     function buildCol(scenario, scenarioData) {
         const isShield = scenario !== 'noShield';
         const isParry = scenario === 'parry';
-        const effBA = isShield ? inputs.blockingArmor * skillFactor * (isParry ? parryMult : 1) : 0;
+        const effBA = isShield ? inputs.blockArmor * skillFactor * (isParry ? parryMult : 1) : 0;
 
         let step2;
         if (!isShield) {
             step2 = `<div class="f-step">
-                ${stepLabel('Step 2 — ', 'Effective Block Armor')}
+                ${stepLabel('2 — ', 'Effective Block Armor')}
                 <div class="f-skipped">No shield — step skipped</div>
             </div>`;
         } else {
             const parryLine = isParry
-                ? `<div class="f-eq">${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} × ${parryMult} = ${hoverResult(
+                ? `<div class="f-eq">${fmt(inputs.blockArmor)} × ${fmt(skillFactor)} × ${parryMult} = ${hoverResult(
                     fmt(effBA),
-                    `effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill) × parryMultiplier<br>${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) × ${parryMult} = ${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} × ${parryMult} = ${fmt(effBA)}`
+                    `effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill) × parryMultiplier<br>${fmt(inputs.blockArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) × ${parryMult} = ${fmt(inputs.blockArmor)} × ${fmt(skillFactor)} × ${parryMult} = ${fmt(effBA)}`
                 )}</div>`
-                : `<div class="f-eq">${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} = ${hoverResult(
+                : `<div class="f-eq">${fmt(inputs.blockArmor)} × ${fmt(skillFactor)} = ${hoverResult(
                     fmt(effBA),
-                    `effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill)<br>${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) = ${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} = ${fmt(effBA)}`
+                    `effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill)<br>${fmt(inputs.blockArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) = ${fmt(inputs.blockArmor)} × ${fmt(skillFactor)} = ${fmt(effBA)}`
                 )}</div>`;
             const formulaLine = isParry
-                ? `<div class="f-eq">${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) × ${parryMult}</div>${parryLine}`
-                : `<div class="f-eq">${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill})</div>${parryLine}`;
+                ? `<div class="f-eq">${fmt(inputs.blockArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) × ${parryMult}</div>${parryLine}`
+                : `<div class="f-eq">${fmt(inputs.blockArmor)} × (1 + 0.005 × ${inputs.blockingSkill})</div>${parryLine}`;
             step2 = `<div class="f-step">
-                ${stepLabel('Step 2 — ', 'Effective Block Armor')}
+                ${stepLabel('2 — ', 'Effective Block Armor')}
                 ${formulaLine}
             </div>`;
         }
@@ -498,7 +498,7 @@ function renderFormula(data, inputs) {
         let step3;
         if (!isShield) {
             step3 = `<div class="f-step">
-                ${stepLabel('Step 3 — ', 'Block Reduction')}
+                ${stepLabel('3 — ', 'Block Armor DMG Reduction')}
                 <div class="f-skipped">No shield — step skipped</div>
             </div>`;
         } else {
@@ -528,8 +528,8 @@ function renderFormula(data, inputs) {
                     <div class="f-eq">${compared}</div>
                     ${staggerWarning(`Compared to stagger threshold: block-reduced damage ${fmt(afterBlock)} &gt; ${fmt(staggerBar)} (= 40% of ${fmt(inputs.maxHealth)} max health) → block bypassed.`)}
                     <div class="f-eq">After Block → ${hoverResult(
-                        fmt(scenarioData.blockingReducedDamage),
-                        'The player was staggered, so blocking armor reduction was not applied.'
+                        fmt(scenarioData.blockReducedDamage),
+                        'The player was staggered, so block armor DMG reduction was not applied.'
                     )}</div>`;
             } else if (blockLinear) {
                 body = `${check}
@@ -546,32 +546,32 @@ function renderFormula(data, inputs) {
             }
 
             step3 = `<div class="f-step">
-                ${stepLabel('Step 3 — ', 'Block Reduction')}
+                ${stepLabel('3 — ', 'Block Armor DMG Reduction')}
                 ${body}
             </div>`;
         }
 
-        const { isLinear: armorLinear } = armorBranch(scenarioData.blockingReducedDamage, inputs.armor);
-        const halfBlock = scenarioData.blockingReducedDamage / 2;
+        const { isLinear: armorLinear } = armorBranch(scenarioData.blockReducedDamage, inputs.armor);
+        const halfBlock = scenarioData.blockReducedDamage / 2;
         const armorYesNo = inputs.armor < halfBlock ? 'YES' : 'NO';
         const armorBranchName = armorLinear ? 'linear' : 'quadratic';
-        const armorCheck = `<div class="f-branch-check">${fmt(inputs.armor)} &lt; ${fmt(scenarioData.blockingReducedDamage)} ÷ 2 (= ${fmt(halfBlock)})? ${hoverDecision(
+        const armorCheck = `<div class="f-branch-check">${fmt(inputs.armor)} &lt; ${fmt(scenarioData.blockReducedDamage)} ÷ 2 (= ${fmt(halfBlock)})? ${hoverDecision(
             `${armorYesNo} → ${armorBranchName}`,
-            thresholdTooltip('armor', 'blockReducedDamage', inputs.armor, scenarioData.blockingReducedDamage, armorLinear)
+            thresholdTooltip('armor', 'blockReducedDamage', inputs.armor, scenarioData.blockReducedDamage, armorLinear)
         )}</div>`;
 
         let armorBody;
         if (armorLinear) {
             armorBody = `${armorCheck}
-                <div class="f-eq">${fmt(scenarioData.blockingReducedDamage)} − ${fmt(inputs.armor)} = ${hoverResult(
+                <div class="f-eq">${fmt(scenarioData.blockReducedDamage)} − ${fmt(inputs.armor)} = ${hoverResult(
                     fmt(scenarioData.finalReducedDamage),
-                    `finalDamage = blockReducedDamage − armor<br>${fmt(scenarioData.blockingReducedDamage)} − ${fmt(inputs.armor)} = ${fmt(scenarioData.finalReducedDamage)}`
+                    `finalDamage = blockReducedDamage − armor<br>${fmt(scenarioData.blockReducedDamage)} − ${fmt(inputs.armor)} = ${fmt(scenarioData.finalReducedDamage)}`
                 )}</div>`;
         } else {
             armorBody = `${armorCheck}
-                <div class="f-eq">${fmt(scenarioData.blockingReducedDamage)}² ÷ (${fmt(inputs.armor)} × 4) = ${hoverResult(
+                <div class="f-eq">${fmt(scenarioData.blockReducedDamage)}² ÷ (${fmt(inputs.armor)} × 4) = ${hoverResult(
                     fmt(scenarioData.finalReducedDamage),
-                    `finalDamage = blockReducedDamage² ÷ (armor × 4)<br>${fmt(scenarioData.blockingReducedDamage)}² ÷ (${fmt(inputs.armor)} × 4) = ${fmt(scenarioData.finalReducedDamage)}`
+                    `finalDamage = blockReducedDamage² ÷ (armor × 4)<br>${fmt(scenarioData.blockReducedDamage)}² ÷ (${fmt(inputs.armor)} × 4) = ${fmt(scenarioData.finalReducedDamage)}`
                 )}</div>`;
         }
 
@@ -581,12 +581,12 @@ function renderFormula(data, inputs) {
         }
 
         const step4 = `<div class="f-step">
-            ${stepLabel('Step 4 — ', 'Body Armor Reduction')}
+            ${stepLabel('4 — ', 'Body Armor DMG Reduction')}
             ${armorBody}
         </div>`;
 
         const step5 = `<div class="f-step">
-            ${stepLabel('Step 5 — ', 'Remaining Health')}
+            ${stepLabel('5 — ', 'Remaining Health')}
             <div class="f-eq">${fmt(inputs.maxHealth)} − ${fmt(scenarioData.finalReducedDamage)} = ${hoverResult(
                 fmt(scenarioData.remainingHealth),
                 `remainingHealth = maxHealth − finalDamage<br>${fmt(inputs.maxHealth)} − ${fmt(scenarioData.finalReducedDamage)} = ${fmt(scenarioData.remainingHealth)}`,

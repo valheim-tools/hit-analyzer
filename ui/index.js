@@ -1,4 +1,4 @@
-import { calculate } from './damage-calculator.js';
+import { calculate } from './damage-calculator.js?v=2';
 
 /* ── Constants ── */
 const DEFAULTS = Object.freeze({

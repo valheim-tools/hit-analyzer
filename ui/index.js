@@ -5,11 +5,11 @@ const DEFAULTS = Object.freeze({
     rawDamage: 60,
     starLevel: 0,
     difficulty: 'NORMAL',
-    maxHealth: 100,
-    blockingSkill: 0,
-    blockArmor: 0,
-    armor: 0,
-    parryMultiplier: 1.5,
+    maxHealth: 120,
+    blockingSkill: 15,
+    blockArmor: 28,
+    armor: 45,
+    parryMultiplier: 2.5,
     extraDamagePercent: 0,
     extraDamageEnabled: 'no',
 });
@@ -637,7 +637,7 @@ function renderFormula(data, inputs) {
 async function initialize() {
     let presets = [];
     try {
-        const resp = await fetch('./mob-presets.json?v=1');
+        const resp = await fetch('./mob-presets.json?v=2');
         if (resp.ok) presets = await resp.json();
         populateMobPresets(presets);
     } catch (e) {

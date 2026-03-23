@@ -8,11 +8,12 @@ public record PlayerStats(
         double blockingSkill,
         double blockingArmor,
         double armor,
-        ParryBonus parryBonus
+        double parryMultiplier
 ) {
-    /** Convenience accessor used by DamageCalculator. */
-    public double parryMultiplier() {
-        return parryBonus.multiplier();
+    public PlayerStats {
+        if (!Double.isFinite(parryMultiplier) || parryMultiplier <= 0.0) {
+            throw new IllegalArgumentException("Parry multiplier must be a positive number.");
+        }
     }
 }
 

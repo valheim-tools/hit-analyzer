@@ -7,12 +7,13 @@
  * @param {Object} inputs
  * @param {number} inputs.rawDamage
  * @param {number} inputs.starLevel        0–3
+ * @param {number} inputs.extraDamagePercent Optional additive damage bonus as a percentage (>= 0)
  * @param {string} inputs.difficulty       "NORMAL" | "HARD" | "VERY_HARD"
  * @param {number} inputs.maxHealth
  * @param {number} inputs.blockingSkill    0–200
  * @param {number} inputs.blockingArmor
  * @param {number} inputs.armor
- * @param {string} inputs.parryBonus       "X1" | "X1_5" | "X2" | "X2_5" | "X4" | "X6"
+ * @param {number} inputs.parryMultiplier  Custom shield parry multiplier (> 0)
  *
  * @returns {Promise<{noShield: DamageResult, block: DamageResult, parry: DamageResult}>}
  */

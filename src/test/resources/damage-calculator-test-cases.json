@@ -100,5 +100,39 @@
       "stagger": "NO",
       "minHealthForNoStagger": 0
     }
+  },
+  {
+    "name": "Normal / 0★ / parry — custom multiplier 3.3",
+    "mob":    { "rawDamage": 50.0, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 20.0, "blockingArmor": 20.0, "armor": 30.0, "parryMultiplier": 3.3 },
+    "difficulty": "NORMAL",
+    "useShield": true,
+    "isParry": true,
+    "expected": {
+      "baseRawDamage": 50.0,
+      "effectiveRawDamage": 50.0,
+      "blockingReducedDamage": 8.609,
+      "finalReducedDamage": 0.618,
+      "remainingHealth": 99.382,
+      "stagger": "NO",
+      "minHealthForNoStagger": 22
+    }
+  },
+  {
+    "name": "Normal / 0★ / no shield — extra damage bonus applied",
+    "mob":    { "rawDamage": 60.0, "starLevel": 0, "extraDamagePercent": 20.0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockingArmor": 0.0, "armor": 30.0, "parryBonus": "X1" },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseRawDamage": 60.0,
+      "effectiveRawDamage": 72.0,
+      "blockingReducedDamage": 72.0,
+      "finalReducedDamage": 42.0,
+      "remainingHealth": 58.0,
+      "stagger": "YES",
+      "minHealthForNoStagger": 105
+    }
   }
 ]

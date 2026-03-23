@@ -3,23 +3,27 @@ package valheim.calculator.core;
 import lombok.Builder;
 
 @Builder
-public record MobStats(double rawDamage, int starLevel) {
+public record MobStats(double rawDamage, int starLevel, double extraDamagePercent) {
 
     public MobStats {
         if (starLevel < 0 || starLevel > 3) {
             throw new IllegalArgumentException("Star level must be between 0 and 3.");
+        }
+        if (!Double.isFinite(extraDamagePercent) || extraDamagePercent < 0.0) {
+            throw new IllegalArgumentException("Extra damage percent must be a non-negative number.");
         }
     }
 
     /**
      * Applies the combined damage multiplier from game difficulty and mob star level.
      * Both bonuses are added together before scaling:
-     *   effectiveDamage = rawDamage * (1 + physicalDamageBonus + starBonus)
+     *   effectiveDamage = rawDamage * (1 + physicalDamageBonus + starBonus + extraDamagePercent / 100)
      * e.g. Hard (+50%) + 1★ (+50%) = rawDamage * 2.0  (not 1.5 * 1.5)
      */
     public double getEffectiveRawDamage(GameDifficulty difficulty) {
         double starBonus = starLevel * 0.50;
-        return rawDamage * (1.0 + difficulty.getPhysicalDamageBonus() + starBonus);
+        double extraBonus = extraDamagePercent / 100.0;
+        return rawDamage * (1.0 + difficulty.getPhysicalDamageBonus() + starBonus + extraBonus);
     }
 }
 

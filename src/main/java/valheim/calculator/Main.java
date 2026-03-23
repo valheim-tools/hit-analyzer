@@ -7,7 +7,6 @@ import valheim.calculator.core.DamageCalculator;
 import valheim.calculator.core.DamageResult;
 import valheim.calculator.core.GameDifficulty;
 import valheim.calculator.core.MobStats;
-import valheim.calculator.core.ParryBonus;
 import valheim.calculator.core.PlayerStats;
 import valheim.calculator.web.WebServer;
 
@@ -47,8 +46,16 @@ public class Main {
         GameDifficulty difficulty = difficulties[difficultyIndex];
 
         int starLevel = reader.readInt("Mob star level (0 = no star)", 0, 3);
+        int extraDamageChoice = reader.readChoice("Add extra damage bonus?", new String[]{"No", "Yes"}, 0);
+        double extraDamagePercent = extraDamageChoice == 1
+                ? reader.readDouble("Extra damage bonus (%)", 0.0, 10000.0)
+                : 0.0;
 
-        MobStats mob = MobStats.builder().rawDamage(rawDamage).starLevel(starLevel).build();
+        MobStats mob = MobStats.builder()
+                .rawDamage(rawDamage)
+                .starLevel(starLevel)
+                .extraDamagePercent(extraDamagePercent)
+                .build();
         log.info("");
 
         // --- Player stats ---
@@ -57,20 +64,14 @@ public class Main {
         double blockingSkill   = reader.readDouble("Blocking skill", 0.0, 200.0);
         double blockingArmor   = reader.readPositiveDouble("Blocking armor");
         double armor           = reader.readPositiveDouble("Armor");
-
-        ParryBonus[] parryBonuses = ParryBonus.values();
-        String[] parryLabels = Arrays.stream(parryBonuses)
-                .map(ParryBonus::getDisplayName)
-                .toArray(String[]::new);
-        int parryIndex = reader.readChoice("Parry bonus", parryLabels, 0);
-        ParryBonus parryBonus = parryBonuses[parryIndex];
+        double parryMultiplier = reader.readDouble("Parry multiplier", 0.1, 100.0);
 
         PlayerStats player = PlayerStats.builder()
                 .maxHealth(maxHealth)
                 .blockingSkill(blockingSkill)
                 .blockingArmor(blockingArmor)
                 .armor(armor)
-                .parryBonus(parryBonus)
+                .parryMultiplier(parryMultiplier)
                 .build();
 
         // --- Calculate all three scenarios ---

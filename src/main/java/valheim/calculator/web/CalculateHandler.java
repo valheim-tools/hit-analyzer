@@ -43,6 +43,7 @@ public class CalculateHandler implements HttpHandler {
             MobStats mob = MobStats.builder()
                     .rawDamage(req.rawDamage())
                     .starLevel(req.starLevel())
+                    .extraDamagePercent(resolveExtraDamagePercent(req))
                     .build();
 
             PlayerStats player = PlayerStats.builder()
@@ -50,7 +51,7 @@ public class CalculateHandler implements HttpHandler {
                     .blockingSkill(req.blockingSkill())
                     .blockingArmor(req.blockingArmor())
                     .armor(req.armor())
-                    .parryBonus(ParryBonus.valueOf(req.parryBonus()))
+                    .parryMultiplier(resolveParryMultiplier(req))
                     .build();
 
             GameDifficulty difficulty = GameDifficulty.valueOf(req.difficulty());
@@ -77,6 +78,33 @@ public class CalculateHandler implements HttpHandler {
                 os.write(body);
             }
         }
+    }
+
+    private double resolveParryMultiplier(CalculateRequest req) {
+        if (req.parryMultiplier() != null) {
+            double multiplier = req.parryMultiplier();
+            if (!Double.isFinite(multiplier) || multiplier <= 0.0) {
+                throw new IllegalArgumentException("parryMultiplier must be a positive number.");
+            }
+            return multiplier;
+        }
+
+        if (req.parryBonus() != null && !req.parryBonus().isBlank()) {
+            return ParryBonus.valueOf(req.parryBonus()).multiplier();
+        }
+
+        throw new IllegalArgumentException("parryMultiplier is required.");
+    }
+
+    private double resolveExtraDamagePercent(CalculateRequest req) {
+        Double extraDamagePercent = req.extraDamagePercent() != null ? req.extraDamagePercent() : req.extraDamage();
+        if (extraDamagePercent == null) {
+            return 0.0;
+        }
+        if (!Double.isFinite(extraDamagePercent) || extraDamagePercent < 0.0) {
+            throw new IllegalArgumentException("extraDamagePercent must be a non-negative number.");
+        }
+        return extraDamagePercent;
     }
 }
 

@@ -7,11 +7,14 @@ package valheim.calculator.web;
 public record CalculateRequest(
         double rawDamage,
         int    starLevel,
+        Double extraDamage,
+        Double extraDamagePercent,
         String difficulty,
         double maxHealth,
         double blockingSkill,
         double blockingArmor,
         double armor,
-        String parryBonus
+        String parryBonus,
+        Double parryMultiplier
 ) {}
 

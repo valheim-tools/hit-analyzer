@@ -54,6 +54,45 @@
         .field { margin-bottom: 0.8rem; }
         .field:last-child { margin-bottom: 0; }
 
+        .parry-multiplier-row,
+        .extra-damage-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .parry-multiplier-row select,
+        .extra-damage-row select {
+            flex: 1 1 auto;
+        }
+
+        .custom-parry-field,
+        .custom-extra-damage-field {
+            flex: 0 0 7.5rem;
+        }
+
+        .custom-parry-field[hidden],
+        .custom-extra-damage-field[hidden] {
+            display: none;
+        }
+
+        .custom-parry-field input,
+        .custom-extra-damage-field input {
+            min-width: 0;
+        }
+
+        @media (max-width: 620px) {
+            .parry-multiplier-row,
+            .extra-damage-row {
+                flex-wrap: wrap;
+            }
+
+            .custom-parry-field,
+            .custom-extra-damage-field {
+                flex: 1 1 100%;
+            }
+        }
+
         label {
             display: block;
             font-size: 0.78rem;
@@ -600,7 +639,7 @@
         <div class="pipeline">
             <div class="pipe-step">
                 <span class="pipe-num">1</span>
-                <span class="pipe-text">Raw damage is scaled by difficulty &amp; star bonuses → <strong>Effective Damage</strong></span>
+                <span class="pipe-text">Raw damage is scaled by difficulty, star &amp; extra damage bonuses → <strong>Effective Damage</strong></span>
             </div>
             <div class="pipe-step">
                 <span class="pipe-num">2</span>
@@ -643,6 +682,18 @@
                         <option value="VERY_HARD">Very Hard — +100%</option>
                     </select>
                 </div>
+                <div class="field">
+                    <label for="extraDamageEnabled">Extra Damage Bonus — apply an additional percentage bonus</label>
+                    <div class="extra-damage-row">
+                        <select id="extraDamageEnabled">
+                            <option value="no" selected>No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                        <div id="customExtraDamageField" class="custom-extra-damage-field" hidden>
+                            <input type="number" id="extraDamagePercent" value="0" min="0" max="10000" step="0.1" placeholder="%" aria-label="Extra damage bonus percentage">
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="section">
@@ -664,15 +715,21 @@
                     <input type="number" id="armor" value="0" min="0" max="500" step="0.1" required>
                 </div>
                 <div class="field">
-                    <label>Parry Bonus — shield parry multiplier</label>
-                    <select id="parryBonus">
-                        <option value="X1">×1 — no bonus</option>
-                        <option value="X1_5" selected>×1.5</option>
-                        <option value="X2">×2</option>
-                        <option value="X2_5">×2.5</option>
-                        <option value="X4">×4</option>
-                        <option value="X6">×6</option>
-                    </select>
+                    <label for="parryMultiplierPreset">Parry Multiplier — choose a preset or use custom</label>
+                    <div class="parry-multiplier-row">
+                        <select id="parryMultiplierPreset">
+                            <option value="1">×1</option>
+                            <option value="1.5" selected>×1.5</option>
+                            <option value="2">×2</option>
+                            <option value="2.5">×2.5</option>
+                            <option value="4">×4</option>
+                            <option value="6">×6</option>
+                            <option value="custom">Custom…</option>
+                        </select>
+                        <div id="customParryMultiplierField" class="custom-parry-field" hidden>
+                            <input type="number" id="parryMultiplier" value="1.5" min="0.1" max="100" step="0.1" placeholder="Custom" aria-label="Custom parry multiplier">
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -727,45 +784,159 @@
     /* ── Constants ── */
     const DEFAULTS = {
         rawDamage: 60, starLevel: 0, difficulty: 'NORMAL',
-        maxHealth: 100, blockingSkill: 0, blockingArmor: 0, armor: 0, parryBonus: 'X1_5',
+        maxHealth: 100, blockingSkill: 0, blockingArmor: 0, armor: 0, parryMultiplier: 1.5,
+        extraDamagePercent: 0, extraDamageEnabled: 'no',
     };
     const LS_FORM    = 'valheim-form';
     const LS_HISTORY = 'valheim-history';
     const MAX_HISTORY = 10;
-    const PARRY_MULTIPLIERS = { X1: 1, X1_5: 1.5, X2: 2, X2_5: 2.5, X4: 4, X6: 6 };
+    const LEGACY_PARRY_MULTIPLIERS = { X1: 1, X1_5: 1.5, X2: 2, X2_5: 2.5, X4: 4, X6: 6 };
+    const PARRY_MULTIPLIER_PRESETS = [1, 1.5, 2, 2.5, 4, 6];
 
     const form      = document.getElementById('calcForm');
     const errBox    = document.getElementById('error');
     const results   = document.getElementById('results');
     const historyEl = document.getElementById('history');
+    const extraDamageToggleEl = document.getElementById('extraDamageEnabled');
+    const extraDamageFieldEl = document.getElementById('customExtraDamageField');
+    const extraDamageInputEl = document.getElementById('extraDamagePercent');
+    const parryPresetEl = document.getElementById('parryMultiplierPreset');
+    const parryCustomFieldEl = document.getElementById('customParryMultiplierField');
+    const parryCustomInputEl = document.getElementById('parryMultiplier');
 
-    /* ── Form persistence ── */
-    function applyForm(values) {
-        document.getElementById('rawDamage').value       = values.rawDamage       ?? DEFAULTS.rawDamage;
-        document.getElementById('starLevel').value       = values.starLevel       ?? DEFAULTS.starLevel;
-        document.getElementById('difficulty').value      = values.difficulty      ?? DEFAULTS.difficulty;
-        document.getElementById('maxHealth').value       = values.maxHealth       ?? DEFAULTS.maxHealth;
-        document.getElementById('blockingSkill').value   = values.blockingSkill   ?? DEFAULTS.blockingSkill;
-        document.getElementById('blockingArmor').value   = values.blockingArmor   ?? DEFAULTS.blockingArmor;
-        document.getElementById('armor').value           = values.armor           ?? DEFAULTS.armor;
-        document.getElementById('parryBonus').value        = values.parryBonus        ?? DEFAULTS.parryBonus;
+    function sanitizeExtraDamagePercent(value, fallback = DEFAULTS.extraDamagePercent) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
     }
 
-    function collectInputs() {
+    function resolveExtraDamagePercentValue(values = {}) {
+        if (values.extraDamagePercent != null && values.extraDamagePercent !== '') {
+            return sanitizeExtraDamagePercent(values.extraDamagePercent);
+        }
+        if (values.extraDamage != null && values.extraDamage !== '') {
+            return sanitizeExtraDamagePercent(values.extraDamage);
+        }
+        return DEFAULTS.extraDamagePercent;
+    }
+
+    function resolveExtraDamageMode(values = {}) {
+        if (values.extraDamageEnabled === 'yes' || values.extraDamageEnabled === 'no') {
+            return values.extraDamageEnabled;
+        }
+        return resolveExtraDamagePercentValue(values) > 0 ? 'yes' : 'no';
+    }
+
+    function syncExtraDamageUi(values = {}) {
+        const percent = resolveExtraDamagePercentValue(values);
+        const enabled = resolveExtraDamageMode(values) === 'yes';
+        extraDamageToggleEl.value = enabled ? 'yes' : 'no';
+        extraDamageFieldEl.hidden = !enabled;
+        extraDamageInputEl.disabled = !enabled;
+        if (enabled || !extraDamageInputEl.value || values === DEFAULTS) {
+            extraDamageInputEl.value = percent;
+        }
+    }
+
+    function getExtraDamagePercentFromUi() {
+        if (extraDamageToggleEl.value !== 'yes') {
+            return 0;
+        }
+        return sanitizeExtraDamagePercent(extraDamageInputEl.value);
+    }
+
+    function sanitizeParryMultiplier(value, fallback = DEFAULTS.parryMultiplier) {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+    }
+
+    function resolveParryMultiplierValue(values = {}) {
+        if (values.parryMultiplier != null && values.parryMultiplier !== '') {
+            return sanitizeParryMultiplier(values.parryMultiplier);
+        }
+        if (values.parryBonus && LEGACY_PARRY_MULTIPLIERS[values.parryBonus] != null) {
+            return LEGACY_PARRY_MULTIPLIERS[values.parryBonus];
+        }
+        return DEFAULTS.parryMultiplier;
+    }
+
+    function formatParryMultiplier(multiplier) {
+        const value = sanitizeParryMultiplier(multiplier);
+        return `×${Number.isInteger(value) ? value.toFixed(0) : String(value)}`;
+    }
+
+    function formatPercent(value) {
+        const normalized = sanitizeExtraDamagePercent(value, 0);
+        return Number.isInteger(normalized) ? normalized.toFixed(0) : String(parseFloat(normalized.toFixed(3)));
+    }
+
+    function resolveParryMultiplierMode(values = {}) {
+        if (values.parryMultiplierMode === 'custom') {
+            return 'custom';
+        }
+        if (values.parryMultiplierMode === 'preset') {
+            return 'preset';
+        }
+        return isPresetParryMultiplier(resolveParryMultiplierValue(values)) ? 'preset' : 'custom';
+    }
+
+    function isPresetParryMultiplier(multiplier) {
+        return PARRY_MULTIPLIER_PRESETS.some(preset => Math.abs(preset - multiplier) < 1e-9);
+    }
+
+    function syncParryMultiplierUi(values = {}) {
+        const multiplier = resolveParryMultiplierValue(values);
+        const isCustom = resolveParryMultiplierMode(values) === 'custom';
+        parryPresetEl.value = isCustom ? 'custom' : String(multiplier);
+        parryCustomFieldEl.hidden = !isCustom;
+        parryCustomInputEl.disabled = !isCustom;
+        if (isCustom || !parryCustomInputEl.value || values === DEFAULTS) {
+            parryCustomInputEl.value = multiplier;
+        }
+    }
+
+    function getParryMultiplierFromUi() {
+        if (parryPresetEl.value === 'custom') {
+            return sanitizeParryMultiplier(parryCustomInputEl.value);
+        }
+        return sanitizeParryMultiplier(parryPresetEl.value);
+    }
+
+    function collectFormState() {
         return {
             rawDamage:       parseFloat(document.getElementById('rawDamage').value),
             starLevel:       parseInt(document.getElementById('starLevel').value, 10),
+            extraDamagePercent: getExtraDamagePercentFromUi(),
+            extraDamageEnabled: extraDamageToggleEl.value,
             difficulty:      document.getElementById('difficulty').value,
             maxHealth:       parseFloat(document.getElementById('maxHealth').value),
             blockingSkill:   parseFloat(document.getElementById('blockingSkill').value),
             blockingArmor:   parseFloat(document.getElementById('blockingArmor').value),
             armor:           parseFloat(document.getElementById('armor').value),
-            parryBonus:      document.getElementById('parryBonus').value,
+            parryMultiplier: getParryMultiplierFromUi(),
+            parryMultiplierMode: parryPresetEl.value === 'custom' ? 'custom' : 'preset',
         };
     }
 
+    /* ── Form persistence ── */
+    function applyForm(values) {
+        document.getElementById('rawDamage').value       = values.rawDamage       ?? DEFAULTS.rawDamage;
+        document.getElementById('starLevel').value       = values.starLevel       ?? DEFAULTS.starLevel;
+        syncExtraDamageUi(values);
+        document.getElementById('difficulty').value      = values.difficulty      ?? DEFAULTS.difficulty;
+        document.getElementById('maxHealth').value       = values.maxHealth       ?? DEFAULTS.maxHealth;
+        document.getElementById('blockingSkill').value   = values.blockingSkill   ?? DEFAULTS.blockingSkill;
+        document.getElementById('blockingArmor').value   = values.blockingArmor   ?? DEFAULTS.blockingArmor;
+        document.getElementById('armor').value           = values.armor           ?? DEFAULTS.armor;
+        syncParryMultiplierUi(values);
+    }
+
+    function collectInputs() {
+        const { parryMultiplierMode, extraDamageEnabled, ...requestInputs } = collectFormState();
+        return requestInputs;
+    }
+
     function saveForm() {
-        localStorage.setItem(LS_FORM, JSON.stringify(collectInputs()));
+        localStorage.setItem(LS_FORM, JSON.stringify(collectFormState()));
     }
 
     function resetForm() {
@@ -781,17 +952,50 @@
 
     form.addEventListener('input', saveForm);
     document.getElementById('resetBtn').addEventListener('click', resetForm);
+    extraDamageToggleEl.addEventListener('change', () => {
+        if (extraDamageToggleEl.value === 'yes') {
+            syncExtraDamageUi({
+                extraDamagePercent: sanitizeExtraDamagePercent(extraDamageInputEl.value),
+                extraDamageEnabled: 'yes',
+            });
+            extraDamageInputEl.focus();
+            extraDamageInputEl.select();
+        } else {
+            syncExtraDamageUi({
+                extraDamagePercent: 0,
+                extraDamageEnabled: 'no',
+            });
+        }
+        saveForm();
+    });
+    parryPresetEl.addEventListener('change', () => {
+        if (parryPresetEl.value === 'custom') {
+            syncParryMultiplierUi({
+                parryMultiplier: sanitizeParryMultiplier(parryCustomInputEl.value),
+                parryMultiplierMode: 'custom',
+            });
+            parryCustomInputEl.focus();
+            parryCustomInputEl.select();
+        } else {
+            syncParryMultiplierUi({
+                parryMultiplier: sanitizeParryMultiplier(parryPresetEl.value),
+                parryMultiplierMode: 'preset',
+            });
+        }
+        saveForm();
+    });
 
     /* ── Submit ── */
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         errBox.style.display = 'none';
+        const formState = collectFormState();
         const inputs = collectInputs();
         try {
             const data = await calculate(inputs);
-            render(data, inputs);
+            render(data, formState);
             const customLabel = document.getElementById('entryLabel').value.trim();
-            pushHistory({ inputs, results: data, label: customLabel || compressLabel(inputs), timestamp: Date.now() });
+            pushHistory({ inputs: formState, results: data, label: customLabel || compressLabel(formState), timestamp: Date.now() });
             document.getElementById('entryLabel').value = '';
             renderHistory();
         } catch (err) {
@@ -821,16 +1025,17 @@
 
     function compressLabel(inputs) {
         const diffMap  = { NORMAL: 'Normal', HARD: 'Hard', VERY_HARD: 'Very Hard' };
-        const parryMap = { X1: '×1', X1_5: '×1.5', X2: '×2', X2_5: '×2.5', X4: '×4', X6: '×6' };
+        const extraDamagePercent = resolveExtraDamagePercentValue(inputs);
         return [
             `${inputs.rawDamage} dmg`,
             `${inputs.starLevel}★`,
+            extraDamagePercent > 0 ? `Extra +${formatPercent(extraDamagePercent)}%` : null,
             diffMap[inputs.difficulty] ?? inputs.difficulty,
             `HP ${inputs.maxHealth}`,
             `Armor ${inputs.armor}`,
             `Block ${inputs.blockingArmor} / Skill ${inputs.blockingSkill}`,
-            `Parry ${parryMap[inputs.parryBonus] ?? inputs.parryBonus}`,
-        ].join(' · ');
+            `Parry ${formatParryMultiplier(resolveParryMultiplierValue(inputs))}`,
+        ].filter(Boolean).join(' · ');
     }
 
     function renderHistory() {
@@ -904,11 +1109,13 @@
         // Line 1 — damage modifier breakdown
         const diffBonus  = { NORMAL: 0, HARD: 50, VERY_HARD: 100 }[inputs.difficulty] ?? 0;
         const starBonus  = inputs.starLevel * 50;
-        const totalBonus = diffBonus + starBonus;
+        const extraDamagePercent = resolveExtraDamagePercentValue(inputs);
+        const totalBonus = diffBonus + starBonus + extraDamagePercent;
         const parts      = [];
         const diffLabel  = document.getElementById('difficulty').selectedOptions[0].text.split(' —')[0];
         if (diffBonus) parts.push(`${diffLabel} +${diffBonus}%`);
         if (starBonus) parts.push(`${inputs.starLevel}★ +${starBonus}%`);
+        if (extraDamagePercent) parts.push(`Extra +${formatPercent(extraDamagePercent)}%`);
 
         document.getElementById('rawSummary').innerHTML = parts.length
             ? `Damage modifier: <span>${parts.join(' | ')}  (+${totalBonus}% total)</span>`
@@ -958,9 +1165,11 @@
         const eff        = data.effectiveRawDamage;
         const diffBonus  = { NORMAL: 0, HARD: 0.5, VERY_HARD: 1.0 }[inputs.difficulty] ?? 0;
         const starBonus  = inputs.starLevel * 0.5;
-        const totalMult  = 1 + diffBonus + starBonus;
+        const extraDamagePercent = resolveExtraDamagePercentValue(inputs);
+        const extraBonus  = extraDamagePercent / 100;
+        const totalMult  = 1 + diffBonus + starBonus + extraBonus;
         const staggerBar = inputs.maxHealth * 0.4;
-        const parryMult  = PARRY_MULTIPLIERS[inputs.parryBonus] ?? 1;
+        const parryMult  = resolveParryMultiplierValue(inputs);
         const skillFactor = 1 + 0.005 * inputs.blockingSkill;
 
         function armorBranch(damage, armor) {
@@ -1008,14 +1217,14 @@
         }
 
         // ── Step 1 (shared) ──────────────────────────────────────────────────
-        const bonusStr = `1 + ${diffBonus} + ${starBonus}`;
+        const bonusStr = `1 + ${diffBonus} + ${starBonus} + (${fmt(extraDamagePercent)} ÷ 100)`;
         const step1Html = `
             <div class="f-shared-label">${stepLabelContent('Step 1 — ', 'Effective Damage')}
                 <span class="f-shared-note">(all scenarios)</span>
             </div>
             <div class="f-eq">${fmt(raw)} × (${bonusStr}) = ${fmt(raw)} × ${fmt(totalMult)} = ${hoverResult(
                 fmt(eff),
-                `effectiveDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5)<br>${fmt(raw)} × (1 + ${diffBonus} + ${starBonus}) = ${fmt(raw)} × ${fmt(totalMult)} = ${fmt(eff)}`
+                `effectiveDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${fmt(raw)} × (1 + ${diffBonus} + ${starBonus} + (${fmt(extraDamagePercent)} ÷ 100)) = ${fmt(raw)} × ${fmt(totalMult)} = ${fmt(eff)}`
             )}</div>`;
 
         // ── Per-scenario column builder ──────────────────────────────────────

@@ -27,6 +27,7 @@ class DamageCalculatorTest {
         MobStats mob = MobStats.builder()
                 .rawDamage(tc.mob.rawDamage)
                 .starLevel(tc.mob.starLevel)
+                .extraDamagePercent(tc.mob.extraDamagePercent != null ? tc.mob.extraDamagePercent : 0.0)
                 .build();
 
         PlayerStats player = PlayerStats.builder()
@@ -34,7 +35,7 @@ class DamageCalculatorTest {
                 .blockingSkill(tc.player.blockingSkill)
                 .blockingArmor(tc.player.blockingArmor)
                 .armor(tc.player.armor)
-                .parryBonus(ParryBonus.valueOf(tc.player.parryBonus))
+                .parryMultiplier(resolveParryMultiplier(tc.player))
                 .build();
 
         GameDifficulty difficulty = GameDifficulty.valueOf(tc.difficulty);
@@ -84,6 +85,7 @@ class DamageCalculatorTest {
     static class MobInput {
         public double rawDamage;
         public int starLevel;
+        public Double extraDamagePercent;
     }
 
     static class PlayerInput {
@@ -92,6 +94,14 @@ class DamageCalculatorTest {
         public double blockingArmor;
         public double armor;
         public String parryBonus;
+        public Double parryMultiplier;
+    }
+
+    private static double resolveParryMultiplier(PlayerInput player) {
+        if (player.parryMultiplier != null) {
+            return player.parryMultiplier;
+        }
+        return ParryBonus.valueOf(player.parryBonus).multiplier();
     }
 
     static class ExpectedOutput {

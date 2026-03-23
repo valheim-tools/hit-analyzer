@@ -405,8 +405,13 @@
             transition: opacity 0.15s;
             pointer-events: none;
             line-height: 1.4;
+            text-transform: none;
+            letter-spacing: 0;
+            font-weight: normal;
+            font-style: normal;
         }
         .tip-wrap:hover .tip-text,
+        .tip-wrap:focus .tip-text,
         .tip-wrap:focus-within .tip-text {
             visibility: visible;
             opacity: 1;
@@ -428,6 +433,156 @@
             cursor: help;
             line-height: 1;
         }
+
+        /* ── Formula breakdown ── */
+        .formula-details {
+            background: #26231a;
+            border: 1px solid #544828;
+            border-radius: 6px;
+            margin-bottom: 1.4rem;
+            overflow: visible;
+        }
+
+        .formula-toggle {
+            list-style: none;
+            cursor: pointer;
+            padding: 0.7rem 1.2rem;
+            font-size: 0.75rem;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .formula-toggle::-webkit-details-marker { display: none; }
+        .formula-toggle::before {
+            content: '▶';
+            font-size: 0.6rem;
+            transition: transform 0.15s;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .formula-details[open] .formula-toggle::before { transform: rotate(90deg); }
+
+        .formula-body {
+            padding: 1rem 1.2rem 1.2rem;
+            border-top: 1px solid #544828;
+        }
+
+        .f-shared {
+            margin-bottom: 1rem;
+            padding-bottom: 0.9rem;
+            border-bottom: 1px solid #3a3420;
+        }
+
+        .f-shared-label {
+            font-size: 0.7rem;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.35rem;
+        }
+
+        .f-shared-note {
+            color: #a89872;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .f-cols {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        @media (max-width: 620px) { .f-cols { grid-template-columns: 1fr; } }
+
+        .f-col {
+            background: #2d2a1e;
+            border: 1px solid #3a3420;
+            border-radius: 4px;
+            overflow: visible;
+        }
+
+        .f-col-title {
+            background: #362c18;
+            color: #c8a850;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.42rem 0.8rem;
+            border-bottom: 1px solid #544828;
+        }
+
+        .f-step {
+            padding: 0.55rem 0.8rem;
+            border-bottom: 1px solid #2a2820;
+        }
+        .f-step:last-child { border-bottom: none; }
+
+        .f-step-label {
+            font-size: 0.68rem;
+            color: #c8a850;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .f-hover-wrap {
+            cursor: help;
+        }
+
+        .f-hover-result,
+        .f-hover-decision,
+        .f-hover-warning {
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-decoration-color: rgba(232, 216, 160, 0.4);
+            text-underline-offset: 2px;
+        }
+
+        .f-hover-decision {
+            color: #e8d8a0;
+        }
+
+        .f-hover-warning {
+            color: #c87840;
+        }
+
+        .f-eq {
+            font-size: 0.79rem;
+            color: #d0c090;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+        .f-eq strong { color: #e8d8a0; }
+
+        .f-branch-check {
+            font-size: 0.73rem;
+            color: #a89872;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            margin-bottom: 0.15rem;
+        }
+
+        .f-skipped {
+            font-size: 0.75rem;
+            color: #504838;
+            font-style: italic;
+        }
+
+        .f-stagger-warn {
+            font-size: 0.73rem;
+            color: #c87840;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            margin: 0.1rem 0;
+        }
+
+        .f-dead { color: #e06060; }
     </style>
 </head>
 <body>
@@ -437,7 +592,7 @@
 
     <div class="calc-summary">
         <h3>How damage taken is calculated</h3>
-        <p class="damage-note">Damage refers to <span class="tip-wrap" style="text-decoration:underline">physical<span class="tip-text">Blunt, Pierce, Slash</span></span> and lightning damage.</p>
+        <p class="damage-note">Damage refers to the maximum <span class="tip-wrap" style="text-decoration:underline">physical<span class="tip-text">Blunt, Pierce, Slash</span></span> or lightning damage a mob can deal. In reality, mob damage varies within a range rather than being a fixed value.</p>
         <div class="pipeline">
             <div class="pipe-step">
                 <span class="pipe-num">1</span>
@@ -445,7 +600,7 @@
             </div>
             <div class="pipe-step">
                 <span class="pipe-num">2</span>
-                <span class="pipe-text">Effective damage is reduced by shield / blocking armor → <strong>Blocking-Reduced Damage</strong></span>
+                <span class="pipe-text">Effective damage is reduced by shield / block armor → <strong>Block-Reduced Damage</strong></span>
             </div>
             <div class="pipe-step">
                 <span class="pipe-num">3</span>
@@ -497,7 +652,7 @@
                     <input type="number" id="blockingSkill" value="0" min="0" max="100" step="0.1" required>
                 </div>
                 <div class="field">
-                    <label>Blocking Armor (0 – 500)</label>
+                    <label>Block Armor (0 – 500)</label>
                     <input type="number" id="blockingArmor" value="0" min="0" max="500" step="0.1" required>
                 </div>
                 <div class="field">
@@ -547,6 +702,11 @@
         </table>
     </div>
 
+    <details id="formulaDetails" class="formula-details" style="display:none">
+        <summary class="formula-toggle">Step-by-step formula with values</summary>
+        <div class="formula-body" id="formula"></div>
+    </details>
+
     <div id="history">
         <div class="history-header">
             <h2>Calculation History</h2>
@@ -568,6 +728,7 @@
     const LS_FORM    = 'valheim-form';
     const LS_HISTORY = 'valheim-history';
     const MAX_HISTORY = 10;
+    const PARRY_MULTIPLIERS = { X1: 1, X1_5: 1.5, X2: 2, X2_5: 2.5, X4: 4, X6: 6 };
 
     const form      = document.getElementById('calcForm');
     const errBox    = document.getElementById('error');
@@ -608,6 +769,7 @@
         localStorage.removeItem(LS_FORM);
         results.style.display = 'none';
         errBox.style.display  = 'none';
+        document.getElementById('formulaDetails').style.display = 'none';
     }
 
     // Restore saved form on load
@@ -695,6 +857,7 @@
         applyForm(entry.inputs);
         localStorage.setItem(LS_FORM, JSON.stringify(entry.inputs));
         render(entry.results, entry.inputs);
+        renderFormula(entry.results, entry.inputs);
         errBox.style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -714,10 +877,10 @@
     function staggerState(s) {
         if (s.stagger === 'YES') {
             const isShielded = s.scenarioName === 'Block' || s.scenarioName === 'Parry';
-            const tip = isShielded
-                ? 'Stagger on blocking armor — blocking damage reduction was not applied.'
-                : 'Stagger on body armor.';
-            return `<span class="stagger-yes">yes<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${tip}</span></span></span>`;
+            if (isShielded) {
+                return `<span class="stagger-yes">yes<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">-> Blocking damage reduction was not applied.</span></span></span>`;
+            }
+            return '<span class="stagger-yes">yes</span>';
         }
         return '<span class="stagger-no">no</span>';
     }
@@ -753,12 +916,11 @@
             : `Effective Damage = <span>${fmt(base)}</span>`;
 
         // Per-scenario rows
-        const BLOCKING_TIP  = 'Remaining damage after the shield / blocking-armor reduction is applied to the effective (scaled) raw damage — before body armor is factored in.';
-        const FINAL_TIP     = 'The final damage after both the blocking and body-armor damage reductions have been applied to the raw damage.';
-        const STAGGER_TIP   = 'Shows whether the player is staggered by the damage, and at which step of the damage reduction calculation the stagger occurred.';
+        const BLOCK_TIP     = 'Remaining damage after the block-armor reduction is applied to the effective raw damage — before body armor is factored in.';
+        const FINAL_TIP     = 'The final damage after both the block and body-armor damage reductions have been applied to the raw damage.';
         const mkTip = txt => `<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${txt}</span></span>`;
         const rows = [
-            { label: `Blocking-Reduced Damage ${mkTip(BLOCKING_TIP)}`,         fn: s => fmt(s.blockingReducedDamage) },
+            { label: `Block-Reduced Damage ${mkTip(BLOCK_TIP)}`,               fn: s => fmt(s.blockingReducedDamage) },
             { label: `Final/Armor-Reduced Damage ${mkTip(FINAL_TIP)}`,         fn: s => fmt(s.finalReducedDamage)    },
             { label: 'Remaining Health', fn: s => {
                 if (s.remainingHealth <= 0) {
@@ -767,7 +929,7 @@
                 return fmt(s.remainingHealth);
             }},
             null,
-            { label: `Stagger ${mkTip(STAGGER_TIP)}`, fn: s => staggerState(s) },
+            { label: 'Staggered', fn: s => staggerState(s) },
             { label: 'Min Health to Avoid Stagger', fn: s => {
                 if (s.minHealthForNoStagger === 0) return '<span class="stagger-no">Immune</span>';
                 const isSafe = inputs.maxHealth >= s.minHealthForNoStagger;
@@ -783,8 +945,227 @@
         }).join('');
 
         results.style.display = 'block';
+        renderFormula(data, inputs);
     }
 
+    /* ── Formula breakdown ── */
+    function renderFormula(data, inputs) {
+        const raw        = data.baseRawDamage;
+        const eff        = data.effectiveRawDamage;
+        const diffBonus  = { NORMAL: 0, HARD: 0.5, VERY_HARD: 1.0 }[inputs.difficulty] ?? 0;
+        const starBonus  = inputs.starLevel * 0.5;
+        const totalMult  = 1 + diffBonus + starBonus;
+        const staggerBar = inputs.maxHealth * 0.4;
+        const parryMult  = PARRY_MULTIPLIERS[inputs.parryBonus] ?? 1;
+        const skillFactor = 1 + 0.005 * inputs.blockingSkill;
+
+        function armorBranch(damage, armor) {
+            const isLinear = armor < damage / 2;
+            const result   = isLinear ? damage - armor : (damage * damage) / (armor * 4);
+            return { isLinear, result };
+        }
+
+        function stepLabelContent(prefix, name) {
+            return `${prefix}${name}`;
+        }
+
+        function stepLabel(prefix, name) {
+            return `<div class="f-step-label">${stepLabelContent(prefix, name)}</div>`;
+        }
+
+        function hoverFormula(content, tooltip, className = '') {
+            const cls = className ? ` class="${className}"` : '';
+            return `<span class="tip-wrap f-hover-wrap" tabindex="0"><span${cls}>${content}</span><span class="tip-text">${tooltip}</span></span>`;
+        }
+
+        function hoverResult(value, tooltip, extraClass = '') {
+            const classNames = ['f-hover-result', extraClass].filter(Boolean).join(' ');
+            return hoverFormula(`<strong class="${classNames}">${value}</strong>`, tooltip);
+        }
+
+        function hoverDecision(text, tooltip) {
+            return hoverFormula(text, tooltip, 'f-hover-decision');
+        }
+
+        function staggerWarning(tooltip) {
+            return `<div class="f-stagger-warn">⚠ ${hoverFormula('Player is staggered', tooltip, 'f-hover-warning')}</div>`;
+        }
+
+        function thresholdTooltip(armorLabel, damageLabel, armor, damage, isLinear) {
+            const equalityNote = Math.abs(armor - (damage / 2)) < 1e-9
+                ? '<br>Because the check is strict (&lt;), an exact tie still uses the quadratic branch.'
+                : '';
+            return `Rule: if ${armorLabel} &lt; ${damageLabel} ÷ 2, use the linear reduction.<br>`
+                + `Otherwise, use the quadratic reduction.<br>`
+                + `${isLinear
+                    ? 'Chosen branch: reducedDamage = damage − armor'
+                    : 'Chosen branch: reducedDamage = damage² ÷ (armor × 4)'}`
+                + equalityNote;
+        }
+
+        // ── Step 1 (shared) ──────────────────────────────────────────────────
+        const bonusStr = `1 + ${diffBonus} + ${starBonus}`;
+        const step1Html = `
+            <div class="f-shared-label">${stepLabelContent('Step 1 — ', 'Effective Damage')}
+                <span class="f-shared-note">(all scenarios)</span>
+            </div>
+            <div class="f-eq">${fmt(raw)} × (${bonusStr}) = ${fmt(raw)} × ${fmt(totalMult)} = ${hoverResult(
+                fmt(eff),
+                `effectiveDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5)<br>${fmt(raw)} × (1 + ${diffBonus} + ${starBonus}) = ${fmt(raw)} × ${fmt(totalMult)} = ${fmt(eff)}`
+            )}</div>`;
+
+        // ── Per-scenario column builder ──────────────────────────────────────
+        function buildCol(scenario, sd) {
+            const isShield = scenario !== 'noShield';
+            const isParry  = scenario === 'parry';
+            const effBA    = isShield ? inputs.blockingArmor * skillFactor * (isParry ? parryMult : 1) : 0;
+
+            // Step 2 — Effective Block Armor
+            let step2;
+            if (!isShield) {
+                step2 = `<div class="f-step">
+                    ${stepLabel('Step 2 — ', 'Effective Block Armor')}
+                    <div class="f-skipped">No shield — step skipped</div>
+                </div>`;
+            } else {
+                const parryLine = isParry
+                    ? `<div class="f-eq">${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} × ${parryMult} = ${hoverResult(
+                        fmt(effBA),
+                        `effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill) × parryMultiplier<br>${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) × ${parryMult} = ${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} × ${parryMult} = ${fmt(effBA)}`
+                    )}</div>`
+                    : `<div class="f-eq">${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} = ${hoverResult(
+                        fmt(effBA),
+                        `effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill)<br>${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) = ${fmt(inputs.blockingArmor)} × ${fmt(skillFactor)} = ${fmt(effBA)}`
+                    )}</div>`;
+                const formulaLine = isParry
+                    ? `<div class="f-eq">${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill}) × ${parryMult}</div>${parryLine}`
+                    : `<div class="f-eq">${fmt(inputs.blockingArmor)} × (1 + 0.005 × ${inputs.blockingSkill})</div>${parryLine}`;
+                step2 = `<div class="f-step">
+                    ${stepLabel('Step 2 — ', 'Effective Block Armor')}
+                    ${formulaLine}
+                </div>`;
+            }
+
+            // Step 3 — Block Reduction
+            let step3;
+            if (!isShield) {
+                step3 = `<div class="f-step">
+                    ${stepLabel('Step 3 — ', 'Block Reduction')}
+                    <div class="f-skipped">No shield — step skipped</div>
+                </div>`;
+            } else {
+                const { isLinear: blockLinear, result: afterBlock } = armorBranch(eff, effBA);
+                const halfEff  = eff / 2;
+                const yesNo    = effBA < halfEff ? 'YES' : 'NO';
+                const branch   = blockLinear ? 'linear' : 'quadratic';
+                const staggeredOnBlock = afterBlock > staggerBar;
+
+                let body;
+                const check = `<div class="f-branch-check">${fmt(effBA)} &lt; ${fmt(eff)} ÷ 2 (= ${fmt(halfEff)})? ${hoverDecision(
+                    `${yesNo} → ${branch}`,
+                    thresholdTooltip('effectiveBlockArmor', 'effectiveDamage', effBA, eff, blockLinear)
+                )}</div>`;
+
+                if (staggeredOnBlock) {
+                    const compared = blockLinear
+                        ? `${fmt(eff)} − ${fmt(effBA)} = ${hoverResult(
+                            fmt(afterBlock),
+                            `blockReducedDamage = effectiveDamage − effectiveBlockArmor<br>${fmt(eff)} − ${fmt(effBA)} = ${fmt(afterBlock)}`
+                        )}`
+                        : `${fmt(eff)}² ÷ (${fmt(effBA)} × 4) = ${hoverResult(
+                            fmt(afterBlock),
+                            `blockReducedDamage = effectiveDamage² ÷ (effectiveBlockArmor × 4)<br>${fmt(eff)}² ÷ (${fmt(effBA)} × 4) = ${fmt(afterBlock)}`
+                        )}`;
+                    body = `${check}
+                        <div class="f-eq">${compared}</div>
+                        ${staggerWarning(`Compared to stagger threshold: block-reduced damage ${fmt(afterBlock)} &gt; ${fmt(staggerBar)} (= 40% of ${fmt(inputs.maxHealth)} max health) → block bypassed.`)}
+                        <div class="f-eq">After Block → ${hoverResult(
+                            fmt(sd.blockingReducedDamage),
+                            `The player was staggered, so blocking armor reduction was not applied.`
+                        )}</div>`;
+                } else if (blockLinear) {
+                    body = `${check}
+                        <div class="f-eq">${fmt(eff)} − ${fmt(effBA)} = ${hoverResult(
+                            fmt(afterBlock),
+                            `blockReducedDamage = effectiveDamage − effectiveBlockArmor<br>${fmt(eff)} − ${fmt(effBA)} = ${fmt(afterBlock)}`
+                        )}</div>`;
+                } else {
+                    body = `${check}
+                        <div class="f-eq">${fmt(eff)}² ÷ (${fmt(effBA)} × 4) = ${hoverResult(
+                            fmt(afterBlock),
+                            `blockReducedDamage = effectiveDamage² ÷ (effectiveBlockArmor × 4)<br>${fmt(eff)}² ÷ (${fmt(effBA)} × 4) = ${fmt(afterBlock)}`
+                        )}</div>`;
+                }
+
+                step3 = `<div class="f-step">
+                    ${stepLabel('Step 3 — ', 'Block Reduction')}
+                    ${body}
+                </div>`;
+            }
+
+            // Step 4 — Body Armor Reduction
+            const { isLinear: armorLinear } = armorBranch(sd.blockingReducedDamage, inputs.armor);
+            const halfBlock    = sd.blockingReducedDamage / 2;
+            const armorYesNo   = inputs.armor < halfBlock ? 'YES' : 'NO';
+            const armorBranch_ = armorLinear ? 'linear' : 'quadratic';
+            const armorCheck   = `<div class="f-branch-check">${fmt(inputs.armor)} &lt; ${fmt(sd.blockingReducedDamage)} ÷ 2 (= ${fmt(halfBlock)})? ${hoverDecision(
+                `${armorYesNo} → ${armorBranch_}`,
+                thresholdTooltip('armor', 'blockReducedDamage', inputs.armor, sd.blockingReducedDamage, armorLinear)
+            )}</div>`;
+
+            let armorBody;
+            if (armorLinear) {
+                armorBody = `${armorCheck}
+                    <div class="f-eq">${fmt(sd.blockingReducedDamage)} − ${fmt(inputs.armor)} = ${hoverResult(
+                        fmt(sd.finalReducedDamage),
+                        `finalDamage = blockReducedDamage − armor<br>${fmt(sd.blockingReducedDamage)} − ${fmt(inputs.armor)} = ${fmt(sd.finalReducedDamage)}`
+                    )}</div>`;
+            } else {
+                armorBody = `${armorCheck}
+                    <div class="f-eq">${fmt(sd.blockingReducedDamage)}² ÷ (${fmt(inputs.armor)} × 4) = ${hoverResult(
+                        fmt(sd.finalReducedDamage),
+                        `finalDamage = blockReducedDamage² ÷ (armor × 4)<br>${fmt(sd.blockingReducedDamage)}² ÷ (${fmt(inputs.armor)} × 4) = ${fmt(sd.finalReducedDamage)}`
+                    )}</div>`;
+            }
+
+            if (!isShield && sd.stagger === 'YES') {
+                armorBody += `
+                    ${staggerWarning(`Compared to stagger threshold: final damage ${fmt(sd.finalReducedDamage)} &gt; ${fmt(staggerBar)} (= 40% of ${fmt(inputs.maxHealth)} max health).`)}`;
+            }
+
+            const step4 = `<div class="f-step">
+                ${stepLabel('Step 4 — ', 'Body Armor Reduction')}
+                ${armorBody}
+            </div>`;
+
+            // Step 5 — Remaining Health
+            const step5 = `<div class="f-step">
+                ${stepLabel('Step 5 — ', 'Remaining Health')}
+                <div class="f-eq">${fmt(inputs.maxHealth)} − ${fmt(sd.finalReducedDamage)} = ${hoverResult(
+                    fmt(sd.remainingHealth),
+                    `remainingHealth = maxHealth − finalDamage<br>${fmt(inputs.maxHealth)} − ${fmt(sd.finalReducedDamage)} = ${fmt(sd.remainingHealth)}`,
+                    sd.remainingHealth <= 0 ? 'f-dead' : ''
+                )}</div>
+            </div>`;
+
+            return `<div class="f-col">
+                <div class="f-col-title">${sd.scenarioName}</div>
+                ${step2}${step3}${step4}${step5}
+            </div>`;
+        }
+
+        document.getElementById('formula').innerHTML = `
+            <div class="f-shared">${step1Html}</div>
+            <div class="f-cols">
+                ${buildCol('noShield', data.noShield)}
+                ${buildCol('block',    data.block)}
+                ${buildCol('parry',    data.parry)}
+            </div>`;
+
+        const det = document.getElementById('formulaDetails');
+        det.style.display = 'block';
+        det.open = true;
+    }
 
 </script>
 </body>

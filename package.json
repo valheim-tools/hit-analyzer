@@ -1,0 +1,14 @@
+{
+  "name": "valheim-damage-calculator",
+  "version": "2.0.0",
+  "description": "Valheim physical-damage calculator — static site, no backend required",
+  "type": "module",
+  "scripts": {
+    "test": "node ui/damage-calculator.test.js",
+    "serve": "powershell -ExecutionPolicy Bypass -File serve.ps1"
+  },
+  "keywords": ["valheim", "damage", "calculator"],
+  "license": "MIT",
+  "private": true
+}
+

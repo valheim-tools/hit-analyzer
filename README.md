@@ -2,6 +2,8 @@
 
 A tool for calculating physical damage in Valheim, accounting for difficulty scaling, star levels, blocking, parrying, and body armor — across three scenarios simultaneously.
 
+Runs entirely in the browser as a static site — no backend required.
+
 ---
 
 ## Features
@@ -12,6 +14,7 @@ A tool for calculating physical damage in Valheim, accounting for difficulty sca
 - **Difficulty & star scaling** — Normal / Hard / Very Hard and 0–3 star mob bonuses (additive, not multiplicative)
 - **Calculation history** — Last 10 results saved in localStorage, with optional custom labels and per-entry delete
 - **Tooltips** — Inline `?` badges on key result rows explain each value
+- **Zero dependencies** — Pure vanilla JS ES modules, no build step
 
 ---
 
@@ -19,7 +22,7 @@ A tool for calculating physical damage in Valheim, accounting for difficulty sca
 
 | Step | What happens |
 |------|-------------|
-| **1** | Raw damage is scaled by difficulty & star bonuses → **Effective Damage** |
+| **1** | Raw damage is scaled by difficulty, star & extra damage bonuses → **Effective Damage** |
 | **2** | Effective damage is reduced by shield / blocking armor → **Blocking-Reduced Damage** |
 | **3** | Remaining damage is reduced by body armor → **Final/Armor-Reduced Damage** |
 | **4** | Final damage is subtracted from Max Health → **Remaining Health** |
@@ -30,10 +33,9 @@ Stagger threshold = **40% of Max Health**. A block-stagger prevents a second arm
 
 ## Tech Stack
 
-- **Backend** — Java 21, JDK built-in `com.sun.net.httpserver.HttpServer` (no Spring / Jakarta EE), Lombok, Jackson
-- **Frontend** — Plain HTML + vanilla JS ES module, no bundler
-- **Build** — Maven (fat-jar via Maven Shade Plugin)
-- **Tests** — JUnit 5, data-driven from `damage-calculator-test-cases.json`
+- **Frontend** — Plain HTML + vanilla JS ES modules, no bundler, no framework
+- **Tests** — Zero-dependency Node.js test runner, data-driven from `test-cases.json`
+- **Dev server** — PowerShell script using Node.js built-in `http` module
 
 ---
 
@@ -41,107 +43,49 @@ Stagger threshold = **40% of Max Health**. A block-stagger prevents a second arm
 
 ### Prerequisites
 
-- Java 21+
-- Maven 3.8+
-- PowerShell (for the launch scripts)
+- Node.js 18+ (for running tests and the dev server)
+- PowerShell (for `serve.ps1`)
 
-### Build & Run
-
-```powershell
-# Build the fat-jar, start the server on port 8080, and open the browser
-.\launch.ps1
-
-# Skip Maven rebuild if the jar is already built
-.\launch.ps1 -SkipBuild
-
-# Stop the running server (kills the process on port 8080)
-.\stop.ps1
-```
-
-> `launch.ps1` must be run from the project root — the server resolves `ui/` relative to the JVM working directory.
-
-### Manual run
+### Serve locally
 
 ```powershell
-# Server mode
-java -jar target\valheim-damage-calculator-1.0-SNAPSHOT.jar --server
+# Start local server on port 3000 and open the browser
+.\serve.ps1
 
-# Interactive console mode
-java -jar target\valheim-damage-calculator-1.0-SNAPSHOT.jar
+# Or on a custom port
+.\serve.ps1 -Port 8080
 ```
 
-### Tests
+### Run tests
 
 ```powershell
-mvn test
+npm test
 ```
 
-Test cases live in `src/test/resources/damage-calculator-test-cases.json`. To add a scenario, append a JSON object — no Java changes needed.
+Test cases live in `ui/test-cases.json`. To add a scenario, append a JSON object — no code changes needed.
 
 ---
 
 ## Project Structure
 
 ```
-src/main/java/valheim/calculator/
-├── Main.java                        # Entry point — server or console mode
-├── console/
-│   ├── InputReader.java             # Interactive console prompts
-│   └── ResultPrinter.java          # Console results table
-├── core/
-│   ├── DamageCalculator.java        # All game math (static utility)
-│   ├── DamageResult.java            # Per-scenario result record
-│   ├── GameDifficulty.java          # NORMAL / HARD / VERY_HARD enum
-│   ├── MobStats.java                # Raw damage + star level record
-│   ├── ParryBonus.java              # Parry multiplier enum
-│   ├── PlayerStats.java             # Player stats record
-│   └── StaggerResult.java          # ON_BLOCK / ON_ARMOR / NONE enum
-└── web/
-    ├── WebServer.java               # HttpServer setup + static file serving
-    ├── CalculateHandler.java        # POST /calculate
-    ├── CalculateRequest.java        # Request DTO record
-    ├── CalculateResponse.java       # Response DTO record
-    └── HealthHandler.java           # GET /health
-
 ui/
-├── index.html                       # Single-page UI
-└── calculator-core.js              # fetch wrapper (only file that knows about the backend)
+├── index.html                  # Single-page UI
+├── index.css                   # Styles
+├── index.js                    # UI logic — form handling, rendering, history
+├── damage-calculator.js        # All game math — single source of truth
+├── damage-calculator.test.js   # Zero-dependency Node.js test runner
+└── test-cases.json             # Data-driven test fixtures
+serve.ps1                       # Static file server (Node.js, port 3000)
+package.json                    # npm scripts for test and serve
 ```
 
 ---
 
-## API
+## Hosting
 
-### `POST /calculate`
+The `ui/` directory is a self-contained static site. Deploy its contents to any static host:
 
-**Request**
-```json
-{
-  "rawDamage": 60.0,
-  "starLevel": 1,
-  "difficulty": "HARD",
-  "maxHealth": 100.0,
-  "blockingSkill": 15.0,
-  "blockingArmor": 28.0,
-  "armor": 42.0,
-  "parryBonus": "X2_5"
-}
-```
-
-**Response**
-```json
-{
-  "baseRawDamage": 60.0,
-  "effectiveRawDamage": 120.0,
-  "noShield": { "scenarioName": "No Shield", "blockingReducedDamage": 120.0, "finalReducedDamage": 47.8, "remainingHealth": 52.2, "stagger": "NONE" },
-  "block":    { "scenarioName": "Block",     "blockingReducedDamage": 47.8,  "finalReducedDamage": 13.6, "remainingHealth": 86.4, "stagger": "NONE" },
-  "parry":    { "scenarioName": "Parry",     "blockingReducedDamage": 11.9,  "finalReducedDamage": 3.4,  "remainingHealth": 96.6, "stagger": "NONE" }
-}
-```
-
-Valid values:
-- `difficulty`: `NORMAL` | `HARD` | `VERY_HARD`
-- `starLevel`: `0` – `3`
-- `parryBonus`: `X1` | `X1_5` | `X2` | `X2_5` | `X4` | `X6`
-- `stagger`: `ON_BLOCK` | `ON_ARMOR` | `NONE`
-
+- **GitHub Pages** — point to the `ui/` folder
+- **Netlify / Vercel** — set publish directory to `ui/`
+- **Any HTTP server** — serve the `ui/` folder as the document root

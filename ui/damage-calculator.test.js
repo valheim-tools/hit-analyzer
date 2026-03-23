@@ -14,7 +14,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const casesPath = resolve(__dirname, '..', 'src', 'test', 'resources', 'damage-calculator-test-cases.json');
+const casesPath = resolve(__dirname, 'test-cases.json');
 const cases = JSON.parse(readFileSync(casesPath, 'utf-8'));
 
 const TOLERANCE = 0.001;

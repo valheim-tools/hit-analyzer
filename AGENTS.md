@@ -1,58 +1,55 @@
-het# AGENTS.md — Valheim Damage Calculator
+# AGENTS.md — Valheim Damage Calculator
 
 ## Architecture Overview
 
-Two-layer application sharing a single damage model:
+Pure static-site application — all calculation logic runs client-side in vanilla JavaScript ES modules. No backend required.
 
-- **Backend** (`src/main/java/valheim/calculator/`): Java 21 fat-jar with **two runtime modes**:
-  - `--server` flag → `web.WebServer` starts a `com.sun.net.httpserver.HttpServer` on port 8080 (no Spring, no Jakarta EE — JDK built-in only)
-  - No flag → interactive console via `InputReader`
-- **Frontend** (`ui/`): Plain HTML + vanilla JS (`index.html`, `calculator-core.js`). Served as static files from the `ui/` directory by `WebServer`. Uses ES module `export` — no bundler.
+- **Frontend** (`ui/`): `index.html`, `damage-calculator.js`, `index.js`, `index.css`. Served as static files by any HTTP server (e.g., `serve.ps1` via Node.js).
+- All calculation logic lives in `ui/damage-calculator.js`. The UI (`index.js`) is a thin wrapper that collects form values and renders results.
 
-All calculation logic lives exclusively in `core/DamageCalculator.java`. The web handler (`web/CalculateHandler`) and console (`Main`) are thin wrappers around it.
-
-## Package Structure
+## File Structure
 
 ```
-valheim.calculator          ← entry point (Main)
-valheim.calculator.console  ← console/interactive-mode utilities
-valheim.calculator.core     ← domain model, pure game logic (no HTTP)
-valheim.calculator.web      ← HTTP layer (handlers, DTOs, server setup)
+ui/
+├── index.html                  # Single-page UI
+├── index.css                   # Styles
+├── index.js                    # UI logic — form handling, rendering, history
+├── damage-calculator.js        # All game math — single source of truth
+├── damage-calculator.test.js   # Zero-dependency Node.js test runner
+└── test-cases.json             # Data-driven test fixtures
+serve.ps1                       # Static file server (Node.js, port 3000)
+package.json                    # npm test / npm run serve
+AGENTS.md                       # This file
+README.md                       # Project documentation
 ```
 
-- Add new domain types to `core`, new HTTP concerns to `web`, new console utilities to `console`.
-- `core` must not import from `web` or `console`; `web` and `console` both import from `core`.
+- `damage-calculator.js` is a pure ES module with no DOM dependency — importable from both the browser and Node.js tests.
+- `index.js` is browser-only (DOM access).
 
 ## Developer Workflows
 
 ```powershell
-# Build + start server + open browser
-.\launch.ps1
+# Serve the app locally and open the browser
+.\serve.ps1
 
-# Skip Maven rebuild (jar already built)
-.\launch.ps1 -SkipBuild
-
-# Stop the running server (finds process by port 8080)
-.\stop.ps1
+# Serve on a custom port
+.\serve.ps1 -Port 8080
 
 # Run tests
-mvn test
+npm test
 
-# Console (interactive) mode
-java -jar target\valheim-damage-calculator-1.0-SNAPSHOT.jar
-
-# Server mode manually
-java -jar target\valheim-damage-calculator-1.0-SNAPSHOT.jar --server
+# Or directly
+node ui/damage-calculator.test.js
 ```
 
-> `launch.ps1` **must be run from the project root** — `WebServer` resolves static files relative to `ui/` from the JVM working directory.
+> `serve.ps1` must be run from the project root — it resolves `ui/` relative to the script directory.
 
 ## Damage Pipeline
 
-Every calculation always produces **three scenarios in one call**: No Shield, Block, Parry (see `DamageCalculator.calculate`).
+Every calculation produces **three scenarios in one call**: No Shield, Block, Parry (see `damage-calculator.js → calculate()`).
 
 ```
-effectiveRawDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5)
+effectiveRawDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent / 100)
                      ← bonuses are ADDITIVE, not multiplicative
 ```
 
@@ -60,32 +57,27 @@ Armor reduction formula (used for both blocking and body armor phases):
 - If `armor < damage / 2` → `reduced = damage − armor`
 - Else → `reduced = damage² / (armor × 4)`
 
-Stagger threshold = 40% of `maxHealth`. A player staggered on block cannot be double-staggered by armor (`staggeredOnBlocking` gates `staggeredOnArmor`).
+Stagger threshold = 40% of `maxHealth`. A player staggered on block cannot be double-staggered by armor (`staggeredOnBlock` gates armor stagger check).
 
 ## Key Conventions
 
-**Use Java records for all POJOs** — data-only types with no mutable state must be records, not classes:
-- Domain objects in `core`: `MobStats`, `PlayerStats`, `DamageResult` — records with Lombok `@Builder`
-- HTTP DTOs in `web`: `CalculateRequest`, `CalculateResponse` — plain records, no Lombok, no Jackson annotations
-- Jackson 2.12+ deserializes records natively via `Class.getRecordComponents()` — no `@JsonCreator` needed
+**`damage-calculator.js`** is a static-function-only module — all exports are pure functions, no class instantiation.
 
-**Construct domain records via `.builder()...build()`** (Lombok `@Builder`). Do not use the canonical constructor directly.
+**Difficulty** values: `NORMAL`, `HARD`, `VERY_HARD` — stored as keys in the `DIFFICULTY` frozen object.
 
-**`DamageCalculator`** is a static-methods-only utility class — never instantiate it.
-
-**`GameDifficulty`** enum values are `NORMAL`, `HARD`, `VERY_HARD`. The string form is used directly in JSON (`difficulty` field). Validate new difficulty values against `GameDifficulty.valueOf()` in `CalculateHandler`.
-
-**`ParryBonus`** enum values are `X1`, `X1_5`, `X2`, `X2_5`, `X4`, `X6` (the fixed set of parry multipliers available in-game). The string form is sent in JSON (`parryBonus` field) and resolved via `ParryBonus.valueOf()` in `CalculateHandler`. `PlayerStats` stores a `ParryBonus` and exposes a `parryMultiplier()` bridge method so `DamageCalculator` is unaware of the enum.
+**Parry multiplier** can be supplied two ways:
+- `parryMultiplier` — direct numeric value (preferred by the UI)
+- `parryBonus` — legacy enum key (`X1`, `X1_5`, `X2`, `X2_5`, `X4`, `X6`) resolved via the `PARRY_BONUS` lookup
 
 ## Testing
 
-Tests are data-driven via `src/test/resources/damage-calculator-test-cases.json`. To add a new scenario, add a JSON object to that file — no Java code changes needed. Use tolerance `0.001` for `assertEquals` on doubles (matches existing assertions in `DamageCalculatorTest`).
+Tests are data-driven via `ui/test-cases.json`. To add a new scenario, add a JSON object to that file — no code changes needed. Tolerance is `±0.001` for floating-point assertions.
 
 ```json
 {
   "name": "descriptive label shown in test output",
   "mob":    { "rawDamage": 60.0, "starLevel": 1 },
-  "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockingArmor": 20.0, "armor": 30.0, "parryBonus": "X1_5" },
+  "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockingArmor": 20.0, "armor": 30.0, "parryMultiplier": 1.5 },
   "difficulty": "HARD",
   "useShield": true,
   "isParry": false,
@@ -97,19 +89,11 @@ Tests are data-driven via `src/test/resources/damage-calculator-test-cases.json`
 
 | File | Purpose |
 |---|---|
-| `core/DamageCalculator.java` | All game math — single source of truth |
-| `core/DamageResult.java` | Output record (Lombok `@Builder`) |
-| `core/MobStats.java` | Validates starLevel 0–3; computes effective damage |
-| `core/PlayerStats.java` | Player stats record (Lombok `@Builder`) |
-| `core/GameDifficulty.java` | Difficulty enum with `physicalDamageBonus` |
-| `web/WebServer.java` | HTTP server setup; static file serving from `ui/` |
-| `web/CalculateHandler.java` | `POST /calculate` — parses JSON, calls calculator, returns 3 scenarios |
-| `web/CalculateRequest.java` | HTTP request record (plain record, no Lombok) |
-| `web/CalculateResponse.java` | HTTP response record wrapping 3 `DamageResult`s |
-| `console/InputReader.java` | Prompts + validation for interactive console mode |
-| `console/ResultPrinter.java` | Formats and logs the three-scenario results table |
-| `ui/calculator-core.js` | Sole frontend-to-backend bridge (`fetch` POST to `/calculate`) |
-| `damage-calculator-test-cases.json` | All test fixtures — extend here first |
-
-
-
+| `ui/damage-calculator.js` | All game math — single source of truth |
+| `ui/index.js` | UI logic — form state, rendering, calculation history |
+| `ui/index.html` | Single-page HTML |
+| `ui/index.css` | Styles |
+| `ui/damage-calculator.test.js` | Zero-dependency Node.js test runner |
+| `ui/test-cases.json` | All test fixtures — extend here first |
+| `serve.ps1` | Static file server (Node.js) |
+| `package.json` | npm scripts for test and serve |

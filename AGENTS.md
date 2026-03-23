@@ -1,4 +1,4 @@
-# AGENTS.md — Valheim Damage Calculator
+# AGENTS.md — Valheim Damage Taken Calculator
 
 ## Architecture Overview
 

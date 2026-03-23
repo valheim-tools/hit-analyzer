@@ -1,6 +1,6 @@
-# ⚔ Valheim Damage Calculator
+# ⚔ Valheim Damage Taken Calculator
 
-A tool for calculating physical damage in Valheim, accounting for difficulty scaling, star levels, blocking, parrying, and body armor — across three scenarios simultaneously.
+A tool for calculating physical damage taken in Valheim, accounting for difficulty scaling, star levels, blocking, parrying, and body armor — across three scenarios simultaneously.
 
 Runs entirely in the browser as a static site — no backend required.
 

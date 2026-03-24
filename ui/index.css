@@ -411,6 +411,22 @@ tbody tr:nth-child(even) td { background: #24211a; }
     border-top: 1px solid #544828;
 }
 
+.formula-hint {
+    font-size: 0.75rem;
+    color: #a89060;
+    margin: 0;
+    padding: 0.5rem 1.2rem;
+    border-bottom: 1px solid #3a3020;
+    background: #1e1c14;
+}
+
+.formula-hint-sample {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: rgba(232, 216, 160, 0.4);
+    text-underline-offset: 2px;
+}
+
 .f-shared {
     margin-bottom: 1rem;
     padding-bottom: 0.9rem;

@@ -382,7 +382,7 @@ function render(data, inputs) {
         ? `Effective Damage = ${fmt(base)} → <span>${fmt(effective)}</span>`
         : `Effective Damage = <span>${fmt(base)}</span>`;
 
-    const BLOCK_TIP = 'Remaining damage after the block armor DMG reduction is applied to the effective raw damage — before body armor is factored in.';
+    const BLOCK_TIP = 'Remaining damage after the block armor damage reduction is applied to the effective raw damage — before body armor is factored in.';
     const FINAL_TIP = 'The final damage after the body armor damage reduction is applied to the block reduced damage.';
     const mkTip = text => `<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${text}</span></span>`;
     const rows = [

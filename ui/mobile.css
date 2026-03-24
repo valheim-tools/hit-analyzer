@@ -1,0 +1,144 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   mobile.css — Valheim Damage Calculator
+   All responsive / small-screen overrides. Loaded after index.css so every
+   rule here takes precedence over the desktop base styles.
+   Breakpoint: 620 px (covers phones in portrait and small landscape).
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── Tooltip: constrain width so it never exceeds the viewport ── */
+.tip-text {
+    max-width: min(400px, calc(100vw - 1rem));
+}
+
+/* ── Table horizontal-scroll wrapper ── */
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ── All small-screen overrides ── */
+@media (max-width: 620px) {
+
+    /* --- Global chrome --- */
+    body {
+        padding: 1rem 0.6rem;
+    }
+
+    h1 {
+        font-size: 1.15rem;
+        letter-spacing: 1px;
+    }
+
+    /* --- Form layout --- */
+
+    /* Stack the two form sections vertically */
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Parry multiplier / extra-damage inline rows: wrap on overflow */
+    .parry-multiplier-row,
+    .extra-damage-row {
+        flex-wrap: wrap;
+    }
+
+    .custom-parry-field,
+    .custom-extra-damage-field {
+        flex: 1 1 100%;
+    }
+
+    /* Tighten up section box padding */
+    .section {
+        padding: 1rem;
+    }
+
+    /* --- Tab navigation --- */
+    .tab-nav {
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+        flex: 1 1 auto;
+        padding: 0.45rem 0.6rem;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-align: center;
+    }
+
+    /* --- Results table --- */
+    .table-scroll {
+        border-radius: 4px;
+    }
+
+    table {
+        min-width: 440px;
+        font-size: 0.82rem;
+    }
+
+    thead th {
+        padding: 0.45rem 0.7rem;
+    }
+
+    tbody td {
+        padding: 0.4rem 0.7rem;
+    }
+
+    /* --- Formula section --- */
+    .f-cols {
+        grid-template-columns: 1fr;
+    }
+
+    .formula-body {
+        padding: 0.8rem 0.8rem 1rem;
+    }
+
+    /* --- Damage pipeline summary --- */
+    .calc-summary {
+        padding: 0.75rem 1rem;
+    }
+
+    /* --- Hit simulator --- */
+    #hitSimulator {
+        padding: 1rem;
+    }
+
+    .sim-main-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.8rem;
+    }
+
+    .sim-scenario-row {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.7rem 1.2rem;
+        padding-right: 0;
+        margin-right: 0;
+        border-right: none;
+        border-bottom: 1px solid #3a3420;
+        padding-bottom: 0.8rem;
+    }
+
+    /* --- Buttons: ensure comfortable tap targets --- */
+    button[type="submit"],
+    .sim-take-hit-btn {
+        padding: 0.75rem;
+        touch-action: manipulation;
+    }
+
+    #resetBtn,
+    #simResetBtn,
+    #simClearLogBtn {
+        touch-action: manipulation;
+    }
+
+    /* --- Tooltips: show below the anchor on mobile so they don't clip
+         above the top of the visible viewport, and rely on JS clamping
+         (mobile.js → initTooltipClamping) to keep them within the
+         horizontal bounds of the screen. --- */
+    .tip-text {
+        bottom: auto;
+        top: 140%;
+    }
+}
+

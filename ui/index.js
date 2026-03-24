@@ -1,4 +1,5 @@
-import { calculate } from './damage-calculator.js?v=5';
+import { calculate } from './damage-calculator.js?v=6';
+import { initTooltipClamping } from './mobile.js?v=6';
 
 /* ── Constants ── */
 const DEFAULTS = Object.freeze({
@@ -639,9 +640,11 @@ function renderFormula(data, inputs) {
 }
 
 async function initialize() {
+    initTooltipClamping();
+
     let presets = [];
     try {
-        const resp = await fetch('./mob-presets.json?v=5');
+        const resp = await fetch('./mob-presets.json?v=6');
         if (resp.ok) presets = await resp.json();
         populateMobPresets(presets);
     } catch (e) {

@@ -580,6 +580,16 @@ tbody tr:nth-child(even) td { background: #24211a; }
 
 #simResetBtn:hover { background: #362c18; }
 
+.sim-note {
+    font-size: 0.75rem;
+    color: #a89872;
+    font-style: italic;
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.sim-note strong { color: #c8a850; font-style: normal; }
+
 /* ── Horizontal main row: radios | bar + readout ── */
 .sim-main-row {
     display: flex;

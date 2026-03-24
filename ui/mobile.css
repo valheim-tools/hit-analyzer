@@ -10,6 +10,12 @@
     max-width: min(400px, calc(100vw - 1rem));
 }
 
+/* ── JS-driven tooltip visibility (mirrors CSS :hover) ── */
+.tip-wrap.tip-active > .tip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
 /* ── Table horizontal-scroll wrapper ── */
 .table-scroll {
     overflow-x: auto;
@@ -21,7 +27,7 @@
 
     /* --- Global chrome --- */
     body {
-        padding: 1rem 0.6rem;
+        padding: 1rem 0.5rem;
     }
 
     h1 {
@@ -49,7 +55,7 @@
 
     /* Tighten up section box padding */
     .section {
-        padding: 1rem;
+        padding: 0.8rem 0.7rem;
     }
 
     /* --- Tab navigation --- */
@@ -59,8 +65,8 @@
 
     .tab-btn {
         flex: 1 1 auto;
-        padding: 0.45rem 0.6rem;
-        font-size: 0.7rem;
+        padding: 0.45rem 0.5rem;
+        font-size: 0.68rem;
         letter-spacing: 1px;
         text-align: center;
     }
@@ -71,16 +77,16 @@
     }
 
     table {
-        min-width: 440px;
-        font-size: 0.82rem;
+        min-width: 380px;
+        font-size: 0.78rem;
     }
 
     thead th {
-        padding: 0.45rem 0.7rem;
+        padding: 0.4rem 0.5rem;
     }
 
     tbody td {
-        padding: 0.4rem 0.7rem;
+        padding: 0.35rem 0.5rem;
     }
 
     /* --- Formula section --- */
@@ -89,17 +95,17 @@
     }
 
     .formula-body {
-        padding: 0.8rem 0.8rem 1rem;
+        padding: 0.6rem 0.6rem 0.8rem;
     }
 
     /* --- Damage pipeline summary --- */
     .calc-summary {
-        padding: 0.75rem 1rem;
+        padding: 0.6rem 0.8rem;
     }
 
     /* --- Hit simulator --- */
     #hitSimulator {
-        padding: 1rem;
+        padding: 0.8rem 0.7rem;
     }
 
     .sim-main-row {
@@ -132,13 +138,81 @@
         touch-action: manipulation;
     }
 
-    /* --- Tooltips: show below the anchor on mobile so they don't clip
-         above the top of the visible viewport, and rely on JS clamping
-         (mobile.js → initTooltipClamping) to keep them within the
-         horizontal bounds of the screen. --- */
+    /* --- Tooltips --- */
+
+    /* The entire .tip-wrap is the tap target on mobile.
+       Enlarge the touch area and provide a visual hint. */
+    .tip-wrap {
+        cursor: pointer;
+        -webkit-tap-highlight-color: rgba(200, 168, 80, 0.15);
+    }
+
+    /* Make the ? icon a comfortable tap target on mobile */
+    .tip-icon {
+        padding: 6px;
+        margin: -6px;
+        margin-left: 2px;
+    }
+
+    /* CSS-default direction is below on mobile; JS overrides to fixed. */
     .tip-text {
         bottom: auto;
         top: 140%;
     }
 }
 
+/* ── Extra-small screen tightening (320 px) ── */
+@media (max-width: 380px) {
+    body {
+        padding: 0.6rem 0.35rem;
+    }
+
+    h1 {
+        font-size: 1rem;
+        letter-spacing: 0;
+        margin-bottom: 1.2rem;
+    }
+
+    .section {
+        padding: 0.6rem 0.5rem;
+    }
+
+    .section h2 {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+    }
+
+    table {
+        min-width: 320px;
+        font-size: 0.72rem;
+    }
+
+    thead th {
+        padding: 0.35rem 0.35rem;
+        font-size: 0.72rem;
+    }
+
+    tbody td {
+        padding: 0.3rem 0.35rem;
+    }
+
+    .tab-btn {
+        padding: 0.4rem 0.35rem;
+        font-size: 0.62rem;
+        letter-spacing: 0;
+    }
+
+    .damage-note {
+        font-size: 0.72rem;
+    }
+
+    .sim-log-entry {
+        font-size: 0.72rem;
+        gap: 0.35rem;
+        padding: 0.25rem 0.4rem;
+    }
+
+    .sim-log-hit-num {
+        min-width: 2.5rem;
+    }
+}

@@ -1,13 +1,14 @@
 /**
  * mobile.js — Valheim Damage Calculator
  *
- * Tooltip viewport clamping — works on every screen size.
+ * Tooltip viewport clamping + mobile touch toggle.
  *
  * All tooltips are switched to position:fixed so they can never be clipped
  * by an overflow:auto ancestor (e.g. the horizontal-scroll table wrapper).
- * One synchronous getBoundingClientRect() call forces a layout flush and
- * returns the real content-sized rect, which is then used to calculate the
- * final clamped position — all before the first paint.
+ *
+ * On touch devices the CSS :hover trigger is unreliable, so this module
+ * adds a JS-driven `.tip-active` class that mirrors :hover visibility.
+ * Tapping a .tip-wrap toggles it open; tapping anywhere else closes it.
  *
  * Desktop → tooltip shown above the anchor  (mirrors the CSS default)
  * Mobile  → tooltip shown below the anchor
@@ -17,14 +18,25 @@
 
 /** Reset every inline style set by this module. */
 function resetTipStyles(tip) {
-    tip.style.position  = '';
-    tip.style.left      = '';
-    tip.style.top       = '';
-    tip.style.bottom    = '';
-    tip.style.transform = '';
-    tip.style.width     = '';
-    tip.style.maxWidth  = '';
-    tip.style.zIndex    = '';
+    tip.style.position   = '';
+    tip.style.left       = '';
+    tip.style.top        = '';
+    tip.style.bottom     = '';
+    tip.style.transform  = '';
+    tip.style.width      = '';
+    tip.style.maxWidth   = '';
+    tip.style.zIndex     = '';
+    tip.style.visibility = '';
+    tip.style.opacity    = '';
+}
+
+/** Close every open tooltip. */
+function closeAllTips() {
+    document.querySelectorAll('.tip-wrap.tip-active').forEach(el => {
+        el.classList.remove('tip-active');
+        const tip = el.querySelector(':scope > .tip-text');
+        if (tip) resetTipStyles(tip);
+    });
 }
 
 /**
@@ -43,26 +55,28 @@ export function clampTooltip(wrapEl) {
     // default CSS positioning (needed to calculate anchor coordinates).
     resetTipStyles(tip);
 
-    const vw  = window.innerWidth;
-    const vh  = window.innerHeight;
+    const vw  = document.documentElement.clientWidth;   // excludes scrollbar
+    const vh  = document.documentElement.clientHeight;
     const pad = 8; // min gap from each viewport edge (px)
 
     // Snapshot the anchor's viewport rect while position:absolute is still
     // in effect (i.e. before we switch to fixed).
     const wrapRect = wrapEl.getBoundingClientRect();
 
-    // Apply position:fixed with placeholder coordinates so that the
-    // subsequent getBoundingClientRect() flush returns the real rendered
-    // size (content-driven width, bounded by maxWidth).
+    // Apply position:fixed with placeholder coordinates.
+    // Force visibility so getBoundingClientRect returns real dimensions
+    // even when CSS :hover hasn't kicked in yet (important on touch).
     const maxW = Math.min(400, vw - pad * 2);
-    tip.style.position  = 'fixed';
-    tip.style.left      = `${pad}px`;  // placeholder — overwritten below
-    tip.style.top       = `${pad}px`;  // placeholder — overwritten below
-    tip.style.bottom    = 'auto';
-    tip.style.transform = 'none';
-    tip.style.width     = '';          // natural max-content width
-    tip.style.maxWidth  = `${maxW}px`;
-    tip.style.zIndex    = '200';
+    tip.style.position   = 'fixed';
+    tip.style.visibility = 'hidden';    // hidden but laid out — allows measurement
+    tip.style.opacity    = '0';
+    tip.style.left       = `${pad}px`;  // placeholder — overwritten below
+    tip.style.top        = `${pad}px`;  // placeholder — overwritten below
+    tip.style.bottom     = 'auto';
+    tip.style.transform  = 'none';
+    tip.style.width      = '';          // natural max-content width
+    tip.style.maxWidth   = `${maxW}px`;
+    tip.style.zIndex     = '200';
 
     // Forced layout flush — gives the actual rendered dimensions.
     const { width: actualW, height: actualH } = tip.getBoundingClientRect();
@@ -77,17 +91,17 @@ export function clampTooltip(wrapEl) {
 
     let top;
     if (vw > 620) {
-        // Desktop: show above (same side as CSS bottom:140%).
-        // Fall back to below if it would clip the top of the viewport.
         top = aboveTop >= pad ? aboveTop : belowTop;
     } else {
-        // Mobile: show below.
-        // Fall back to above if it would clip the bottom of the viewport.
         top = belowTop + actualH <= vh - pad ? belowTop : aboveTop;
     }
 
-    tip.style.left = `${Math.round(left)}px`;
-    tip.style.top  = `${Math.round(top)}px`;
+    tip.style.left       = `${Math.round(left)}px`;
+    tip.style.top        = `${Math.round(top)}px`;
+    // Now make it visible — the correct position is already in place
+    // before the browser paints, so there's no flash.
+    tip.style.visibility = 'visible';
+    tip.style.opacity    = '1';
 }
 
 /**
@@ -95,21 +109,62 @@ export function clampTooltip(wrapEl) {
  * including ones created dynamically after this call (event delegation).
  */
 export function initTooltipClamping() {
-    function handleShow(e) {
+    // ── Desktop: mouse / keyboard ────────────────────────────────────────
+    document.addEventListener('mouseover', e => {
         const wrap = e.target.closest('.tip-wrap');
         if (wrap) clampTooltip(wrap);
-    }
+    });
+    document.addEventListener('mouseout', e => {
+        const wrap = e.target.closest('.tip-wrap');
+        if (wrap) {
+            const tip = wrap.querySelector(':scope > .tip-text');
+            if (tip) resetTipStyles(tip);
+        }
+    });
+    document.addEventListener('focusin', e => {
+        const wrap = e.target.closest('.tip-wrap');
+        if (wrap) clampTooltip(wrap);
+    }, true);
+    document.addEventListener('focusout', e => {
+        const wrap = e.target.closest('.tip-wrap');
+        if (wrap) {
+            const tip = wrap.querySelector(':scope > .tip-text');
+            if (tip) resetTipStyles(tip);
+        }
+    }, true);
 
-    // mouseover bubbles — reliable for delegation on dynamically-created nodes.
-    // touchstart handles mobile tap-to-show.
-    // focusin handles keyboard navigation.
-    document.addEventListener('mouseover',  handleShow);
-    document.addEventListener('focusin',    handleShow, true);
-    document.addEventListener('touchstart', handleShow, { capture: true, passive: true });
+    // ── Scroll: hide any tooltip that was clamped with position:fixed ────
+    window.addEventListener('scroll', () => {
+        document.querySelectorAll('.tip-text').forEach(resetTipStyles);
+    }, { passive: true });
 
-    // On resize / orientation change, clear inline styles so the next
-    // interaction recalculates from a clean base position.
+    // ── Mobile: tap to toggle ────────────────────────────────────────────
+    // We track whether the device uses touch so hover-only users are not
+    // affected by the toggle logic.
+    let isTouchDevice = false;
+    document.addEventListener('touchstart', () => { isTouchDevice = true; }, { once: true, passive: true });
+
+    document.addEventListener('click', e => {
+        if (!isTouchDevice) return;
+
+        const wrap = e.target.closest('.tip-wrap');
+        if (wrap) {
+            e.preventDefault();
+            const wasActive = wrap.classList.contains('tip-active');
+            closeAllTips();           // close every other tooltip first
+            if (!wasActive) {
+                wrap.classList.add('tip-active');
+                clampTooltip(wrap);
+            }
+        } else {
+            // Tapped outside any tooltip — close all.
+            closeAllTips();
+        }
+    });
+
+    // ── Layout changes ───────────────────────────────────────────────────
     window.addEventListener('resize', () => {
+        closeAllTips();
         document.querySelectorAll('.tip-text').forEach(resetTipStyles);
     });
 }

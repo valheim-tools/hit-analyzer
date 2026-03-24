@@ -1,5 +1,5 @@
-import { calculate } from './damage-calculator.js?v=6';
-import { initTooltipClamping } from './mobile.js?v=6';
+import { calculate } from './damage-calculator.js?v=7';
+import { initTooltipClamping } from './mobile.js?v=7';
 
 /* ── Constants ── */
 const DEFAULTS = Object.freeze({
@@ -202,13 +202,29 @@ const SIM_SCENARIO_LABELS = { noShield: 'No Shield', block: 'Block', parry: 'Par
 
 /**
  * Initialise (or re-initialise) the simulator from the current form values.
- * Does NOT require Calculate to have been run first.
+ * Full reset: HP restored, hit count zeroed, log cleared.
  */
 function initHitSimulator() {
     const maxHp = parseFloat(maxHealthEl.value) || 0;
     simState = { maxHealth: maxHp, currentHp: maxHp, hitCount: 0 };
     simLogEl.innerHTML = '';
     simErrorEl.hidden = true;
+    renderHitSimulator();
+}
+
+/**
+ * Update the simulator's max-health WITHOUT resetting HP, hit count, or
+ * the hit log.  If no hits have been taken yet, current HP follows max HP.
+ */
+function syncSimMaxHealth() {
+    if (!simState) { initHitSimulator(); return; }
+    const newMax = parseFloat(maxHealthEl.value) || 0;
+    if (simState.hitCount === 0) {
+        simState.maxHealth = newMax;
+        simState.currentHp = newMax;
+    } else {
+        simState.maxHealth = newMax;
+    }
     renderHitSimulator();
 }
 
@@ -298,11 +314,7 @@ function loadSavedForm(fallback = DEFAULTS) {
 /* ── Mob presets ── */
 function extractMobFields(preset) {
     return {
-        rawDamage:          preset.rawDamage,
-        starLevel:          preset.starLevel,
-        difficulty:         preset.difficulty,
-        extraDamagePercent: preset.extraDamagePercent ?? 0,
-        extraDamageEnabled: preset.extraDamageEnabled ?? 'no',
+        rawDamage: preset.rawDamage,
     };
 }
 
@@ -341,7 +353,7 @@ function staggerState(scenario) {
     if (scenario.stagger === 'YES') {
         const isShielded = scenario.scenarioName === 'Block' || scenario.scenarioName === 'Parry';
         if (isShielded) {
-            return '<span class="stagger-yes">yes<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">-> Block armor damage reduction was not applied.</span></span></span>';
+            return '<span class="stagger-yes">yes</span> <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">→ Block armor damage reduction was not applied.</span></span>';
         }
         return '<span class="stagger-yes">yes</span>';
     }
@@ -384,10 +396,10 @@ function render(data, inputs) {
 
     const BLOCK_TIP = 'Remaining damage after the block armor damage reduction is applied to the effective raw damage — before body armor is factored in.';
     const FINAL_TIP = 'The final damage after the body armor damage reduction is applied to the block reduced damage.';
-    const mkTip = text => `<span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${text}</span></span>`;
+    const mkTip = (label, text) => `${label} <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${text}</span></span>`;
     const rows = [
-        { label: `Block-Reduced Damage ${mkTip(BLOCK_TIP)}`, fn: scenario => fmt(scenario.blockReducedDamage) },
-        { label: `Final/Armor-Reduced Damage ${mkTip(FINAL_TIP)}`, fn: scenario => fmt(scenario.finalReducedDamage) },
+        { label: mkTip('Block-Reduced Damage', BLOCK_TIP), fn: scenario => fmt(scenario.blockReducedDamage) },
+        { label: mkTip('Final/Armor-Reduced Damage', FINAL_TIP), fn: scenario => fmt(scenario.finalReducedDamage) },
         {
             label: 'Remaining Health',
             fn: scenario => {
@@ -422,7 +434,7 @@ function render(data, inputs) {
 
     results.style.display = 'block';
     renderFormula(data, inputs);
-    initHitSimulator();
+    syncSimMaxHealth();
 }
 
 /* ── Formula breakdown ── */
@@ -556,7 +568,7 @@ function renderFormula(data, inputs) {
                     ${staggerWarning(`Compared to stagger threshold: block-reduced damage ${fmt(afterBlock)} &gt; ${fmt(staggerBar)} (= 40% of ${fmt(inputs.maxHealth)} max health) → block bypassed.`)}
                     <div class="f-eq">After Block → ${hoverResult(
                         fmt(scenarioData.blockReducedDamage),
-                        'The player was staggered, so block armor DMG reduction was not applied.'
+                        'The player was staggered, so block armor damage reduction was not applied.'
                     )}</div>`;
             } else if (blockLinear) {
                 body = `${check}
@@ -644,7 +656,7 @@ async function initialize() {
 
     let presets = [];
     try {
-        const resp = await fetch('./mob-presets.json?v=6');
+        const resp = await fetch('./mob-presets.json?v=7');
         if (resp.ok) presets = await resp.json();
         populateMobPresets(presets);
     } catch (e) {
@@ -658,8 +670,12 @@ async function initialize() {
     loadSavedForm(firstVisitDefaults);
 
     form.addEventListener('input', saveForm);
-    form.addEventListener('input', initHitSimulator);
-    form.addEventListener('change', initHitSimulator);
+
+    // Only changing Game Difficulty resets the simulator (full reset).
+    // Max Health changes update the HP bar live without clearing the log.
+    // All other fields can change mid-fight — the sim reads them on each hit.
+    difficultyEl.addEventListener('change', initHitSimulator);
+    maxHealthEl.addEventListener('input', syncSimMaxHealth);
     resetBtnEl.addEventListener('click', resetForm);
     extraDamageToggleEl.addEventListener('change', () => {
         if (extraDamageToggleEl.value === 'yes') {

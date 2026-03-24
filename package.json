@@ -1,6 +1,6 @@
 {
   "name": "valheim-damage-taken-calculator",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Valheim Damage Taken Calculator — static site, no backend required",
   "type": "module",
   "scripts": {

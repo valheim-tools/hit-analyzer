@@ -2,46 +2,26 @@
   {
     "id": "troll-log-vertical",
     "label": "Troll — Log Slam (Vertical)",
-    "rawDamage": 70,
-    "starLevel": 1,
-    "difficulty": "HARD",
-    "extraDamagePercent": 0,
-    "extraDamageEnabled": "no"
+    "rawDamage": 70
   },
   {
     "id": "troll-log-horizontal",
     "label": "Troll — Log Swing (Horizontal)",
-    "rawDamage": 60,
-    "starLevel": 1,
-    "difficulty": "HARD",
-    "extraDamagePercent": 0,
-    "extraDamageEnabled": "no"
+    "rawDamage": 60
   },
   {
     "id": "abomination-swing",
     "label": "Abomination — Swing (60 Blunt)",
-    "rawDamage": 60,
-    "starLevel": 0,
-    "difficulty": "HARD",
-    "extraDamagePercent": 0,
-    "extraDamageEnabled": "no"
+    "rawDamage": 60
   },
   {
     "id": "abomination-slam",
     "label": "Abomination — Slam (80 Blunt)",
-    "rawDamage": 80,
-    "starLevel": 0,
-    "difficulty": "HARD",
-    "extraDamagePercent": 0,
-    "extraDamageEnabled": "no"
+    "rawDamage": 80
   },
   {
     "id": "abomination-ground-slam",
     "label": "Abomination — Ground Slam (80 Blunt)",
-    "rawDamage": 80,
-    "starLevel": 0,
-    "difficulty": "HARD",
-    "extraDamagePercent": 0,
-    "extraDamageEnabled": "no"
+    "rawDamage": 80
   }
 ]

@@ -78,6 +78,16 @@ const simErrorEl          = document.getElementById('simError');
 const simLogEl            = document.getElementById('simLog');
 const simScenarioRadios   = () => document.querySelectorAll('input[name="simScenario"]');
 
+/* ── Combat Arena DOM refs ── */
+const simArenaEl          = document.getElementById('simArena');
+const arenaMobEl          = document.getElementById('arenaMob');
+const arenaProjectileEl   = document.getElementById('arenaProjectile');
+const arenaPlayerEl       = document.getElementById('arenaPlayer');
+const arenaPlayerShieldEl = document.getElementById('arenaPlayerShield');
+
+const SHIELD_IMAGE_BLOCK = 'src/assets/images/blue-shield.png';
+const SHIELD_IMAGE_PARRY = 'src/assets/images/yellow-shield.png';
+
 function sanitizeExtraDamagePercent(value, fallback = DEFAULTS.extraDamagePercent) {
     const parsed = Number(value);
     return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
@@ -213,6 +223,8 @@ function initHitSimulator() {
     simState = { maxHealth, currentHealth: maxHealth, hitCount: 0 };
     simLogEl.innerHTML = '';
     simErrorEl.hidden = true;
+    resetArenaAnimations();
+    resetArenaDeathState();
     renderHitSimulator();
 }
 
@@ -277,6 +289,113 @@ function appendSimLogEntry(hitNumber, scenarioKey, damage, remainingHealth, stag
         + staggerBadge;
     simLogEl.appendChild(li);
     simLogEl.scrollTop = simLogEl.scrollHeight;
+}
+
+/* ── Combat Arena Animation ── */
+let arenaCleanupTimer = null;
+let arenaReactionTimer = null;
+
+const ARENA_ANIMATION_CLASSES = Object.freeze([
+    'arena-animating',
+    'arena-hit-no-shield',
+    'arena-hit-block',
+    'arena-hit-parry',
+    'arena-stagger',
+    'arena-shield-break',
+    'arena-death',
+    'arena-parry-flash',
+    'arena-mob-stagger',
+]);
+
+function resetArenaAnimations() {
+    if (arenaCleanupTimer) {
+        clearTimeout(arenaCleanupTimer);
+        arenaCleanupTimer = null;
+    }
+    if (arenaReactionTimer) {
+        clearTimeout(arenaReactionTimer);
+        arenaReactionTimer = null;
+    }
+    arenaMobEl.classList.remove('arena-animating');
+    arenaMobEl.classList.remove('arena-mob-stagger');
+    arenaProjectileEl.classList.remove('arena-animating');
+    ARENA_ANIMATION_CLASSES.forEach(className => {
+        arenaPlayerEl.classList.remove(className);
+        simArenaEl.classList.remove(className);
+    });
+}
+
+function resetArenaDeathState() {
+    arenaPlayerEl.classList.remove('arena-dead');
+}
+
+/**
+ * Trigger a combat animation in the arena.
+ * Cancels any in-progress animation immediately so rapid clicks stay in sync.
+ * @param {'noShield'|'block'|'parry'} scenarioKey — which scenario was used
+ * @param {boolean} isStaggered — whether the player was staggered
+ * @param {boolean} isDead — whether the player died
+ */
+function triggerCombatAnimation(scenarioKey, isStaggered, isDead) {
+    // Cancel any in-progress animation and reset classes
+    resetArenaAnimations();
+    resetArenaDeathState();
+
+    // Force a reflow so removed classes take effect before re-adding
+    void arenaPlayerEl.offsetWidth;
+
+    // Start mob attack animation + projectile
+    arenaMobEl.classList.add('arena-animating');
+    arenaProjectileEl.classList.add('arena-animating');
+
+    // Determine which player reaction to show
+    const playerHitClass = {
+        noShield: 'arena-hit-no-shield',
+        block:    'arena-hit-block',
+        parry:    'arena-hit-parry',
+    }[scenarioKey] || 'arena-hit-no-shield';
+
+    // Delay the player reaction slightly so the attack "lands"
+    const reactionDelay = 267;
+    const isShieldScenario = scenarioKey === 'block' || scenarioKey === 'parry';
+
+    // Swap shield image: blue for block, yellow for parry
+    if (isShieldScenario) {
+        arenaPlayerShieldEl.src = scenarioKey === 'parry' ? SHIELD_IMAGE_PARRY : SHIELD_IMAGE_BLOCK;
+    }
+
+    arenaReactionTimer = setTimeout(() => {
+        arenaReactionTimer = null;
+
+        if (isDead) {
+            arenaPlayerEl.classList.add('arena-death');
+        } else if (isStaggered) {
+            arenaPlayerEl.classList.add(playerHitClass);
+            arenaPlayerEl.classList.add('arena-stagger');
+            if (isShieldScenario) {
+                arenaPlayerEl.classList.add('arena-shield-break');
+            }
+        } else {
+            arenaPlayerEl.classList.add(playerHitClass);
+        }
+
+        if (scenarioKey === 'parry' && !isStaggered && !isDead) {
+            simArenaEl.classList.add('arena-parry-flash');
+            arenaMobEl.classList.add('arena-mob-stagger');
+        }
+    }, reactionDelay);
+
+    // Clean up after the longest animation completes
+    const totalDuration = isDead ? 1600 : isStaggered ? 1733 : 1200;
+    arenaCleanupTimer = setTimeout(() => {
+        resetArenaAnimations();
+
+        if (isDead) {
+            arenaPlayerEl.classList.add('arena-dead');
+        }
+
+        arenaCleanupTimer = null;
+    }, totalDuration);
 }
 
 /* ── Form persistence ── */
@@ -798,6 +917,7 @@ async function initialize() {
             const rngFactor = rngOptions.rng !== undefined ? Math.sqrt(rngOptions.rng) : null;
             appendSimLogEntry(simState.hitCount, key, damage, simState.currentHealth, staggered, exactRemainingHealth, rngFactor);
             renderHitSimulator();
+            triggerCombatAnimation(key, staggered, simState.currentHealth <= 0);
         } catch (error) {
             simErrorEl.textContent = 'Error: ' + error.message;
             simErrorEl.hidden = false;

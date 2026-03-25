@@ -112,6 +112,58 @@
         box-sizing: border-box;
     }
 
+    /* --- Combat arena --- */
+    .sim-arena {
+        height: 90px;
+        padding: 0 1rem;
+        margin-bottom: 0.6rem;
+    }
+
+    .arena-mob-icon,
+    .arena-player-icon {
+        width: 3.7rem;
+        height: 3.7rem;
+    }
+
+    .arena-player-axe {
+        font-size: 0.95rem;
+        top: 4px;
+        right: -12px;
+    }
+
+    .arena-player-shield {
+        width: 3.4rem;
+        height: 3.4rem;
+        top: 2px;
+        left: -10px;
+    }
+
+    .arena-player-shield-broken {
+        width: 3.4rem;
+        height: 3.4rem;
+        top: 2px;
+        left: -10px;
+    }
+
+    .arena-mob-weapon {
+        font-size: 0.85rem;
+        top: -2px;
+        right: -8px;
+    }
+
+    .arena-stagger-badge {
+        font-size: 0.5rem;
+        padding: 0 3px;
+    }
+
+    .arena-death-overlay {
+        font-size: 1.6rem;
+    }
+
+    .arena-projectile {
+        font-size: 1.2rem;
+    }
+
     .sim-main-row {
         flex-direction: column;
         align-items: stretch;

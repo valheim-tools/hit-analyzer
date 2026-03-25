@@ -11,9 +11,9 @@ const OUTPUT_DIR = 'dist';
 // This is needed because the build flattens src/ into dist/ root, so all
 // deep paths (e.g. ./src/assets/styles/index.css) must become flat (./index.css).
 const PATH_REWRITES = {
-    './src/assets/styles/index.css?v=11':  './index.css',
-    './src/assets/styles/mobile.css?v=11': './mobile.css',
-    './src/index.js?v=11':                 './index.js',
+    './src/assets/styles/index.css?v=12':  './index.css',
+    './src/assets/styles/mobile.css?v=12': './mobile.css',
+    './src/index.js?v=12':                 './index.js',
     './damage-calculator.js?v=9':          './damage-calculator.js',
     './src/data/mob-presets.json?v=9':     './mob-presets.json',
 };

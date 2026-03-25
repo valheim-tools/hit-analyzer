@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valheim Damage Taken Calculator</title>
-    <link rel="stylesheet" href="./src/assets/styles/index.css?v=11">
-    <link rel="stylesheet" href="./src/assets/styles/mobile.css?v=11">
+    <link rel="stylesheet" href="./src/assets/styles/index.css?v=12">
+    <link rel="stylesheet" href="./src/assets/styles/mobile.css?v=12">
 </head>
 <body>
 <div class="container">
@@ -109,11 +109,11 @@
     <div id="tab-simulator" class="tab-panel">
         <div id="hitSimulator">
             <div class="sim-header">
-                <h2>⚔ Hit Simulator</h2>
+                <h2>Simulate sequential attacks</h2>
                 <button type="button" id="simResetBtn">Reset HP</button>
             </div>
 
-            <p class="sim-note">💡 You can change any stat between hits — simulate sequential different type of attacks. Only changing <strong>Game Difficulty</strong> resets the simulator.</p>
+            <p class="sim-note">💡 You can change any stat between hits, except <strong>Game Difficulty</strong> which resets the simulator.</p>
 
             <p class="sim-note sim-note-rng">🎲 <strong>Random Hit</strong> applies Valheim's in-game damage variance: <strong>damage × √rng</strong>, where rng is a uniform random number between 0.75 and 1.0 — giving a range of ~86.6%–100% of the base damage per hit.</p>
 
@@ -141,6 +141,24 @@
             </div>
 
             <div id="simError" class="sim-error" hidden></div>
+
+            <!-- ── Combat Animation Arena ── -->
+            <div id="simArena" class="sim-arena">
+                <div class="arena-ground"></div>
+                <div id="arenaMob" class="arena-mob">
+                    <img class="arena-mob-icon" id="arenaMobIcon" src="src/assets/images/greydwarf.png" alt="Monster">
+                    <span class="arena-mob-weapon" id="arenaMobWeapon">⚔</span>
+                </div>
+                <img id="arenaProjectile" class="arena-projectile" src="src/assets/images/projectile.png" alt="Projectile">
+                <div id="arenaPlayer" class="arena-player">
+                    <img class="arena-player-icon" id="arenaPlayerIcon" src="src/assets/images/viking.png" alt="Viking">
+                    <span class="arena-player-axe">🪓</span>
+                    <img class="arena-player-shield" id="arenaPlayerShield" src="src/assets/images/blue-shield.png" alt="Shield">
+                    <img class="arena-player-shield-broken" id="arenaPlayerShieldBroken" src="src/assets/images/red-shield.png" alt="Broken Shield">
+                    <span class="arena-stagger-badge" id="arenaStaggerBadge">⚠ Staggered</span>
+                    <span class="arena-death-overlay" id="arenaDeathOverlay">💀</span>
+                </div>
+            </div>
 
             <div class="sim-hit-row">
                 <button type="button" id="simTakeHitBtn" class="sim-take-hit-btn">⚔ Base Hit</button>
@@ -221,7 +239,7 @@
 
 </div>
 
-<script type="module" src="./src/index.js?v=11"></script>
+<script type="module" src="./src/index.js?v=12"></script>
 </body>
 </html>
 

@@ -846,6 +846,387 @@ tbody tr:nth-child(even) td { background: #24211a; }
     margin-top: 0;
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   Combat Animation Arena
+   ═══════════════════════════════════════════════════════════════════ */
+
+.sim-arena {
+    position: relative;
+    height: 120px;
+    background: linear-gradient(180deg, #18160e 0%, #1e1b12 60%, #252218 100%);
+    border: 1px solid #3a3420;
+    border-radius: 6px;
+    margin-bottom: 0.8rem;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+}
+
+/* Ground line */
+.arena-ground {
+    position: absolute;
+    bottom: 18px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 5%, #544828 20%, #544828 80%, transparent 95%);
+}
+
+/* ── Mob (left side) ── */
+.arena-mob {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.15s ease;
+}
+
+.arena-mob-icon {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(200, 60, 60, 0.4));
+    transition: filter 0.15s;
+}
+
+.arena-mob-weapon {
+    font-size: 1.1rem;
+    position: absolute;
+    top: -4px;
+    right: -12px;
+    opacity: 0;
+    transition: opacity 0.1s;
+}
+
+/* ── Projectile (flying attack) ── */
+.arena-projectile {
+    position: absolute;
+    left: 15%;
+    top: 50%;
+    transform: translate(0, -50%);
+    width: 2rem;
+    height: 2rem;
+    object-fit: contain;
+    opacity: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+/* ── Player (right side) — Viking warrior ── */
+.arena-player {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.15s ease;
+}
+
+.arena-player-icon {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(80, 140, 200, 0.3));
+    transition: filter 0.3s, opacity 0.3s;
+}
+
+.arena-player-axe {
+    display: none;
+}
+
+.arena-player-shield {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+    position: absolute;
+    top: 4px;
+    left: -14px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 3;
+}
+
+.arena-player-shield-broken {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+    position: absolute;
+    top: 4px;
+    left: -14px;
+    opacity: 0;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.arena-stagger-badge {
+    position: absolute;
+    bottom: -2px;
+    font-size: 0.6rem;
+    color: #c87840;
+    background: rgba(30, 28, 19, 0.9);
+    border: 1px solid #c87840;
+    border-radius: 3px;
+    padding: 1px 5px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.arena-death-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2rem;
+    opacity: 0;
+    pointer-events: none;
+    filter: drop-shadow(0 0 8px rgba(200, 40, 40, 0.8));
+}
+
+/* ─── Animation: mob attack lunge ─── */
+@keyframes arenaAttackLunge {
+    0%   { transform: translateX(0); }
+    30%  { transform: translateX(30px) rotate(5deg); }
+    60%  { transform: translateX(30px) rotate(5deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* ─── Animation: mob weapon slash ─── */
+@keyframes arenaWeaponSlash {
+    0%   { opacity: 0; transform: rotate(0deg); }
+    15%  { opacity: 1; transform: rotate(-30deg); }
+    50%  { opacity: 1; transform: rotate(20deg); }
+    70%  { opacity: 0.5; transform: rotate(10deg); }
+    100% { opacity: 0; transform: rotate(0deg); }
+}
+
+/* ─── Animation: projectile fly across ─── */
+@keyframes arenaProjectileFly {
+    0%   { left: 18%; opacity: 0; transform: translate(0, -50%) scale(0.6); }
+    10%  { opacity: 1; transform: translate(0, -50%) scale(1); }
+    70%  { opacity: 1; left: 72%; transform: translate(0, -50%) scale(1.2); }
+    85%  { opacity: 0.6; left: 78%; transform: translate(0, -50%) scale(1.4); }
+    100% { opacity: 0; left: 80%; transform: translate(0, -50%) scale(0.5); }
+}
+
+/* ─── Animation: player hit recoil (no shield) ─── */
+@keyframes arenaPlayerHit {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(12px) rotate(-3deg); }
+    40%  { transform: translateX(-4px) rotate(1deg); }
+    60%  { transform: translateX(6px) rotate(-1deg); }
+    80%  { transform: translateX(-2px); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* ─── Animation: player block (slight pushback + shield flash) ─── */
+@keyframes arenaPlayerBlock {
+    0%   { transform: translateX(0); }
+    25%  { transform: translateX(6px) rotate(-1deg); }
+    50%  { transform: translateX(3px); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arenaShieldBlock {
+    0%   { opacity: 0; }
+    15%  { opacity: 1; }
+    60%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* ─── Animation: player parry (bright gold flash) ─── */
+@keyframes arenaPlayerParry {
+    0%   { transform: translateX(0); }
+    15%  { transform: translateX(3px); }
+    30%  { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes arenaShieldParry {
+    0%   { opacity: 0; }
+    10%  { opacity: 1; }
+    30%  { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes arenaParryFlash {
+    0%   { box-shadow: inset 0 0 0 0 transparent; }
+    15%  { box-shadow: inset 0 0 30px rgba(255, 220, 100, 0.3); }
+    50%  { box-shadow: inset 0 0 15px rgba(255, 200, 60, 0.1); }
+    100% { box-shadow: inset 0 0 0 0 transparent; }
+}
+
+/* ─── Animation: stagger wobble ─── */
+@keyframes arenaPlayerStagger {
+    0%   { transform: translateX(0) rotate(0deg); }
+    10%  { transform: translateX(16px) rotate(-8deg); }
+    25%  { transform: translateX(-10px) rotate(6deg); }
+    40%  { transform: translateX(8px) rotate(-4deg); }
+    55%  { transform: translateX(-5px) rotate(3deg); }
+    70%  { transform: translateX(3px) rotate(-1deg); }
+    85%  { transform: translateX(-1px) rotate(0deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arenaStaggerBadgeFade {
+    0%   { opacity: 0; transform: translateY(4px); }
+    15%  { opacity: 1; transform: translateY(0); }
+    75%  { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-2px); }
+}
+
+/* ─── Animation: player death ─── */
+@keyframes arenaPlayerDeath {
+    0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
+    30%  { transform: translateX(10px) rotate(-10deg); opacity: 0.8; }
+    60%  { transform: translateX(-5px) rotate(15deg); opacity: 0.4; }
+    100% { transform: translateX(0) rotate(25deg); opacity: 0.15; }
+}
+
+@keyframes arenaDeathSkull {
+    0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+    30%  { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+    50%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ─── Animation: player flash red on damage ─── */
+@keyframes arenaPlayerDamageFlash {
+    0%   { filter: drop-shadow(0 0 6px rgba(80, 140, 200, 0.3)); }
+    20%  { filter: drop-shadow(0 0 12px rgba(224, 96, 96, 0.8)) brightness(1.3); }
+    50%  { filter: drop-shadow(0 0 8px rgba(224, 96, 96, 0.4)) brightness(1.1); }
+    100% { filter: drop-shadow(0 0 6px rgba(80, 140, 200, 0.3)) brightness(1); }
+}
+
+/* ─── Active animation classes (applied by JS) ─── */
+
+/* Mob */
+.arena-mob.arena-animating {
+    animation: arenaAttackLunge 0.93s ease-out forwards;
+}
+
+.arena-mob.arena-animating .arena-mob-weapon {
+    animation: arenaWeaponSlash 0.93s ease-out forwards;
+}
+
+/* Projectile */
+.arena-projectile.arena-animating {
+    animation: arenaProjectileFly 0.8s ease-out forwards;
+}
+
+/* Player — no shield hit */
+.arena-player.arena-hit-no-shield {
+    animation: arenaPlayerHit 0.8s ease-out forwards;
+}
+
+.arena-player.arena-hit-no-shield .arena-player-icon {
+    animation: arenaPlayerDamageFlash 0.8s ease-out forwards;
+}
+
+/* Player — block */
+.arena-player.arena-hit-block {
+    animation: arenaPlayerBlock 0.67s ease-out forwards;
+}
+
+.arena-player.arena-hit-block .arena-player-shield {
+    animation: arenaShieldBlock 0.8s ease-out forwards;
+}
+
+/* Player — parry */
+.arena-player.arena-hit-parry {
+    animation: arenaPlayerParry 0.53s ease-out forwards;
+}
+
+.arena-player.arena-hit-parry .arena-player-shield {
+    animation: arenaShieldParry 0.67s ease-out forwards;
+}
+
+.sim-arena.arena-parry-flash {
+    animation: arenaParryFlash 0.67s ease-out forwards;
+}
+
+/* Player — stagger */
+.arena-player.arena-stagger {
+    animation: arenaPlayerStagger 1.2s ease-out forwards;
+}
+
+.arena-player.arena-stagger .arena-stagger-badge {
+    animation: arenaStaggerBadgeFade 1.33s ease-out forwards;
+}
+
+/* Player — shield break (stagger while blocking/parrying) */
+.arena-player.arena-shield-break .arena-player-shield {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+.arena-player.arena-shield-break .arena-player-shield-broken {
+    animation: arenaShieldBreak 1.2s ease-out forwards;
+}
+
+@keyframes arenaShieldBreak {
+    0%   { opacity: 0; transform: scale(1) rotate(0deg); }
+    8%   { opacity: 1; transform: scale(1.3) rotate(-8deg); }
+    20%  { opacity: 1; transform: scale(1.1) rotate(5deg); }
+    40%  { opacity: 0.8; transform: scale(0.9) rotate(-3deg) translateY(4px); }
+    65%  { opacity: 0.4; transform: scale(0.7) rotate(8deg) translateY(12px); }
+    100% { opacity: 0; transform: scale(0.4) rotate(15deg) translateY(22px); }
+}
+
+/* Player — death */
+.arena-player.arena-death .arena-player-icon {
+    animation: arenaPlayerDeath 1.07s ease-out forwards;
+}
+
+.arena-player.arena-death .arena-death-overlay {
+    animation: arenaDeathSkull 1.07s 0.27s ease-out forwards;
+}
+
+/* Keep death state visible after animation */
+.arena-player.arena-dead .arena-player-icon {
+    opacity: 0.15;
+    transform: rotate(25deg);
+}
+
+.arena-player.arena-dead .arena-death-overlay {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* ─── Idle ambient glow on mob ─── */
+@keyframes arenaMobIdle {
+    0%, 100% { filter: drop-shadow(0 0 6px rgba(200, 60, 60, 0.3)); }
+    50%      { filter: drop-shadow(0 0 10px rgba(200, 60, 60, 0.6)); }
+}
+
+/* ─── Mob stagger on successful parry ─── */
+@keyframes arenaMobStagger {
+    0%   { transform: translateX(0) rotate(0deg); }
+    10%  { transform: translateX(-14px) rotate(6deg); }
+    25%  { transform: translateX(8px) rotate(-4deg); }
+    40%  { transform: translateX(-5px) rotate(3deg); }
+    55%  { transform: translateX(3px) rotate(-1deg); }
+    70%  { transform: translateX(-1px) rotate(0deg); }
+    100% { transform: translateX(0) rotate(0deg); }
+}
+
+.arena-mob.arena-mob-stagger {
+    animation: arenaMobStagger 1s ease-out forwards;
+}
+
+.arena-mob-icon {
+    animation: arenaMobIdle 3s ease-in-out infinite;
+}
+
+.arena-mob.arena-animating .arena-mob-icon {
+    animation: none;
+    filter: drop-shadow(0 0 10px rgba(200, 60, 60, 0.8));
+}
+
 
 /* ── Tab navigation ── */
 .tab-nav {

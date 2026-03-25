@@ -6,6 +6,26 @@ import { join, extname } from 'path';
 const SOURCE_DIR = '.';
 const OUTPUT_DIR = 'dist';
 
+// Path rewrites applied to file content before minification.
+// Keys are literal strings found in source; values are their flat-dist replacements.
+// This is needed because the build flattens src/ into dist/ root, so all
+// deep paths (e.g. ./src/assets/styles/index.css) must become flat (./index.css).
+const PATH_REWRITES = {
+    './src/assets/styles/index.css?v=11':  './index.css',
+    './src/assets/styles/mobile.css?v=11': './mobile.css',
+    './src/index.js?v=11':                 './index.js',
+    './damage-calculator.js?v=9':          './damage-calculator.js',
+    './src/data/mob-presets.json?v=9':     './mob-presets.json',
+};
+
+function applyPathRewrites(content) {
+    let rewritten = content;
+    for (const [originalPath, flatPath] of Object.entries(PATH_REWRITES)) {
+        rewritten = rewritten.split(originalPath).join(flatPath);
+    }
+    return rewritten;
+}
+
 // Files to include in the deployment build (excludes test files).
 // Each entry is { src, out } where src is relative to SOURCE_DIR (project root)
 // and out is the flat filename written to OUTPUT_DIR.
@@ -26,7 +46,7 @@ for (const { src, out } of DEPLOY_FILES) {
     const outputPath = join(OUTPUT_DIR, out);
     const fileName   = out;
     const extension  = extname(out);
-    const sourceContent = await readFile(sourcePath, 'utf8');
+    const sourceContent = applyPathRewrites(await readFile(sourcePath, 'utf8'));
 
     let minifiedContent;
 

@@ -45,15 +45,6 @@ node ui/damage-calculator.test.js
 > `serve.ps1` must be run from the project root — it resolves `ui/` relative to the script directory.
 > `serve.ps1` automatically kills any process already listening on the target port before starting.
 
-## ⚠️ UI Verification After Every Change
-
-After completing **any** code change that affects the UI (HTML, CSS, JS), run the dev server so the user can verify the result visually:
-
-```powershell
-.\serve.ps1
-```
-
-This must be done **before** considering the task complete.
 
 ## Damage Pipeline
 

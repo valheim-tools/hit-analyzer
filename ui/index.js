@@ -1,5 +1,5 @@
-import { calculate } from './damage-calculator.js?v=7';
-import { initTooltipClamping } from './mobile.js?v=7';
+import { calculate, sampleRng, getPercentileRng } from './damage-calculator.js?v=9';
+import { initTooltipClamping } from './mobile.js?v=9';
 
 /* ── Constants ── */
 const DEFAULTS = Object.freeze({
@@ -13,6 +13,7 @@ const DEFAULTS = Object.freeze({
     parryMultiplier: 2.5,
     extraDamagePercent: 0,
     extraDamageEnabled: 'no',
+    percentile: 100,
 });
 const LS_FORM = 'valheim-form';
 const LEGACY_PARRY_MULTIPLIERS = { X1: 1, X1_5: 1.5, X2: 2, X2_5: 2.5, X4: 4, X6: 6 };
@@ -46,6 +47,8 @@ const parryCustomFieldEl = document.getElementById('customParryMultiplierField')
 const parryCustomInputEl = document.getElementById('parryMultiplier');
 const resetBtnEl = document.getElementById('resetBtn');
 const mobPresetEl = document.getElementById('mobPreset');
+const simRandomHitBtnEl = document.getElementById('simRandomHitBtn');
+const percentileInputEl = document.getElementById('percentileInput');
 
 /* ── Tab DOM refs ── */
 const tabSimulatorEl   = document.getElementById('tab-simulator');
@@ -185,6 +188,7 @@ function collectFormState() {
         armor: parseFloat(armorEl.value),
         parryMultiplier: getParryMultiplierFromUi(),
         parryMultiplierMode: parryPresetEl.value === 'custom' ? 'custom' : 'preset',
+        percentile: percentileInputEl.value,
     };
 }
 
@@ -249,21 +253,26 @@ function renderHitSimulator() {
     }
 
     simTakeHitBtnEl.disabled = isDead;
+    simRandomHitBtnEl.disabled = isDead;
 }
 
-function appendSimLogEntry(hitNum, scenarioKey, damage, hpAfter, staggered, rawHpAfter) {
+function appendSimLogEntry(hitNum, scenarioKey, damage, hpAfter, staggered, rawHpAfter, rngFactor = null) {
     const isDead = hpAfter <= 0;
     const hpText = isDead
         ? `<span class="sim-log-hp sim-log-dead tip-wrap">0.000 💀<span class="tip-text">${fmt(rawHpAfter)}</span></span>`
         : `<span class="sim-log-hp">${fmt(hpAfter)} HP</span>`;
     const staggerBadge = staggered ? `<span class="sim-log-stagger">⚠ Staggered</span>` : '';
     const scenarioLabel = SIM_SCENARIO_LABELS[scenarioKey] ?? scenarioKey;
+    const factorBadge = rngFactor !== null
+        ? `<span class="sim-log-factor" title="RNG factor: ×${fmt(rngFactor)} (rng=${fmt(rngFactor * rngFactor)})">×${fmt(rngFactor)}</span>`
+        : '';
 
     const li = document.createElement('li');
     li.className = 'sim-log-entry';
     li.innerHTML = `<span class="sim-log-hit-num">Hit #${hitNum}</span>`
         + `<span class="sim-log-scenario">[${scenarioLabel}]</span>`
         + `<span class="sim-log-dmg">−${fmt(damage)}</span>`
+        + factorBadge
         + hpText
         + staggerBadge;
     simLogEl.appendChild(li);
@@ -281,11 +290,23 @@ function applyForm(values) {
     blockArmorEl.value = values.blockArmor ?? DEFAULTS.blockArmor;
     armorEl.value = values.armor ?? DEFAULTS.armor;
     syncParryMultiplierUi(values);
+    percentileInputEl.value = values.percentile ?? DEFAULTS.percentile;
 }
 
 function collectInputs() {
-    const { parryMultiplierMode, extraDamageEnabled, ...requestInputs } = collectFormState();
+    const { parryMultiplierMode, extraDamageEnabled, percentile, ...requestInputs } = collectFormState();
     return requestInputs;
+}
+
+function getPercentile() {
+    const raw = parseInt(percentileInputEl.value, 10);
+    return Number.isFinite(raw) && raw >= 1 && raw <= 100 ? raw : DEFAULTS.percentile;
+}
+
+function getPercentileRngOpts() {
+    const pct = getPercentile();
+    if (pct >= 100) return {};
+    return { rng: getPercentileRng(pct / 100) };
 }
 
 function saveForm() {
@@ -335,7 +356,7 @@ form.addEventListener('submit', async (event) => {
     const requestInputs = collectInputs();
 
     try {
-        const data = await calculate(requestInputs);
+        const data = await calculate(requestInputs, getPercentileRngOpts());
         render(data, formState);
     } catch (error) {
         errBox.textContent = 'Error: ' + error.message;
@@ -369,6 +390,9 @@ function render(data, inputs) {
 
     const base = data.baseRawDamage;
     const effective = data.effectiveRawDamage;
+    const scaled = data.scaledEffectiveRawDamage;
+    const pct = getPercentile();
+    const hasPercentile = pct < 100;
 
     const diffBonus = { NORMAL: 0, HARD: 50, VERY_HARD: 100 }[inputs.difficulty] ?? 0;
     const starBonus = inputs.starLevel * 50;
@@ -390,9 +414,19 @@ function render(data, inputs) {
         ? `Damage modifier: <span>${parts.join(' | ')}  (+${totalBonus}% total)</span>`
         : 'No damage modifier';
 
-    modifierLineEl.innerHTML = effective !== base
-        ? `Effective Damage = ${fmt(base)} → <span>${fmt(effective)}</span>`
-        : `Effective Damage = <span>${fmt(base)}</span>`;
+    const percentileBadge = hasPercentile
+        ? ` <span class="percentile-badge">${pct}th percentile (×${fmt(Math.sqrt(getPercentileRng(pct / 100)))})</span>`
+        : '';
+
+    if (hasPercentile) {
+        modifierLineEl.innerHTML = effective !== base
+            ? `Effective Damage = ${fmt(base)} → ${fmt(effective)} → <span>${fmt(scaled)}</span>${percentileBadge}`
+            : `Effective Damage = ${fmt(base)} → <span>${fmt(scaled)}</span>${percentileBadge}`;
+    } else {
+        modifierLineEl.innerHTML = effective !== base
+            ? `Effective Damage = ${fmt(base)} → <span>${fmt(effective)}</span>`
+            : `Effective Damage = <span>${fmt(base)}</span>`;
+    }
 
     const BLOCK_TIP = 'Remaining damage after the block armor damage reduction is applied to the effective raw damage — before body armor is factored in.';
     const FINAL_TIP = 'The final damage after the body armor damage reduction is applied to the block reduced damage.';
@@ -495,7 +529,28 @@ function renderFormula(data, inputs) {
     }
 
     const bonusStr = `1 + ${diffBonus} + ${starBonus} + (${fmt(extraDamagePercent)} ÷ 100)`;
-    const step1Html = `
+    const pct = getPercentile();
+    const hasPercentile = pct < 100;
+    const rngVal = hasPercentile ? getPercentileRng(pct / 100) : null;
+    const rngFactor = rngVal !== null ? Math.sqrt(rngVal) : null;
+    const scaledEff = hasPercentile ? data.scaledEffectiveRawDamage : eff;
+
+    let step1Html;
+    if (hasPercentile) {
+        step1Html = `
+        <div class="f-shared-label">${stepLabelContent('1 — ', 'Effective Damage')}
+            <span class="f-shared-note">(all scenarios)</span>
+        </div>
+        <div class="f-eq">${fmt(raw)} × (${bonusStr}) = ${fmt(raw)} × ${fmt(totalMult)} = ${hoverResult(
+            fmt(eff),
+            `effectiveDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${fmt(raw)} × (1 + ${diffBonus} + ${starBonus} + (${fmt(extraDamagePercent)} ÷ 100)) = ${fmt(raw)} × ${fmt(totalMult)} = ${fmt(eff)}`
+        )}</div>
+        <div class="f-eq">${fmt(eff)} × √${fmt(rngVal)} = ${fmt(eff)} × ${fmt(rngFactor)} = ${hoverResult(
+            fmt(scaledEff),
+            `${pct}th percentile: scaledEffective = effective × √rng<br>rng = 0.75 + 0.25 × ${pct / 100} = ${fmt(rngVal)}<br>${fmt(eff)} × √${fmt(rngVal)} = ${fmt(eff)} × ${fmt(rngFactor)} = ${fmt(scaledEff)}`
+        )} <span class="percentile-badge">${pct}th pctl</span></div>`;
+    } else {
+        step1Html = `
         <div class="f-shared-label">${stepLabelContent('1 — ', 'Effective Damage')}
             <span class="f-shared-note">(all scenarios)</span>
         </div>
@@ -503,6 +558,7 @@ function renderFormula(data, inputs) {
             fmt(eff),
             `effectiveDamage = rawDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${fmt(raw)} × (1 + ${diffBonus} + ${starBonus} + (${fmt(extraDamagePercent)} ÷ 100)) = ${fmt(raw)} × ${fmt(totalMult)} = ${fmt(eff)}`
         )}</div>`;
+    }
 
     function buildCol(scenario, scenarioData) {
         const isShield = scenario !== 'noShield';
@@ -720,11 +776,12 @@ async function initialize() {
         mobPresetEl.value = '';
     });
 
-    simTakeHitBtnEl.addEventListener('click', () => {
+    function performHit(useRng) {
         if (!simState || simState.currentHp <= 0) return;
         simErrorEl.hidden = true;
         try {
-            const data = calculate(collectInputs());
+            const rng = useRng ? sampleRng() : null;
+            const data = calculate(collectInputs(), rng !== null ? { rng } : {});
             const key = getSelectedSimScenario();
             const scenarioData = data[key];
             const damage = scenarioData.finalReducedDamage;
@@ -732,13 +789,17 @@ async function initialize() {
             const rawHpAfter = simState.currentHp - damage;
             simState.currentHp = Math.max(0, rawHpAfter);
             simState.hitCount += 1;
-            appendSimLogEntry(simState.hitCount, key, damage, simState.currentHp, staggered, rawHpAfter);
+            const rngFactor = rng !== null ? Math.sqrt(rng) : null;
+            appendSimLogEntry(simState.hitCount, key, damage, simState.currentHp, staggered, rawHpAfter, rngFactor);
             renderHitSimulator();
         } catch (e) {
             simErrorEl.textContent = 'Error: ' + e.message;
             simErrorEl.hidden = false;
         }
-    });
+    }
+
+    simTakeHitBtnEl.addEventListener('click', () => performHit(false));
+    simRandomHitBtnEl.addEventListener('click', () => performHit(true));
 
     simResetBtnEl.addEventListener('click', () => {
         initHitSimulator();

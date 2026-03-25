@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valheim Damage Taken Calculator</title>
-    <link rel="stylesheet" href="./index.css?v=8">
-    <link rel="stylesheet" href="./mobile.css?v=8">
+    <link rel="stylesheet" href="./index.css?v=9">
+    <link rel="stylesheet" href="./mobile.css?v=9">
 </head>
 <body>
 <div class="container">
@@ -26,7 +26,7 @@
                     </select>
                 </div>
                 <div class="field">
-                    <label>Raw Damage (0 – 1000)</label>
+                    <label>Raw Max Damage (0 – 1000)</label>
                     <input type="number" id="rawDamage" value="60" min="0" max="1000" step="0.1" required>
                 </div>
                 <div class="field">
@@ -113,7 +113,9 @@
                 <button type="button" id="simResetBtn">Reset HP</button>
             </div>
 
-            <p class="sim-note">💡 You can change any stat between hits without resetting HP — simulate sequential different type of attacks. Only changing <strong>Game Difficulty</strong> resets the simulator.</p>
+            <p class="sim-note">💡 You can change any stat between hits — simulate sequential different type of attacks. Only changing <strong>Game Difficulty</strong> resets the simulator.</p>
+
+            <p class="sim-note sim-note-rng">🎲 <strong>Random Hit</strong> applies Valheim's in-game damage variance: <strong>damage × √rng</strong>, where rng is a uniform random number between 0.75 and 1.0 — giving a range of ~86.6%–100% of the maximum damage per hit.</p>
 
             <div class="sim-main-row">
                 <div class="sim-scenario-row">
@@ -140,7 +142,11 @@
 
             <div id="simError" class="sim-error" hidden></div>
 
-            <button type="button" id="simTakeHitBtn" class="sim-take-hit-btn">Hit</button>
+            <div class="sim-hit-row">
+                <button type="button" id="simTakeHitBtn" class="sim-take-hit-btn">⚔ Max Hit</button>
+                <button type="button" id="simRandomHitBtn" class="sim-take-hit-btn sim-random-hit-btn">🎲 Random Hit</button>
+            </div>
+
 
             <div class="sim-log-header">
                 <span class="sim-log-title">Hit Log</span>
@@ -178,6 +184,10 @@
         <div class="btn-row">
             <button type="submit" form="calcForm">Hit</button>
             <button type="button" id="resetBtn">Reset</button>
+            <div class="btn-row-option">
+                <label class="btn-row-option-label" for="percentileInput">Percentile %</label>
+                <input type="number" id="percentileInput" value="100" min="1" max="100" step="1" title="Confidence level (1–100). At 100% you see max damage. At e.g. 99% you see damage that only 1% of hits will exceed.">
+            </div>
         </div>
 
         <div id="error"></div>
@@ -211,7 +221,7 @@
 
 </div>
 
-<script type="module" src="./index.js?v=8"></script>
+<script type="module" src="./index.js?v=9"></script>
 </body>
 </html>
 

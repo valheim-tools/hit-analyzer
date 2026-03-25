@@ -32,6 +32,29 @@ const PARRY_BONUS = Object.freeze({
     X6:   6.0,
 });
 
+/* ── RNG damage variance ── */
+// In Valheim, a mob's hit deals effectiveRawDamage × sqrt(rng) where rng ~ Uniform(0.75, 1.0).
+// This gives a damage factor in the range [sqrt(0.75), 1.0] ≈ [0.866, 1.000].
+
+const RNG_MIN = 0.75;
+const RNG_MAX = 1.0;
+
+/** Returns a uniformly sampled rng value in [0.75, 1.0]. */
+export function sampleRng() {
+    return RNG_MIN + (RNG_MAX - RNG_MIN) * Math.random();
+}
+
+/**
+ * Returns the rng value at a given CDF percentile p ∈ [0, 1].
+ * Because rng ~ Uniform(0.75, 1.0), the inverse CDF is linear:
+ *   rng_p = 0.75 + 0.25 × p
+ * The damage factor at this percentile is sqrt(rng_p).
+ * Interpretation: in p×100% of hits, the RNG damage will be ≤ effectiveRawDamage × sqrt(rng_p).
+ */
+export function getPercentileRng(p) {
+    return RNG_MIN + (RNG_MAX - RNG_MIN) * p;
+}
+
 /* ── Validation helpers ── */
 
 function validateMob(rawDamage, starLevel, extraDamagePercent) {
@@ -176,7 +199,7 @@ function resolveExtraDamagePercent(inputs) {
  * @returns {{ baseRawDamage: number, effectiveRawDamage: number,
  *             noShield: Object, block: Object, parry: Object }}
  */
-export function calculate(inputs) {
+export function calculate(inputs, { rng = null } = {}) {
     // Resolve difficulty
     const diffKey = String(inputs.difficulty);
     if (!(diffKey in DIFFICULTY)) {
@@ -192,7 +215,12 @@ export function calculate(inputs) {
 
     const effectiveRawDamage = getEffectiveRawDamage(rawDamage, starLevel, extraDamagePercent, difficulty);
 
-    const mob = { rawDamage, starLevel, extraDamagePercent, effectiveRawDamage };
+    // Apply optional RNG factor: damage = effectiveRawDamage × sqrt(rng)
+    const scaledEffective = rng !== null
+        ? effectiveRawDamage * Math.sqrt(rng)
+        : effectiveRawDamage;
+
+    const mob = { rawDamage, starLevel, extraDamagePercent, effectiveRawDamage: scaledEffective };
 
     // Resolve player stats
     const parryMultiplier = resolveParryMultiplier(inputs);
@@ -211,9 +239,59 @@ export function calculate(inputs) {
 
     return {
         baseRawDamage: rawDamage,
-        effectiveRawDamage,
+        effectiveRawDamage,       // base (pre-rng) — for display in the calculator
+        scaledEffectiveRawDamage: scaledEffective, // actual damage used in scenarios
         noShield,
         block,
         parry,
     };
 }
+
+/**
+ * Computes the full damage pipeline at each of the given CDF percentile levels.
+ *
+ * For each percentile p:
+ *   rng_p  = 0.75 + 0.25 × p      (inverse CDF of Uniform(0.75, 1.0))
+ *   factor = sqrt(rng_p)
+ *   scaledEffective = effectiveRawDamage × factor
+ *
+ * Returns an array of result objects, one per percentile, in input order.
+ *
+ * @param {Object}   inputs      — same shape as calculate()
+ * @param {number[]} percentiles — CDF probabilities, e.g. [0.90, 0.95, 0.99]
+ */
+export function calculatePercentiles(inputs, percentiles = [0.90, 0.95, 0.99]) {
+    // Resolve inputs once — same logic as calculate()
+    const diffKey = String(inputs.difficulty);
+    if (!(diffKey in DIFFICULTY)) throw new Error(`Unknown difficulty: ${diffKey}`);
+    const difficulty = DIFFICULTY[diffKey];
+
+    const rawDamage          = Number(inputs.rawDamage);
+    const starLevel          = Number(inputs.starLevel);
+    const extraDamagePercent = resolveExtraDamagePercent(inputs);
+    validateMob(rawDamage, starLevel, extraDamagePercent);
+
+    const baseEffective   = getEffectiveRawDamage(rawDamage, starLevel, extraDamagePercent, difficulty);
+    const parryMultiplier = resolveParryMultiplier(inputs);
+    const player = {
+        maxHealth:     Number(inputs.maxHealth),
+        blockingSkill: Number(inputs.blockingSkill),
+        blockArmor:    Number(inputs.blockArmor),
+        armor:         Number(inputs.armor),
+        parryMultiplier,
+    };
+
+    return percentiles.map(p => {
+        const rng    = getPercentileRng(p);
+        const factor = Math.sqrt(rng);
+        const scaledEffective = baseEffective * factor;
+        const mob = { rawDamage, starLevel, extraDamagePercent, effectiveRawDamage: scaledEffective };
+
+        const noShield = calculateScenario(player, mob, difficulty, false, false);
+        const block    = calculateScenario(player, mob, difficulty, true,  false);
+        const parry    = calculateScenario(player, mob, difficulty, true,  true);
+
+        return { percentile: p, rng, factor, effectiveRawDamage: scaledEffective, noShield, block, parry };
+    });
+}
+

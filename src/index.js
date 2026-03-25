@@ -87,6 +87,12 @@ const arenaPlayerShieldEl = document.getElementById('arenaPlayerShield');
 
 const SHIELD_IMAGE_BLOCK = 'src/assets/images/blue-shield.png';
 const SHIELD_IMAGE_PARRY = 'src/assets/images/yellow-shield.png';
+const SHIELD_IMAGE_BROKEN = 'src/assets/images/red-shield.png';
+
+/* Preload shield images so swapping src is instant on first use */
+new Image().src = SHIELD_IMAGE_BLOCK;
+new Image().src = SHIELD_IMAGE_PARRY;
+new Image().src = SHIELD_IMAGE_BROKEN;
 
 function sanitizeExtraDamagePercent(value, fallback = DEFAULTS.extraDamagePercent) {
     const parsed = Number(value);

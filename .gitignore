@@ -6,6 +6,10 @@ target/
 *.iml
 out/
 
+# Build output
+dist/
+node_modules/
+
 # OS
 .DS_Store
 Thumbs.db

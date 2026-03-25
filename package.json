@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "test": "node ui/damage-calculator.test.js",
+    "build": "node build.js",
     "serve": "powershell -ExecutionPolicy Bypass -File serve.ps1"
   },
   "keywords": ["valheim", "damage", "calculator"],
   "license": "MIT",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "html-minifier-terser": "^7.2.0"
+  }
 }
 

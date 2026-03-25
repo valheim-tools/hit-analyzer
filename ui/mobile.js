@@ -32,9 +32,9 @@ function resetTipStyles(tip) {
 
 /** Close every open tooltip. */
 function closeAllTips() {
-    document.querySelectorAll('.tip-wrap.tip-active').forEach(el => {
-        el.classList.remove('tip-active');
-        const tip = el.querySelector(':scope > .tip-text');
+    document.querySelectorAll('.tip-wrap.tip-active').forEach(element => {
+        element.classList.remove('tip-active');
+        const tip = element.querySelector(':scope > .tip-text');
         if (tip) resetTipStyles(tip);
     });
 }
@@ -55,9 +55,9 @@ export function clampTooltip(wrapEl) {
     // default CSS positioning (needed to calculate anchor coordinates).
     resetTipStyles(tip);
 
-    const vw  = document.documentElement.clientWidth;   // excludes scrollbar
-    const vh  = document.documentElement.clientHeight;
-    const pad = 8; // min gap from each viewport edge (px)
+    const viewportWidth  = document.documentElement.clientWidth;   // excludes scrollbar
+    const viewportHeight = document.documentElement.clientHeight;
+    const padding = 8; // min gap from each viewport edge (px)
 
     // Snapshot the anchor's viewport rect while position:absolute is still
     // in effect (i.e. before we switch to fixed).
@@ -66,34 +66,34 @@ export function clampTooltip(wrapEl) {
     // Apply position:fixed with placeholder coordinates.
     // Force visibility so getBoundingClientRect returns real dimensions
     // even when CSS :hover hasn't kicked in yet (important on touch).
-    const maxW = Math.min(400, vw - pad * 2);
+    const maxWidth = Math.min(400, viewportWidth - padding * 2);
     tip.style.position   = 'fixed';
     tip.style.visibility = 'hidden';    // hidden but laid out — allows measurement
     tip.style.opacity    = '0';
-    tip.style.left       = `${pad}px`;  // placeholder — overwritten below
-    tip.style.top        = `${pad}px`;  // placeholder — overwritten below
+    tip.style.left       = `${padding}px`;  // placeholder — overwritten below
+    tip.style.top        = `${padding}px`;  // placeholder — overwritten below
     tip.style.bottom     = 'auto';
     tip.style.transform  = 'none';
     tip.style.width      = '';          // natural max-content width
-    tip.style.maxWidth   = `${maxW}px`;
+    tip.style.maxWidth   = `${maxWidth}px`;
     tip.style.zIndex     = '200';
 
     // Forced layout flush — gives the actual rendered dimensions.
-    const { width: actualW, height: actualH } = tip.getBoundingClientRect();
+    const { width: actualWidth, height: actualHeight } = tip.getBoundingClientRect();
 
     // ── Horizontal: centre on anchor, clamp to viewport ─────────────────
     const anchorCentre = wrapRect.left + wrapRect.width / 2;
-    const left = Math.max(pad, Math.min(anchorCentre - actualW / 2, vw - actualW - pad));
+    const left = Math.max(padding, Math.min(anchorCentre - actualWidth / 2, viewportWidth - actualWidth - padding));
 
     // ── Vertical: prefer above on desktop, below on mobile ───────────────
-    const aboveTop = wrapRect.top  - actualH - 8;
+    const aboveTop = wrapRect.top  - actualHeight - 8;
     const belowTop = wrapRect.bottom + 6;
 
     let top;
-    if (vw > 620) {
-        top = aboveTop >= pad ? aboveTop : belowTop;
+    if (viewportWidth > 620) {
+        top = aboveTop >= padding ? aboveTop : belowTop;
     } else {
-        top = belowTop + actualH <= vh - pad ? belowTop : aboveTop;
+        top = belowTop + actualHeight <= viewportHeight - padding ? belowTop : aboveTop;
     }
 
     tip.style.left       = `${Math.round(left)}px`;
@@ -110,23 +110,23 @@ export function clampTooltip(wrapEl) {
  */
 export function initTooltipClamping() {
     // ── Desktop: mouse / keyboard ────────────────────────────────────────
-    document.addEventListener('mouseover', e => {
-        const wrap = e.target.closest('.tip-wrap');
+    document.addEventListener('mouseover', event => {
+        const wrap = event.target.closest('.tip-wrap');
         if (wrap) clampTooltip(wrap);
     });
-    document.addEventListener('mouseout', e => {
-        const wrap = e.target.closest('.tip-wrap');
+    document.addEventListener('mouseout', event => {
+        const wrap = event.target.closest('.tip-wrap');
         if (wrap) {
             const tip = wrap.querySelector(':scope > .tip-text');
             if (tip) resetTipStyles(tip);
         }
     });
-    document.addEventListener('focusin', e => {
-        const wrap = e.target.closest('.tip-wrap');
+    document.addEventListener('focusin', event => {
+        const wrap = event.target.closest('.tip-wrap');
         if (wrap) clampTooltip(wrap);
     }, true);
-    document.addEventListener('focusout', e => {
-        const wrap = e.target.closest('.tip-wrap');
+    document.addEventListener('focusout', event => {
+        const wrap = event.target.closest('.tip-wrap');
         if (wrap) {
             const tip = wrap.querySelector(':scope > .tip-text');
             if (tip) resetTipStyles(tip);
@@ -144,12 +144,12 @@ export function initTooltipClamping() {
     let isTouchDevice = false;
     document.addEventListener('touchstart', () => { isTouchDevice = true; }, { once: true, passive: true });
 
-    document.addEventListener('click', e => {
+    document.addEventListener('click', event => {
         if (!isTouchDevice) return;
 
-        const wrap = e.target.closest('.tip-wrap');
+        const wrap = event.target.closest('.tip-wrap');
         if (wrap) {
-            e.preventDefault();
+            event.preventDefault();
             const wasActive = wrap.classList.contains('tip-active');
             closeAllTips();           // close every other tooltip first
             if (!wasActive) {

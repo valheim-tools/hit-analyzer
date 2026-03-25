@@ -28,68 +28,68 @@ function approxEqual(a, b, label) {
     return null;
 }
 
-for (const tc of cases) {
+for (const testCase of cases) {
     const errors = [];
 
     // Build inputs in the same shape the UI sends
     const inputs = {
-        rawDamage:          tc.mob.rawDamage,
-        starLevel:          tc.mob.starLevel,
-        extraDamagePercent: tc.mob.extraDamagePercent ?? 0,
-        difficulty:         tc.difficulty,
-        maxHealth:          tc.player.maxHealth,
-        blockingSkill:      tc.player.blockingSkill,
-        blockArmor:         tc.player.blockArmor,
-        armor:              tc.player.armor,
+        rawDamage:          testCase.mob.rawDamage,
+        starLevel:          testCase.mob.starLevel,
+        extraDamagePercent: testCase.mob.extraDamagePercent ?? 0,
+        difficulty:         testCase.difficulty,
+        maxHealth:          testCase.player.maxHealth,
+        blockingSkill:      testCase.player.blockingSkill,
+        blockArmor:         testCase.player.blockArmor,
+        armor:              testCase.player.armor,
     };
 
     // Resolve parry multiplier — prefer explicit, fall back to parryBonus enum
-    if (tc.player.parryMultiplier != null) {
-        inputs.parryMultiplier = tc.player.parryMultiplier;
+    if (testCase.player.parryMultiplier != null) {
+        inputs.parryMultiplier = testCase.player.parryMultiplier;
     } else {
-        inputs.parryBonus = tc.player.parryBonus;
+        inputs.parryBonus = testCase.player.parryBonus;
     }
 
     let data;
     try {
         data = calculate(inputs);
-    } catch (e) {
-        errors.push(`  EXCEPTION: ${e.message}`);
-        console.log(`✗ ${tc.name}`);
-        errors.forEach(e => console.log(e));
+    } catch (error) {
+        errors.push(`  EXCEPTION: ${error.message}`);
+        console.log(`✗ ${testCase.name}`);
+        errors.forEach(errorLine => console.log(errorLine));
         failed++;
         continue;
     }
 
     // Pick the scenario that the test case targets
-    const result = !tc.useShield ? data.noShield : tc.isParry ? data.parry : data.block;
-    const exp = tc.expected;
+    const result = !testCase.useShield ? data.noShield : testCase.isParry ? data.parry : data.block;
+    const expected = testCase.expected;
 
     // Assertions
     const checks = [
-        approxEqual(data.baseRawDamage,             exp.baseRawDamage,           'baseRawDamage'),
-        approxEqual(data.effectiveRawDamage,         exp.effectiveRawDamage,      'effectiveRawDamage'),
-        approxEqual(result.blockReducedDamage,    exp.blockReducedDamage,   'blockReducedDamage'),
-        approxEqual(result.finalReducedDamage,       exp.finalReducedDamage,      'finalReducedDamage'),
-        approxEqual(result.remainingHealth,           exp.remainingHealth,         'remainingHealth'),
+        approxEqual(data.baseRawDamage,             expected.baseRawDamage,           'baseRawDamage'),
+        approxEqual(data.effectiveRawDamage,         expected.effectiveRawDamage,      'effectiveRawDamage'),
+        approxEqual(result.blockReducedDamage,    expected.blockReducedDamage,   'blockReducedDamage'),
+        approxEqual(result.finalReducedDamage,       expected.finalReducedDamage,      'finalReducedDamage'),
+        approxEqual(result.remainingHealth,           expected.remainingHealth,         'remainingHealth'),
     ];
 
     // Stagger (string comparison)
-    if (result.stagger !== exp.stagger) {
-        checks.push(`  FAIL stagger: expected ${exp.stagger}, got ${result.stagger}`);
+    if (result.stagger !== expected.stagger) {
+        checks.push(`  FAIL stagger: expected ${expected.stagger}, got ${result.stagger}`);
     }
     // minHealthForNoStagger (exact int)
-    if (result.minHealthForNoStagger !== exp.minHealthForNoStagger) {
-        checks.push(`  FAIL minHealthForNoStagger: expected ${exp.minHealthForNoStagger}, got ${result.minHealthForNoStagger}`);
+    if (result.minHealthForNoStagger !== expected.minHealthForNoStagger) {
+        checks.push(`  FAIL minHealthForNoStagger: expected ${expected.minHealthForNoStagger}, got ${result.minHealthForNoStagger}`);
     }
 
     const failures = checks.filter(Boolean);
     if (failures.length) {
-        console.log(`✗ ${tc.name}`);
-        failures.forEach(f => console.log(f));
+        console.log(`✗ ${testCase.name}`);
+        failures.forEach(failure => console.log(failure));
         failed++;
     } else {
-        console.log(`✓ ${tc.name}`);
+        console.log(`✓ ${testCase.name}`);
         passed++;
     }
 }

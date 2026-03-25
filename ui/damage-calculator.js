@@ -51,8 +51,8 @@ export function sampleRng() {
  * The damage factor at this percentile is sqrt(rng_p).
  * Interpretation: in p×100% of hits, the RNG damage will be ≤ effectiveRawDamage × sqrt(rng_p).
  */
-export function getPercentileRng(p) {
-    return RNG_MIN + (RNG_MAX - RNG_MIN) * p;
+export function getPercentileRng(percentile) {
+    return RNG_MIN + (RNG_MAX - RNG_MIN) * percentile;
 }
 
 /* ── Validation helpers ── */
@@ -177,9 +177,9 @@ function resolveParryMultiplier(inputs) {
 }
 
 function resolveExtraDamagePercent(inputs) {
-    const raw = inputs.extraDamagePercent != null ? inputs.extraDamagePercent : inputs.extraDamage;
-    if (raw == null) return 0.0;
-    const value = Number(raw);
+    const rawValue = inputs.extraDamagePercent != null ? inputs.extraDamagePercent : inputs.extraDamage;
+    if (rawValue == null) return 0.0;
+    const value = Number(rawValue);
     if (!Number.isFinite(value) || value < 0) {
         throw new Error('extraDamagePercent must be a non-negative number.');
     }
@@ -201,11 +201,11 @@ function resolveExtraDamagePercent(inputs) {
  */
 export function calculate(inputs, { rng = null } = {}) {
     // Resolve difficulty
-    const diffKey = String(inputs.difficulty);
-    if (!(diffKey in DIFFICULTY)) {
-        throw new Error(`Unknown difficulty: ${diffKey}`);
+    const difficultyKey = String(inputs.difficulty);
+    if (!(difficultyKey in DIFFICULTY)) {
+        throw new Error(`Unknown difficulty: ${difficultyKey}`);
     }
-    const difficulty = DIFFICULTY[diffKey];
+    const difficulty = DIFFICULTY[difficultyKey];
 
     // Resolve mob stats
     const rawDamage = Number(inputs.rawDamage);
@@ -262,16 +262,16 @@ export function calculate(inputs, { rng = null } = {}) {
  */
 export function calculatePercentiles(inputs, percentiles = [0.90, 0.95, 0.99]) {
     // Resolve inputs once — same logic as calculate()
-    const diffKey = String(inputs.difficulty);
-    if (!(diffKey in DIFFICULTY)) throw new Error(`Unknown difficulty: ${diffKey}`);
-    const difficulty = DIFFICULTY[diffKey];
+    const difficultyKey = String(inputs.difficulty);
+    if (!(difficultyKey in DIFFICULTY)) throw new Error(`Unknown difficulty: ${difficultyKey}`);
+    const difficulty = DIFFICULTY[difficultyKey];
 
     const rawDamage          = Number(inputs.rawDamage);
     const starLevel          = Number(inputs.starLevel);
     const extraDamagePercent = resolveExtraDamagePercent(inputs);
     validateMob(rawDamage, starLevel, extraDamagePercent);
 
-    const baseEffective   = getEffectiveRawDamage(rawDamage, starLevel, extraDamagePercent, difficulty);
+    const baseEffectiveRawDamage = getEffectiveRawDamage(rawDamage, starLevel, extraDamagePercent, difficulty);
     const parryMultiplier = resolveParryMultiplier(inputs);
     const player = {
         maxHealth:     Number(inputs.maxHealth),
@@ -281,17 +281,17 @@ export function calculatePercentiles(inputs, percentiles = [0.90, 0.95, 0.99]) {
         parryMultiplier,
     };
 
-    return percentiles.map(p => {
-        const rng    = getPercentileRng(p);
+    return percentiles.map(percentile => {
+        const rng    = getPercentileRng(percentile);
         const factor = Math.sqrt(rng);
-        const scaledEffective = baseEffective * factor;
+        const scaledEffective = baseEffectiveRawDamage * factor;
         const mob = { rawDamage, starLevel, extraDamagePercent, effectiveRawDamage: scaledEffective };
 
         const noShield = calculateScenario(player, mob, difficulty, false, false);
         const block    = calculateScenario(player, mob, difficulty, true,  false);
         const parry    = calculateScenario(player, mob, difficulty, true,  true);
 
-        return { percentile: p, rng, factor, effectiveRawDamage: scaledEffective, noShield, block, parry };
+        return { percentile, rng, factor, effectiveRawDamage: scaledEffective, noShield, block, parry };
     });
 }
 

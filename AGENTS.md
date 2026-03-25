@@ -63,6 +63,16 @@ Stagger threshold = 40% of `maxHealth`. A player staggered on block cannot be do
 
 ## Key Conventions
 
+**Naming — use explicit, unabbreviated variable and function names.** This is a hard rule for all new and modified code:
+- **No abbreviations**: `effectiveBlockArmor` not `effBA`, `parryMultiplier` not `parryMult`, `formatNumber` not `fmt`, `percentile` not `pct`.
+- **No single-letter or two-letter names**: `event` not `e`, `button` not `btn`, `element` not `el`, `viewportWidth` not `vw`.
+- **Spell out `Health`**: `currentHealth` not `currentHp`, `simHealthCurrentEl` not `simHpCurrentEl`, `healthPercent` not `hpPct`.
+- **Boolean prefixes**: use `is`/`has` — `isBlockLinear` not `blockLinear`, `hasPercentile` not `hasPct`.
+- **Destructure aliases must also be explicit**: `{ isLinear: isBlockLinear }` not `{ isLinear: blockLinear }`.
+- **Loop/callback parameters**: `testCase` not `tc`, `failure` not `f`, `error` not `e`.
+
+When in doubt, prefer a longer descriptive name over a shorter ambiguous one.
+
 **`damage-calculator.js`** is a static-function-only module — all exports are pure functions, no class instantiation.
 
 **Difficulty** values: `NORMAL`, `HARD`, `VERY_HARD` — stored as keys in the `DIFFICULTY` frozen object.

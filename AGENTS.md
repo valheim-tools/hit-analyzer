@@ -67,6 +67,11 @@ Armor reduction formula (used for both block and body armor phases):
 - If `armor < damage / 2` → `reduced = damage − armor`
 - Else → `reduced = damage² / (armor × 4)`
 
+Resistance modifiers (§3) — applied per damage type between block and body armor:
+- Each type can have a multiplier (0.0–2.0) from the `RESISTANCE_PRESET` lookup
+- Presets: Very Weak (200%), Weak (150%), Slightly Weak (125%), Neutral (100%), Slightly Resistant (75%), Resistant (50%), Very Resistant (25%), Immune (0%)
+- The UI allows custom percentages as well
+
 Stagger threshold = 40% of `maxHealth`. A player staggered on block cannot be double-staggered by armor (`staggeredOnBlock` gates armor stagger check).
 
 ## Key Conventions
@@ -97,7 +102,7 @@ Tests are data-driven via `tests/test-cases.json`. To add a new scenario, add a 
 {
   "name": "descriptive label shown in test output",
   "mob":    { "baseDamage": 60.0, "starLevel": 1 },
-  "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 20.0, "armor": 30.0, "parryMultiplier": 1.5 },
+  "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 20.0, "armor": 30.0, "parryMultiplier": 1.5, "resistanceModifiers": { "Fire": 0.5 } },
   "difficulty": "HARD",
   "useShield": true,
   "isParry": false,

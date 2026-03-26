@@ -4,15 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Valheim Damage Taken Calculator</title>
-    <link rel="stylesheet" href="./src/assets/styles/index.css?v=12">
-    <link rel="stylesheet" href="./src/assets/styles/mobile.css?v=12">
+    <link rel="stylesheet" href="./src/assets/styles/index.css?v=15">
+    <link rel="stylesheet" href="./src/assets/styles/mobile.css?v=13">
 </head>
 <body>
 <div class="container">
 
     <h1>⚔ Valheim Damage Taken Calculator</h1>
-
-    <p class="damage-note">Since stagger applies only to <span class="tip-wrap tip-underlined">physical<span class="tip-text">Blunt, Pierce, Slash</span></span> and lightning damage, the calculator is limited to these damage types for now.</p>
 
     <form id="calcForm">
         <div class="form-grid">
@@ -20,43 +18,81 @@
             <div class="section">
                 <h2>Mob Attack Stats <a href="https://valheim.fandom.com/wiki/Creatures" target="_blank" rel="noopener" class="creature-link">↗ creature list</a></h2>
                 <div class="preset-row">
-                    <label for="mobPreset">Preset — load a mob attack</label>
-                    <select id="mobPreset">
-                        <option value="">— Try a preset —</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Base Damage (0 – 1000)</label>
-                    <input type="number" id="baseDamage" value="60" min="0" max="1000" step="0.1" required>
-                </div>
-                <div class="field">
-                    <label>Star Level — Damage +50% per star</label>
-                    <select id="starLevel">
-                        <option value="0">0★ — no bonus</option>
-                        <option value="1">1★ — +50%</option>
-                        <option value="2">2★ — +100%</option>
-                        <option value="3">3★ — +150%</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Game Difficulty — Damage bonus</label>
-                    <select id="difficulty">
-                        <option value="NORMAL">Normal — no bonus</option>
-                        <option value="HARD">Hard — +50%</option>
-                        <option value="VERY_HARD">Very Hard — +100%</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label for="extraDamageEnabled">Extra Damage Bonus — apply an additional percentage bonus</label>
-                    <div class="extra-damage-row">
-                        <select id="extraDamageEnabled">
-                            <option value="no" selected>No</option>
-                            <option value="yes">Yes</option>
-                        </select>
-                        <div id="customExtraDamageField" class="custom-extra-damage-field" hidden>
-                            <input type="number" id="extraDamagePercent" value="0" min="0" max="10000" step="0.1" placeholder="%" aria-label="Extra damage bonus percentage">
+                    <label for="mobPreset">Mob Attack Preset</label>
+                    <div class="mob-preset-dropdown" id="mobPresetDropdown">
+                        <button type="button" class="mob-preset-trigger" id="mobPresetTrigger">
+                            <span class="mob-preset-trigger-text">— Select a mob attack —</span>
+                            <span class="mob-preset-trigger-arrow">▾</span>
+                        </button>
+                        <div class="mob-preset-panel" id="mobPresetPanel" hidden>
+                            <input type="text" class="mob-preset-search" id="mobPresetSearch" placeholder="Search mobs…" autocomplete="off">
+                            <div class="mob-preset-list" id="mobPresetList"></div>
                         </div>
                     </div>
+                    <input type="hidden" id="mobPreset" value="">
+                </div>
+                <div class="field">
+                    <label>Base Damage Types</label>
+                    <div id="damageTypeInputs" class="damage-type-inputs">
+                        <div class="damage-type-row">
+                            <select class="damage-type-select" aria-label="Damage type">
+                                <optgroup label="⚔ Instant">
+                                    <option value="Blunt">🔨 Blunt</option>
+                                    <option value="Slash">⚔ Slash</option>
+                                    <option value="Pierce">🏹 Pierce</option>
+                                    <option value="Frost">❄ Frost</option>
+                                    <option value="Lightning">⚡ Lightning</option>
+                                </optgroup>
+                                <optgroup label="⏳ Damage over Time">
+                                    <option value="Fire">🔥 Fire</option>
+                                    <option value="Poison">☠ Poison</option>
+                                    <option value="Spirit">👻 Spirit</option>
+                                </optgroup>
+                            </select>
+                            <input type="number" class="damage-type-value" value="60" min="0" max="1000" step="0.1" aria-label="Damage value">
+                            <button type="button" class="damage-type-remove" title="Remove" aria-label="Remove damage type">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" id="addDamageTypeBtn" class="add-damage-type-btn">+ Add damage type</button>
+                </div>
+                <div class="field">
+                    <label>Star Level —  0 / 50 / 100 % additional damage bonus</label>
+                    <div class="toggle-group" id="starLevelGroup">
+                        <label class="toggle-btn">
+                            <input type="radio" name="starLevel" value="0" checked>
+                            <span>0★</span>
+                        </label>
+                        <label class="toggle-btn">
+                            <input type="radio" name="starLevel" value="1">
+                            <span>1★</span>
+                        </label>
+                        <label class="toggle-btn">
+                            <input type="radio" name="starLevel" value="2">
+                            <span>2★</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Game Difficulty —  0 / 50 / 100 % additional damage bonus</label>
+                    <div class="toggle-group" id="difficultyGroup">
+                        <label class="toggle-btn">
+                            <input type="radio" name="difficulty" value="NORMAL" checked>
+                            <span>Normal</span>
+                        </label>
+                        <label class="toggle-btn">
+                            <input type="radio" name="difficulty" value="HARD">
+                            <span>Hard</span>
+                        </label>
+                        <label class="toggle-btn">
+                            <input type="radio" name="difficulty" value="VERY_HARD">
+                            <span>Very Hard</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Extra Damage Bonus</label>
+                    <div id="extraDamageInputs" class="extra-damage-inputs"></div>
+                    <button type="button" id="addExtraDamageBtn" class="add-extra-damage-btn">+ Add extra damage bonus</button>
                 </div>
             </div>
 
@@ -67,32 +103,74 @@
                     <input type="number" id="maxHealth" value="100" min="0" max="1000" step="0.1" required>
                 </div>
                 <div class="field">
-                    <label>Blocking Skill (0 – 100)</label>
-                    <input type="number" id="blockingSkill" value="0" min="0" max="100" step="0.1" required>
+                    <label>Resistance Modifiers</label>
+                    <div id="resistanceTypeInputs" class="resistance-type-inputs"></div>
+                    <button type="button" id="addResistanceTypeBtn" class="add-resistance-type-btn">+ Add resistance</button>
                 </div>
-                <div class="field">
-                    <label>Block Armor (0 – 500)</label>
-                    <input type="number" id="blockArmor" value="0" min="0" max="500" step="0.1" required>
-                </div>
-                <div class="field">
-                    <label>Armor (0 – 500)</label>
-                    <input type="number" id="armor" value="0" min="0" max="500" step="0.1" required>
-                </div>
-                <div class="field">
-                    <label for="parryMultiplierPreset">Parry Multiplier — choose a preset or use custom</label>
-                    <div class="parry-multiplier-row">
-                        <select id="parryMultiplierPreset">
-                            <option value="1">×1</option>
-                            <option value="1.5" selected>×1.5</option>
-                            <option value="2">×2</option>
-                            <option value="2.5">×2.5</option>
-                            <option value="4">×4</option>
-                            <option value="6">×6</option>
-                            <option value="custom">Custom…</option>
-                        </select>
-                        <div id="customParryMultiplierField" class="custom-parry-field" hidden>
-                            <input type="number" id="parryMultiplier" value="1.5" min="0.1" max="100" step="0.1" placeholder="Custom" aria-label="Custom parry multiplier">
+                <div class="preset-row">
+                    <label for="shieldPreset">Shield Preset</label>
+                    <div class="shield-preset-row">
+                        <div class="shield-preset-dropdown" id="shieldPresetDropdown">
+                            <button type="button" class="shield-preset-trigger" id="shieldPresetTrigger">
+                                <span class="shield-preset-trigger-text">Custom</span>
+                                <span class="shield-preset-trigger-arrow">▾</span>
+                            </button>
+                            <div class="shield-preset-panel" id="shieldPresetPanel" hidden>
+                                <div class="shield-preset-list" id="shieldPresetList">
+                                    <div class="shield-preset-option" data-value="">
+                                        <span class="shield-preset-option-text">Custom</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                        <input type="hidden" id="shieldPreset" value="">
+                        <div class="shield-quality-toggles" id="shieldQualityGroup">
+                            <label class="shield-quality-btn">
+                                <input type="radio" name="shieldQuality" value="1" checked>
+                                <span>⚒ 1</span>
+                            </label>
+                            <label class="shield-quality-btn">
+                                <input type="radio" name="shieldQuality" value="2">
+                                <span>⚒ 2</span>
+                            </label>
+                            <label class="shield-quality-btn">
+                                <input type="radio" name="shieldQuality" value="3">
+                                <span>⚒ 3</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label>Block Armor (0 – 500)</label>
+                        <input type="number" id="blockArmor" value="0" min="0" max="500" step="0.1" required>
+                    </div>
+                    <div class="field">
+                        <label for="parryMultiplierPreset">Parry Multiplier</label>
+                        <div class="parry-multiplier-row">
+                            <select id="parryMultiplierPreset">
+                                <option value="1">×1</option>
+                                <option value="1.5" selected>×1.5</option>
+                                <option value="2">×2</option>
+                                <option value="2.5">×2.5</option>
+                                <option value="4">×4</option>
+                                <option value="6">×6</option>
+                                <option value="custom">Custom…</option>
+                            </select>
+                            <div id="customParryMultiplierField" class="custom-parry-field" hidden>
+                                <input type="number" id="parryMultiplier" value="1.5" min="0.1" max="100" step="0.1" placeholder="Custom" aria-label="Custom parry multiplier">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label>Blocking Skill (0 – 100)</label>
+                        <input type="number" id="blockingSkill" value="0" min="0" max="100" step="0.1" required>
+                    </div>
+                    <div class="field">
+                        <label>Armor (0 – 500)</label>
+                        <input type="number" id="armor" value="0" min="0" max="500" step="0.1" required>
                     </div>
                 </div>
             </div>
@@ -146,15 +224,15 @@
             <div id="simArena" class="sim-arena">
                 <div class="arena-ground"></div>
                 <div id="arenaMob" class="arena-mob">
-                    <img class="arena-mob-icon" id="arenaMobIcon" src="src/assets/images/greydwarf.png" alt="Monster">
+                    <img class="arena-mob-icon" id="arenaMobIcon" src="src/assets/images/animations/greydwarf.png" alt="Monster">
                     <span class="arena-mob-weapon" id="arenaMobWeapon">⚔</span>
                 </div>
-                <img id="arenaProjectile" class="arena-projectile" src="src/assets/images/projectile.png" alt="Projectile">
+                <img id="arenaProjectile" class="arena-projectile" src="src/assets/images/animations/projectile.png" alt="Projectile">
                 <div id="arenaPlayer" class="arena-player">
-                    <img class="arena-player-icon" id="arenaPlayerIcon" src="src/assets/images/viking.png" alt="Viking">
+                    <img class="arena-player-icon" id="arenaPlayerIcon" src="src/assets/images/animations/viking.png" alt="Viking">
                     <span class="arena-player-axe">🪓</span>
-                    <img class="arena-player-shield" id="arenaPlayerShield" src="src/assets/images/blue-shield.png" alt="Shield">
-                    <img class="arena-player-shield-broken" id="arenaPlayerShieldBroken" src="src/assets/images/red-shield.png" alt="Broken Shield">
+                    <img class="arena-player-shield" id="arenaPlayerShield" src="src/assets/images/animations/blue-shield.png" alt="Shield">
+                    <img class="arena-player-shield-broken" id="arenaPlayerShieldBroken" src="src/assets/images/animations/red-shield.png" alt="Broken Shield">
                     <span class="arena-stagger-badge" id="arenaStaggerBadge">⚠ Staggered</span>
                     <span class="arena-death-overlay" id="arenaDeathOverlay">💀</span>
                 </div>
@@ -163,6 +241,12 @@
             <div class="sim-hit-row">
                 <button type="button" id="simTakeHitBtn" class="sim-take-hit-btn">⚔ Base Hit</button>
                 <button type="button" id="simRandomHitBtn" class="sim-take-hit-btn sim-random-hit-btn">🎲 Random Hit</button>
+            </div>
+
+            <div class="sim-dot-speed-row">
+                <label for="dotSpeedSlider" class="dot-speed-label">DoT Speed</label>
+                <input type="range" id="dotSpeedSlider" min="1" max="10" value="3" step="0.5" class="dot-speed-slider">
+                <span id="dotSpeedValue" class="dot-speed-value">3×</span>
             </div>
 
 
@@ -190,10 +274,14 @@
                 </div>
                 <div class="pipe-step">
                     <span class="pipe-num">3</span>
-                    <span class="pipe-text">Block reduced damage is reduced by body armor → <strong>Final Damage</strong></span>
+                    <span class="pipe-text">Resistance modifiers scale damage up or down → <strong>Resistance-Reduced Damage</strong></span>
                 </div>
                 <div class="pipe-step">
                     <span class="pipe-num">4</span>
+                    <span class="pipe-text">Resistance-reduced damage is reduced by body armor → <strong>Final Damage</strong></span>
+                </div>
+                <div class="pipe-step">
+                    <span class="pipe-num">5</span>
                     <span class="pipe-text">Final damage is subtracted from Max Health → <strong>Remaining Health</strong></span>
                 </div>
             </div>
@@ -239,7 +327,7 @@
 
 </div>
 
-<script type="module" src="./src/index.js?v=12"></script>
+<script type="module" src="./src/index.js?v=15"></script>
 </body>
 </html>
 

@@ -9,7 +9,7 @@ Runs entirely in the browser as a static site — no backend required.
 ## Features
 
 - **Three scenarios in one calculation** — No Shield, Block, and Parry results side by side
-- **Damage pipeline** — Step-by-step breakdown: Effective Damage → Block-Reduced → Final/Armor-Reduced → Remaining Health
+- **Damage pipeline** — Step-by-step breakdown: Effective Damage → Block-Reduced → Final Damage → Remaining Health
 - **Stagger detection** — Shows whether the player is staggered on block or on armor, as a single unified result
 - **Difficulty & star scaling** — Normal / Hard / Very Hard and 0–3 star mob bonuses (additive, not multiplicative)
 - **Calculation history** — Last 10 results saved in localStorage, with optional custom labels and per-entry delete
@@ -24,7 +24,7 @@ Runs entirely in the browser as a static site — no backend required.
 |------|-------------|
  **1**  Base damage is scaled by difficulty, star & extra damage bonuses → **Effective Damage**
 | **2** | Effective damage is reduced by shield / block armor → **Block-Reduced Damage** |
-| **3** | Remaining damage is reduced by body armor → **Final/Armor-Reduced Damage** |
+| **3** | Remaining damage is reduced by body armor → **Final Damage Damage** |
 | **4** | Final damage is subtracted from Max Health → **Remaining Health** |
 
 Stagger threshold = **40% of Max Health**. A block-stagger prevents a second armor-stagger on the same hit.

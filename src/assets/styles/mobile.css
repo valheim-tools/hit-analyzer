@@ -48,6 +48,11 @@
         flex-wrap: wrap;
     }
 
+    /* Stack paired field rows vertically */
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+
     .custom-parry-field,
     .custom-extra-damage-field {
         flex: 1 1 100%;
@@ -360,5 +365,71 @@
 
     .sim-log-hit-num {
         min-width: auto;
+    }
+
+    /* ── Mob preset dropdown on mobile ── */
+    .mob-preset-trigger {
+        font-size: 0.78rem;
+        padding: 0.32rem 0.5rem;
+    }
+
+    .mob-preset-trigger-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .mob-preset-panel {
+        max-height: 280px;
+    }
+
+    .mob-preset-option {
+        font-size: 0.72rem;
+        padding: 0.25rem 0.5rem 0.25rem 1.2rem;
+    }
+
+    .mob-preset-mob-header {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem 0.15rem 0.6rem;
+    }
+
+    .mob-preset-mob-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* ── Shield preset dropdown on mobile ── */
+    .shield-preset-row {
+        flex-wrap: wrap;
+    }
+
+    .shield-preset-dropdown {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .shield-preset-trigger {
+        font-size: 0.78rem;
+        padding: 0.32rem 0.5rem;
+    }
+
+    .shield-preset-trigger-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .shield-preset-option {
+        font-size: 0.75rem;
+        padding: 0.3rem 0.5rem;
+    }
+
+    .shield-preset-option-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    /* ── Shield quality toggles on mobile ── */
+    .shield-quality-btn span {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.72rem;
     }
 }

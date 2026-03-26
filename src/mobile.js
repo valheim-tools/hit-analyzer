@@ -47,7 +47,7 @@ function closeAllTips() {
  *
  * @param {Element} wrapEl  The .tip-wrap element whose tooltip to clamp.
  */
-export function clampTooltip(wrapEl) {
+function clampTooltip(wrapEl) {
     const tip = wrapEl.querySelector(':scope > .tip-text');
     if (!tip) return;
 

@@ -134,5 +134,167 @@
       "stagger": "YES",
       "minHealthForNoStagger": 105
     }
+  },
+  {
+    "name": "Multi-type / Surtling (Blunt+Fire) / no shield — DoT extraction",
+    "mob":    { "damageTypes": { "Blunt": 10.0, "Fire": 40.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 20.0, "parryMultiplier": 1.5 },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 50.0,
+      "effectiveDamage": 50.0,
+      "blockReducedDamage": 50.0,
+      "finalReducedDamage": 30.0,
+      "remainingHealth": 70.0,
+      "stagger": "NO",
+      "minHealthForNoStagger": 15,
+      "instantDamage": 6.0,
+      "dotBreakdown": {
+        "fire": { "total": 24.0, "tickCount": 5 }
+      }
+    }
+  },
+  {
+    "name": "Multi-type / Bonemass punch (Blunt+Poison) / Hard / no shield — stagger + poison DoT",
+    "mob":    { "damageTypes": { "Blunt": 80.0, "Poison": 50.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 150.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 30.0, "parryMultiplier": 1.5 },
+    "difficulty": "HARD",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 130.0,
+      "effectiveDamage": 195.0,
+      "blockReducedDamage": 195.0,
+      "finalReducedDamage": 165.0,
+      "remainingHealth": -15.0,
+      "stagger": "YES",
+      "minHealthForNoStagger": 254,
+      "instantDamage": 101.538,
+      "dotBreakdown": {
+        "poison": { "total": 63.462, "tickCount": 18 }
+      }
+    }
+  },
+  {
+    "name": "Multi-type / Pure Poison (Blob) / no shield — all DoT, zero instant",
+    "mob":    { "damageTypes": { "Poison": 90.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 25.0, "parryMultiplier": 1.5 },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 90.0,
+      "effectiveDamage": 90.0,
+      "blockReducedDamage": 90.0,
+      "finalReducedDamage": 65.0,
+      "remainingHealth": 35.0,
+      "stagger": "NO",
+      "minHealthForNoStagger": 0,
+      "instantDamage": 0.0,
+      "dotBreakdown": {
+        "poison": { "total": 65.0, "tickCount": 19 }
+      }
+    }
+  },
+  {
+    "name": "Multi-type / Mixed parry (Blunt+Fire) — fire nearly zeroed by parry",
+    "mob":    { "damageTypes": { "Blunt": 40.0, "Fire": 20.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 10.0, "blockArmor": 50.0, "armor": 30.0, "parryMultiplier": 2.0 },
+    "difficulty": "NORMAL",
+    "useShield": true,
+    "isParry": true,
+    "expected": {
+      "baseDamage": 60.0,
+      "effectiveDamage": 60.0,
+      "blockReducedDamage": 8.571,
+      "finalReducedDamage": 0.612,
+      "remainingHealth": 99.388,
+      "stagger": "NO",
+      "minHealthForNoStagger": 15,
+      "instantDamage": 0.408,
+      "dotBreakdown": {
+        "fire": { "total": 0.204, "tickCount": 0 }
+      }
+    }
+  },
+  {
+    "name": "Backward compat / baseDamage as Blunt — same as original baseline",
+    "mob":    { "baseDamage": 60.0, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 30.0, "parryMultiplier": 1.0 },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 60.0,
+      "effectiveDamage": 60.0,
+      "blockReducedDamage": 60.0,
+      "finalReducedDamage": 30.0,
+      "remainingHealth": 70.0,
+      "stagger": "NO",
+      "minHealthForNoStagger": 75,
+      "instantDamage": 30.0
+    }
+  },
+  {
+    "name": "Resistance / Fire Resistant (50%) on Blunt+Fire attack / no shield",
+    "mob":    { "damageTypes": { "Blunt": 40.0, "Fire": 20.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 20.0, "parryMultiplier": 1.5, "resistanceModifiers": { "Fire": 0.5 } },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 60.0,
+      "effectiveDamage": 60.0,
+      "blockReducedDamage": 60.0,
+      "resistanceReducedDamage": 50.0,
+      "finalReducedDamage": 30.0,
+      "remainingHealth": 70.0,
+      "stagger": "NO",
+      "minHealthForNoStagger": 60,
+      "instantDamage": 24.0,
+      "dotBreakdown": {
+        "fire": { "total": 6.0, "tickCount": 5 }
+      }
+    }
+  },
+  {
+    "name": "Resistance / Immune to Poison — all damage eliminated / no shield",
+    "mob":    { "damageTypes": { "Poison": 90.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 25.0, "parryMultiplier": 1.5, "resistanceModifiers": { "Poison": 0.0 } },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 90.0,
+      "effectiveDamage": 90.0,
+      "blockReducedDamage": 90.0,
+      "resistanceReducedDamage": 0.0,
+      "finalReducedDamage": 0.0,
+      "remainingHealth": 100.0,
+      "stagger": "NO",
+      "minHealthForNoStagger": 0,
+      "instantDamage": 0.0
+    }
+  },
+  {
+    "name": "Resistance / Very Weak to Blunt (200%) — amplified damage / no shield",
+    "mob":    { "damageTypes": { "Blunt": 60.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 100.0, "blockingSkill": 0.0, "blockArmor": 0.0, "armor": 30.0, "parryMultiplier": 1.0, "resistanceModifiers": { "Blunt": 2.0 } },
+    "difficulty": "NORMAL",
+    "useShield": false,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 60.0,
+      "effectiveDamage": 60.0,
+      "blockReducedDamage": 60.0,
+      "resistanceReducedDamage": 120.0,
+      "finalReducedDamage": 90.0,
+      "remainingHealth": 10.0,
+      "stagger": "YES",
+      "minHealthForNoStagger": 225,
+      "instantDamage": 90.0
+    }
   }
 ]

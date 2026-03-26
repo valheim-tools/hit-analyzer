@@ -123,3 +123,20 @@ Tests are data-driven via `tests/test-cases.json`. To add a new scenario, add a 
 | `serve.ps1` | Static file server (Node.js) |
 | `build.js` | Production build — minifies to dist/ |
 | `package.json` | npm scripts for test, serve, and build |
+
+## Git Workflow
+
+**Never work on the `main` branch.** For every task, create a new feature branch first:
+
+```powershell
+git checkout -b <descriptive-branch-name>
+```
+
+**Commit after every change.** Each meaningful edit (or small group of related edits) should be committed immediately with a clear message:
+
+```powershell
+git add -A
+git commit -m "concise description of the change"
+```
+
+**Never push without explicit permission.** Commits stay local until the user explicitly asks to push. Do not run `git push` on your own.

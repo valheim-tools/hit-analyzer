@@ -1,3 +1,0 @@
-This directory is intentionally kept in source control so the output path always exists.
-Generated .xlsx files are excluded by .gitignore.
-

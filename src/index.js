@@ -8,7 +8,7 @@ const DAMAGE_TYPE_CLASSES = { Blunt: 'dt-blunt', Slash: 'dt-slash', Pierce: 'dt-
 const DOT_CSS_CLASSES = { fire: 'sim-dot-fire', poison: 'sim-dot-poison', spirit: 'sim-dot-spirit' };
 
 const DEFAULTS = Object.freeze({
-    mobPreset: 'troll_log_swing_v',
+    mobPreset: '',
     damageTypes: { Blunt: 70 },
     starLevel: 0,
     difficulty: 'NORMAL',
@@ -834,7 +834,7 @@ function applyForm(values) {
         const triggerIcon = mobPresetTriggerEl.querySelector('.mob-preset-trigger-icon');
         if (triggerIcon) triggerIcon.hidden = true;
     } else {
-        mobPresetTriggerTextEl.textContent = '— Select a mob attack —';
+        mobPresetTriggerTextEl.textContent = 'Custom';
         const triggerIcon = mobPresetTriggerEl.querySelector('.mob-preset-trigger-icon');
         if (triggerIcon) triggerIcon.hidden = true;
     }
@@ -941,6 +941,16 @@ function populateMobPresets(data) {
 
     mobPresetListEl.innerHTML = '';
 
+    // Custom (no preset) option — always at the top
+    const customOption = document.createElement('div');
+    customOption.className = 'mob-preset-option mob-preset-custom-option';
+    customOption.dataset.value = '';
+    const customOptionText = document.createElement('span');
+    customOptionText.className = 'mob-preset-option-text';
+    customOptionText.textContent = 'Custom';
+    customOption.appendChild(customOptionText);
+    mobPresetListEl.appendChild(customOption);
+
     for (const biome of biomes) {
         const biomeHeader = document.createElement('div');
         biomeHeader.className = 'mob-preset-biome-header';
@@ -1033,7 +1043,11 @@ function filterMobPresetList(query) {
             child.hidden = !isMobNameMatch;
             if (isMobNameMatch) biomeHasVisibleMob = true;
         } else if (child.classList.contains('mob-preset-option')) {
-            child.hidden = !isMobNameMatch;
+            if (child.classList.contains('mob-preset-custom-option')) {
+                child.hidden = false;
+            } else {
+                child.hidden = !isMobNameMatch;
+            }
         }
     }
     // Finalize last biome
@@ -1041,6 +1055,10 @@ function filterMobPresetList(query) {
 }
 
 function selectMobPreset(attackId) {
+    if (!attackId) {
+        clearMobPreset();
+        return;
+    }
     mobPresetEl.value = attackId;
     const preset = flatMobPresets.find(preset => preset._id === attackId);
     if (preset) {
@@ -1056,7 +1074,7 @@ function selectMobPreset(attackId) {
         triggerIcon.alt = '';
         triggerIcon.hidden = false;
     } else {
-        mobPresetTriggerTextEl.textContent = '— Select a mob attack —';
+        mobPresetTriggerTextEl.textContent = 'Custom';
         const triggerIcon = mobPresetTriggerEl.querySelector('.mob-preset-trigger-icon');
         if (triggerIcon) triggerIcon.hidden = true;
     }
@@ -1066,11 +1084,11 @@ function selectMobPreset(attackId) {
 }
 
 function clearMobPreset() {
-    if (!mobPresetEl.value) return;
     mobPresetEl.value = '';
     mobPresetTriggerTextEl.textContent = 'Custom';
     const triggerIcon = mobPresetTriggerEl.querySelector('.mob-preset-trigger-icon');
     if (triggerIcon) triggerIcon.hidden = true;
+    closeMobPresetDropdown();
     saveForm();
 }
 

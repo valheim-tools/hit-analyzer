@@ -1,9 +1,9 @@
-import { calculate, calculateShieldBlockArmor, sampleRng, getPercentileRng } from './damage-calculator.js?v=9';
+import { calculate, calculateShieldBlockArmor, sampleRng, getPercentileRng, STAGGER_TYPES } from './damage-calculator.js?v=9';
 import { initTooltipClamping } from './mobile.js?v=9';
 
 /* ── Constants ── */
 const DAMAGE_TYPE_NAMES = ['Blunt', 'Slash', 'Pierce', 'Fire', 'Frost', 'Lightning', 'Poison', 'Spirit'];
-const DAMAGE_TYPE_ICONS = { Blunt: '🔨', Slash: '⚔', Pierce: '🏹', Fire: '🔥', Frost: '❄', Lightning: '⚡', Poison: '☠', Spirit: '👻' };
+const DAMAGE_TYPE_ICONS = { Blunt: '🔨', Slash: '⚔️', Pierce: '🏹', Fire: '🔥', Frost: '❄️', Lightning: '⚡', Poison: '☣️', Spirit: '👻' };
 const DAMAGE_TYPE_CLASSES = { Blunt: 'dt-blunt', Slash: 'dt-slash', Pierce: 'dt-pierce', Fire: 'dt-fire', Frost: 'dt-frost', Lightning: 'dt-lightning', Poison: 'dt-poison', Spirit: 'dt-spirit' };
 const DOT_CSS_CLASSES = { fire: 'sim-dot-fire', poison: 'sim-dot-poison', spirit: 'sim-dot-spirit' };
 
@@ -19,7 +19,7 @@ const DEFAULTS = Object.freeze({
     parryMultiplier: 2.5,
     extraDamagePercent: 0,
     resistanceModifiers: {},
-    percentile: 100,
+    riskFactor: 0,
     shieldPreset: 'ShieldBronzeBuckler',
     shieldQuality: 3,
     dotSpeed: 3,
@@ -32,8 +32,8 @@ const PARRY_MULTIPLIER_PRESETS = [1, 1.5, 2, 2.5, 4, 6];
 const form = document.getElementById('calcForm');
 const errBox = document.getElementById('error');
 const results = document.getElementById('results');
-const formulaDetailsEl = document.getElementById('formulaDetails');
-const formulaEl = document.getElementById('formula');
+const analysisDetailsEl = document.getElementById('analysisDetails');
+const analysisEl = document.getElementById('analysis');
 const damageSummaryEl = document.getElementById('damageSummary');
 const modifierLineEl = document.getElementById('modifierLine');
 const tbodyEl = document.getElementById('tbody');
@@ -72,7 +72,7 @@ const shieldPresetListEl = document.getElementById('shieldPresetList');
 const shieldQualityGroupEl = document.getElementById('shieldQualityGroup');
 const shieldQualityRadios = () => document.querySelectorAll('input[name="shieldQuality"]');
 const simRandomHitBtnEl = document.getElementById('simRandomHitBtn');
-const percentileInputEl = document.getElementById('percentileInput');
+const riskFactorInputEl = document.getElementById('riskFactorInput');
 const dotSpeedSliderEl = document.getElementById('dotSpeedSlider');
 const dotSpeedValueEl = document.getElementById('dotSpeedValue');
 const resistanceTypeInputsEl = document.getElementById('resistanceTypeInputs');
@@ -80,12 +80,12 @@ const addResistanceTypeBtnEl = document.getElementById('addResistanceTypeBtn');
 
 /* ── Tab DOM refs ── */
 const tabSimulatorEl   = document.getElementById('tab-simulator');
-const tabCalculatorEl  = document.getElementById('tab-calculator');
+const tabHitAnalyzerEl = document.getElementById('tab-hit-analyzer');
 
 function switchTab(name) {
     const isSimulator = name === 'simulator';
-    tabSimulatorEl.hidden  = !isSimulator;
-    tabCalculatorEl.hidden = isSimulator;
+    tabSimulatorEl.hidden   = !isSimulator;
+    tabHitAnalyzerEl.hidden = isSimulator;
     document.querySelectorAll('.tab-btn').forEach(button => {
         const active = button.dataset.tab === name;
         button.classList.toggle('active', active);
@@ -125,16 +125,16 @@ new Image().src = SHIELD_IMAGE_BROKEN;
 
 const DAMAGE_TYPE_ROW_TEMPLATE = `
     <select class="damage-type-select" aria-label="Damage type">
-        <optgroup label="⚔ Instant">
+        <optgroup label="⚔️ Instant">
             <option value="Blunt">🔨 Blunt</option>
-            <option value="Slash">⚔ Slash</option>
+            <option value="Slash">⚔️ Slash</option>
             <option value="Pierce">🏹 Pierce</option>
-            <option value="Frost">❄ Frost</option>
+            <option value="Frost">❄️ Frost</option>
             <option value="Lightning">⚡ Lightning</option>
         </optgroup>
         <optgroup label="⏳ Damage over Time">
             <option value="Fire">🔥 Fire</option>
-            <option value="Poison">☠ Poison</option>
+            <option value="Poison">☣️ Poison</option>
             <option value="Spirit">👻 Spirit</option>
         </optgroup>
     </select>
@@ -182,16 +182,16 @@ function setDamageTypesInUi(damageTypes) {
 /* ── Resistance type input management ── */
 
 const RESISTANCE_TYPE_SELECT_OPTIONS = `
-    <optgroup label="⚔ Instant">
+    <optgroup label="⚔️ Instant">
         <option value="Blunt">🔨 Blunt</option>
-        <option value="Slash">⚔ Slash</option>
+        <option value="Slash">⚔️ Slash</option>
         <option value="Pierce">🏹 Pierce</option>
-        <option value="Frost">❄ Frost</option>
+        <option value="Frost">❄️ Frost</option>
         <option value="Lightning">⚡ Lightning</option>
     </optgroup>
     <optgroup label="⏳ Damage over Time">
         <option value="Fire">🔥 Fire</option>
-        <option value="Poison">☠ Poison</option>
+        <option value="Poison">☣️ Poison</option>
         <option value="Spirit">👻 Spirit</option>
     </optgroup>`;
 
@@ -527,7 +527,7 @@ function collectFormState() {
         armor: parseFloat(armorEl.value),
         parryMultiplier: getParryMultiplierFromUi(),
         parryMultiplierMode: parryPresetEl.value === 'custom' ? 'custom' : 'preset',
-        percentile: percentileInputEl.value,
+        riskFactor: riskFactorInputEl.value,
         shieldPreset: shieldPresetEl.value,
         shieldQuality: getShieldQuality(),
         dotSpeed: parseFloat(dotSpeedSliderEl.value) || DEFAULTS.dotSpeed,
@@ -850,7 +850,7 @@ function applyForm(values) {
     blockArmorEl.value = values.blockArmor ?? DEFAULTS.blockArmor;
     armorEl.value = values.armor ?? DEFAULTS.armor;
     syncParryMultiplierUi(values);
-    percentileInputEl.value = values.percentile ?? DEFAULTS.percentile;
+    riskFactorInputEl.value = values.riskFactor ?? DEFAULTS.riskFactor;
     const savedShieldPrefab = values.shieldPreset ?? DEFAULTS.shieldPreset;
     shieldPresetEl.value = savedShieldPrefab;
     // Sync shield trigger display
@@ -877,20 +877,20 @@ function applyForm(values) {
 }
 
 function collectInputs() {
-    const { parryMultiplierMode, percentile, shieldPreset, shieldQuality, dotSpeed, ...requestInputs } = collectFormState();
+    const { parryMultiplierMode, riskFactor, shieldPreset, shieldQuality, dotSpeed, ...requestInputs } = collectFormState();
     return requestInputs;
 }
 
-function getPercentile() {
-    const inputValue = parseFloat(percentileInputEl.value);
-    if (!Number.isFinite(inputValue) || inputValue < 1 || inputValue > 100) return DEFAULTS.percentile;
+function getRiskFactor() {
+    const inputValue = parseFloat(riskFactorInputEl.value);
+    if (!Number.isFinite(inputValue) || inputValue < 0 || inputValue > 100) return DEFAULTS.riskFactor;
     return Math.round(inputValue * 10) / 10;
 }
 
-function getPercentileRngOpts() {
-    const percentile = getPercentile();
-    if (percentile >= 100) return {};
-    return { rng: getPercentileRng(percentile / 100) };
+function getRiskFactorRngOptions() {
+    const riskFactor = getRiskFactor();
+    if (riskFactor <= 0) return {};
+    return { rng: getPercentileRng((100 - riskFactor) / 100) };
 }
 
 function saveForm() {
@@ -898,12 +898,14 @@ function saveForm() {
 }
 
 function resetForm() {
+    const currentRiskFactor = riskFactorInputEl.value;
     applyForm(DEFAULTS);
+    riskFactorInputEl.value = currentRiskFactor;
     localStorage.removeItem(LS_FORM);
     results.style.display = 'none';
     errBox.style.display = 'none';
-    formulaDetailsEl.hidden = true;
-    formulaDetailsEl.open = false;
+    analysisDetailsEl.hidden = true;
+    analysisDetailsEl.open = false;
     initHitSimulator();
 }
 
@@ -1090,7 +1092,7 @@ form.addEventListener('submit', async (event) => {
     const requestInputs = collectInputs();
 
     try {
-        const data = await calculate(requestInputs, getPercentileRngOpts());
+        const data = await calculate(requestInputs, getRiskFactorRngOptions());
         render(data, formState);
     } catch (error) {
         errBox.textContent = 'Error: ' + error.message;
@@ -1101,7 +1103,7 @@ form.addEventListener('submit', async (event) => {
 
 /* ── Rendering ── */
 function formatNumber(value) {
-    return Number(value).toFixed(2);
+    return Number(value).toFixed(3);
 }
 
 function formatDamageTypeBadgesHtml(damageMap) {
@@ -1116,7 +1118,7 @@ function formatDamageTypeBadgesHtml(damageMap) {
 const DOT_TYPE_DEFINITIONS = [
     { key: 'fire',   icon: '🔥', label: 'Fire',   fixedDuration: 5 },
     { key: 'spirit', icon: '👻', label: 'Spirit', fixedDuration: 3 },
-    { key: 'poison', icon: '☠',  label: 'Poison', fixedDuration: null },
+    { key: 'poison', icon: '☣️',  label: 'Poison', fixedDuration: null },
 ];
 
 function getActiveDotTypes(scenarios) {
@@ -1181,8 +1183,8 @@ function render(data, inputs) {
     const baseDamage = data.baseDamage;
     const effectiveDamage = data.effectiveDamage;
     const scaledEffectiveDamage = data.scaledEffectiveDamage;
-    const percentile = getPercentile();
-    const hasPercentile = percentile < 100;
+    const riskFactor = getRiskFactor();
+    const hasRiskFactor = riskFactor > 0;
 
     const diffBonus = { NORMAL: 0, HARD: 50, VERY_HARD: 100 }[inputs.difficulty] ?? 0;
     const starBonus = inputs.starLevel * 50;
@@ -1198,14 +1200,14 @@ function render(data, inputs) {
         ? `Damage modifier: <span>${parts.join(' | ')}  (+${totalBonus}% total)</span>`
         : 'No damage modifier';
 
-    const percentileBadge = hasPercentile
-        ? ` <span class="percentile-badge">${percentile}th percentile (×${formatNumber(Math.sqrt(getPercentileRng(percentile / 100)))})</span>`
+    const riskFactorBadge = hasRiskFactor
+        ? ` <span class="risk-factor-badge">${riskFactor}% risk (×${formatNumber(Math.sqrt(getPercentileRng((100 - riskFactor) / 100)))})</span>`
         : '';
 
-    if (hasPercentile) {
+    if (hasRiskFactor) {
         modifierLineEl.innerHTML = effectiveDamage !== baseDamage
-            ? `Scaled Effective Damage = ${formatNumber(baseDamage)} → ${formatNumber(effectiveDamage)} → <span>${formatNumber(scaledEffectiveDamage)}</span>${percentileBadge}`
-            : `Scaled Effective Damage = ${formatNumber(baseDamage)} → <span>${formatNumber(scaledEffectiveDamage)}</span>${percentileBadge}`;
+            ? `Scaled Effective Damage = ${formatNumber(baseDamage)} → ${formatNumber(effectiveDamage)} → <span>${formatNumber(scaledEffectiveDamage)}</span>${riskFactorBadge}`
+            : `Scaled Effective Damage = ${formatNumber(baseDamage)} → <span>${formatNumber(scaledEffectiveDamage)}</span>${riskFactorBadge}`;
     } else {
         modifierLineEl.innerHTML = effectiveDamage !== baseDamage
             ? `Effective Damage = ${formatNumber(baseDamage)} → <span>${formatNumber(effectiveDamage)}</span>`
@@ -1223,11 +1225,11 @@ function render(data, inputs) {
         scenario.dotBreakdown.poison.total > 0.001
     );
 
-    const BLOCK_TIP = hasPercentile
+    const BLOCK_TIP = hasRiskFactor
         ? 'Remaining damage after the block armor damage reduction is applied to the scaled effective damage — before resistance modifiers are factored in.'
         : 'Remaining damage after the block armor damage reduction is applied to the effective damage — before resistance modifiers are factored in.';
-    const RESISTANCE_TIP = 'Remaining damage after resistance modifiers are applied — before body armor is factored in.';
-    const FINAL_TIP = 'The final damage after the body armor damage reduction is applied to the resistance-reduced damage.';
+    const RESISTANCE_TIP = 'Damage after resistance modifiers are applied — before body armor is factored in. Modifiers can reduce or amplify damage.';
+    const ARMOR_REDUCED_TIP = 'The damage after the body armor damage reduction is applied to the resistance-multiplied damage.';
     const makeTooltipLabel = (label, text) => `${label} <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">${text}</span></span>`;
 
     const hasResistance = Object.keys(inputs.resistanceModifiers || {}).length > 0;
@@ -1238,13 +1240,13 @@ function render(data, inputs) {
 
     if (hasResistance) {
         rows.push({
-            label: makeTooltipLabel('Resistance-Reduced Damage', RESISTANCE_TIP),
-            fn: scenario => formatNumber(scenario.resistanceReducedDamage),
+            label: makeTooltipLabel('Resistance-Multiplied Damage', RESISTANCE_TIP),
+            fn: scenario => formatNumber(scenario.resistanceMultipliedDamage),
         });
     }
 
     rows.push(
-        { label: makeTooltipLabel('Final Damage', FINAL_TIP), fn: scenario => formatNumber(scenario.finalReducedDamage) },
+        { label: makeTooltipLabel('Armor Reduced Damage', ARMOR_REDUCED_TIP), fn: scenario => formatNumber(scenario.armorReducedDamage) },
     );
 
     if (hasDoT) {
@@ -1276,14 +1278,25 @@ function render(data, inputs) {
     });
     rows.push({ label: 'Staggered', fn: scenario => staggerState(scenario) });
     rows.push({
-        label: 'Min Health to Avoid Stagger',
+        label: 'Min Health to Avoid Block Stagger',
         fn: scenario => {
-            if (scenario.minHealthForNoStagger === 0) {
+            if (scenario.minHealthForNoBlockStagger === 0) {
                 return '<span class="stagger-no">Immune</span>';
             }
-            const isSafe = inputs.maxHealth >= scenario.minHealthForNoStagger;
+            const isSafe = inputs.maxHealth >= scenario.minHealthForNoBlockStagger;
             const className = isSafe ? 'health-safe' : 'health-warning';
-            return `<span class="${className}">${scenario.minHealthForNoStagger}</span>`;
+            return `<span class="${className}">${scenario.minHealthForNoBlockStagger}</span>`;
+        },
+    });
+    rows.push({
+        label: 'Min Health to Avoid Armor Stagger',
+        fn: scenario => {
+            if (scenario.minHealthForNoArmorStagger === 0) {
+                return '<span class="stagger-no">Immune</span>';
+            }
+            const isSafe = inputs.maxHealth >= scenario.minHealthForNoArmorStagger;
+            const className = isSafe ? 'health-safe' : 'health-warning';
+            return `<span class="${className}">${scenario.minHealthForNoArmorStagger}</span>`;
         },
     });
 
@@ -1295,12 +1308,12 @@ function render(data, inputs) {
 
 
     results.style.display = 'block';
-    renderFormula(data, inputs);
+    renderAnalysis(data, inputs);
     syncSimMaxHealth();
 }
 
-/* ── Formula breakdown ── */
-function renderFormula(data, inputs) {
+/* ── Step-by-step analysis ── */
+function renderAnalysis(data, inputs) {
     const baseDamage = data.baseDamage;
     const effectiveDamage = data.effectiveDamage;
     const diffBonus = { NORMAL: 0, HARD: 0.5, VERY_HARD: 1.0 }[inputs.difficulty] ?? 0;
@@ -1326,22 +1339,22 @@ function renderFormula(data, inputs) {
         return `<div class="f-step-label">${stepLabelContent(prefix, name)}</div>`;
     }
 
-    function hoverFormula(content, tooltip, className = '') {
+    function hoverAnalysis(content, tooltip, className = '') {
         const classAttribute = className ? ` class="${className}"` : '';
         return `<span class="tip-wrap f-hover-wrap" tabindex="0"><span${classAttribute}>${content}</span><span class="tip-text">${tooltip}</span></span>`;
     }
 
     function hoverResult(value, tooltip, extraClass = '') {
         const classNames = ['f-hover-result', extraClass].filter(Boolean).join(' ');
-        return hoverFormula(`<strong class="${classNames}">${value}</strong>`, tooltip);
+        return hoverAnalysis(`<strong class="${classNames}">${value}</strong>`, tooltip);
     }
 
     function hoverDecision(text, tooltip) {
-        return hoverFormula(text, tooltip, 'f-hover-decision');
+        return hoverAnalysis(text, tooltip, 'f-hover-decision');
     }
 
-    function staggerWarning(tooltip) {
-        return `<div class="f-stagger-warn">⚠ ${hoverFormula('Player is staggered', tooltip, 'f-hover-warning')}</div>`;
+    function staggerWarning(staggerValue, tooltip) {
+        return `<div class="f-stagger-warn">⚠ Staggered → ${hoverResult(staggerValue, tooltip)}</div>`;
     }
 
     function thresholdTooltip(armorLabel, damageLabel, armor, damage, isLinear) {
@@ -1357,47 +1370,44 @@ function renderFormula(data, inputs) {
     }
 
     const bonusExpression = `1 + ${diffBonus} + ${starBonus} + (${formatNumber(extraDamagePercent)} ÷ 100)`;
-    const percentile = getPercentile();
-    const hasPercentile = percentile < 100;
-    const rngValue = hasPercentile ? getPercentileRng(percentile / 100) : null;
+    const riskFactor = getRiskFactor();
+    const hasRiskFactor = riskFactor > 0;
+    const rngValue = hasRiskFactor ? getPercentileRng((100 - riskFactor) / 100) : null;
     const rngFactor = rngValue !== null ? Math.sqrt(rngValue) : null;
-    const scaledEffectiveDamage = hasPercentile ? data.scaledEffectiveDamage : effectiveDamage;
-    const effectiveDamageLabel = hasPercentile ? 'Scaled Effective Damage' : 'Effective Damage';
+    const scaledEffectiveDamage = hasRiskFactor ? data.scaledEffectiveDamage : effectiveDamage;
+    const effectiveDamageLabel = hasRiskFactor ? 'Scaled Effective Damage' : 'Effective Damage';
 
-    // Show per-type base damage breakdown
+    // Show per-type base damage breakdown (stays in shared section)
     const baseDamageMapHtml = formatDamageTypeBadgesHtml(data.baseDamageMap);
-    const typeBreakdownLine = baseDamageMapHtml
+    const sharedHtml = baseDamageMapHtml
         ? `<div class="f-eq f-type-badges">Base damage: ${baseDamageMapHtml}</div>`
         : '';
 
-    let step1Html;
-    if (hasPercentile) {
-        step1Html = `
-        <div class="f-shared-label">${stepLabelContent('1 — ', effectiveDamageLabel)}
-            <span class="f-shared-note">(all scenarios)</span>
-        </div>
-        ${typeBreakdownLine}
-        <div class="f-eq">${formatNumber(baseDamage)} × (${bonusExpression}) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${hoverResult(
-            formatNumber(effectiveDamage),
-            `effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${formatNumber(baseDamage)} × (1 + ${diffBonus} + ${starBonus} + (${formatNumber(extraDamagePercent)} ÷ 100)) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${formatNumber(effectiveDamage)}`
-        )}</div>
-        <div class="f-eq">${formatNumber(effectiveDamage)} × √${formatNumber(rngValue)} = ${formatNumber(effectiveDamage)} × ${formatNumber(rngFactor)} = ${hoverResult(
-            formatNumber(scaledEffectiveDamage),
-            `${percentile}th percentile: scaledEffectiveDamage = effectiveDamage × √rng<br>rng = 0.75 + 0.25 × ${percentile / 100} = ${formatNumber(rngValue)}<br>${formatNumber(effectiveDamage)} × √${formatNumber(rngValue)} = ${formatNumber(effectiveDamage)} × ${formatNumber(rngFactor)} = ${formatNumber(scaledEffectiveDamage)}`
-        )} <span class="percentile-badge">${percentile}th pctl</span></div>`;
+    // Step 1 analysis (rendered inside each column)
+    let step1AnalysisHtml;
+    if (hasRiskFactor) {
+        step1AnalysisHtml = `<div class="f-step">
+            ${stepLabel('1 — ', effectiveDamageLabel)}
+            <div class="f-eq">${formatNumber(baseDamage)} × (${bonusExpression}) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${hoverResult(
+                formatNumber(effectiveDamage),
+                `effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${formatNumber(baseDamage)} × (1 + ${diffBonus} + ${starBonus} + (${formatNumber(extraDamagePercent)} ÷ 100)) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${formatNumber(effectiveDamage)}`
+            )}</div>
+            <div class="f-eq">${formatNumber(effectiveDamage)} × √${formatNumber(rngValue)} = ${formatNumber(effectiveDamage)} × ${formatNumber(rngFactor)} = ${hoverResult(
+                formatNumber(scaledEffectiveDamage),
+                `${riskFactor}% risk: scaledEffectiveDamage = effectiveDamage × √rng<br>rng = 0.75 + 0.25 × ${(100 - riskFactor) / 100} = ${formatNumber(rngValue)}<br>${formatNumber(effectiveDamage)} × √${formatNumber(rngValue)} = ${formatNumber(effectiveDamage)} × ${formatNumber(rngFactor)} = ${formatNumber(scaledEffectiveDamage)}`
+            )} <span class="risk-factor-badge">${riskFactor}% risk</span></div>
+        </div>`;
     } else {
-        step1Html = `
-        <div class="f-shared-label">${stepLabelContent('1 — ', effectiveDamageLabel)}
-            <span class="f-shared-note">(all scenarios)</span>
-        </div>
-        ${typeBreakdownLine}
-        <div class="f-eq">${formatNumber(baseDamage)} × (${bonusExpression}) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${hoverResult(
-            formatNumber(effectiveDamage),
-            `effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${formatNumber(baseDamage)} × (1 + ${diffBonus} + ${starBonus} + (${formatNumber(extraDamagePercent)} ÷ 100)) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${formatNumber(effectiveDamage)}`
-        )}</div>`;
+        step1AnalysisHtml = `<div class="f-step">
+            ${stepLabel('1 — ', effectiveDamageLabel)}
+            <div class="f-eq">${formatNumber(baseDamage)} × (${bonusExpression}) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${hoverResult(
+                formatNumber(effectiveDamage),
+                `effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>${formatNumber(baseDamage)} × (1 + ${diffBonus} + ${starBonus} + (${formatNumber(extraDamagePercent)} ÷ 100)) = ${formatNumber(baseDamage)} × ${formatNumber(totalMultiplier)} = ${formatNumber(effectiveDamage)}`
+            )}</div>
+        </div>`;
     }
 
-    function buildProportionalBreakdown(beforeMap, afterMap, totalBefore, totalAfter, beforeLabel, afterLabel) {
+    function buildProportionalBreakdown(beforeMap, afterMap, totalBefore, totalAfter, beforeLabel, afterLabel, markStaggerTypes = false) {
         const ratio = totalBefore > 0 ? totalAfter / totalBefore : 0;
         const activeTypes = DAMAGE_TYPE_NAMES.filter(typeName => (beforeMap[typeName] || 0) > 0.01);
         if (activeTypes.length <= 1) return '';
@@ -1408,7 +1418,8 @@ function renderFormula(data, inputs) {
             const formula = `${afterLabel}${typeName}Damage = ${beforeLabel}${typeName}Damage × (${afterLabel}Damage ÷ ${beforeLabel}Damage)`;
             const equation = `${formatNumber(before)} × (${formatNumber(totalAfter)} ÷ ${formatNumber(totalBefore)}) = ${formatNumber(before)} × ${formatNumber(ratio)} = ${formatNumber(after)}`;
             const tooltip = `${formula}<br>${equation}`;
-            return `<div class="f-eq">${icon} ${formatNumber(before)} → ${hoverResult(formatNumber(after), tooltip)}</div>`;
+            const staggerMarker = markStaggerTypes && STAGGER_TYPES.includes(typeName) ? ' ⚡' : '';
+            return `<div class="f-eq">${icon} ${formatNumber(before)} → ${hoverResult(formatNumber(after), tooltip)}${staggerMarker}</div>`;
         }).join('');
     }
 
@@ -1416,7 +1427,7 @@ function renderFormula(data, inputs) {
         const isShield = scenario !== 'noShield';
         const isParry = scenario === 'parry';
         const effectiveBlockArmor = isShield ? inputs.blockArmor * skillFactor * (isParry ? parryMultiplier : 1) : 0;
-        const inputDamageMap = hasPercentile ? data.scaledDamageMap : data.effectiveDamageMap;
+        const inputDamageMap = hasRiskFactor ? data.scaledDamageMap : data.effectiveDamageMap;
 
         let step2;
         if (!isShield) {
@@ -1454,8 +1465,8 @@ function renderFormula(data, inputs) {
             const halfEffectiveDamage = scaledEffectiveDamage / 2;
             const yesNo = effectiveBlockArmor < halfEffectiveDamage ? 'YES' : 'NO';
             const branch = isBlockLinear ? 'linear' : 'quadratic';
-            const staggeredOnBlock = afterBlock > staggerBar;
-            const damageVarName = hasPercentile ? 'scaledEffectiveDamage' : 'effectiveDamage';
+            const staggeredOnBlock = scenarioData.staggeredOnBlock;
+            const damageVarName = hasRiskFactor ? 'scaledEffectiveDamage' : 'effectiveDamage';
 
             let body;
             const check = `<div class="f-branch-check">${formatNumber(effectiveBlockArmor)} &lt; ${formatNumber(scaledEffectiveDamage)} ÷ 2 (= ${formatNumber(halfEffectiveDamage)})? ${hoverDecision(
@@ -1464,7 +1475,7 @@ function renderFormula(data, inputs) {
             )}</div>`;
 
             const afterBlockMap = scenarioData.damageBreakdown.afterBlock;
-            const effectiveLabel = hasPercentile ? 'scaledEffective' : 'effective';
+            const effectiveLabel = hasRiskFactor ? 'scaledEffective' : 'effective';
             const blockBreakdownHtml = afterBlockMap
                 ? buildProportionalBreakdown(inputDamageMap, afterBlockMap, scaledEffectiveDamage, scenarioData.blockReducedDamage, effectiveLabel, 'blockReduced')
                 : '';
@@ -1473,10 +1484,29 @@ function renderFormula(data, inputs) {
                 const compared = isBlockLinear
                     ? `${formatNumber(scaledEffectiveDamage)} − ${formatNumber(effectiveBlockArmor)} = ${hoverResult(formatNumber(afterBlock), `blockReducedDamage = ${damageVarName} − effectiveBlockArmor`)}`
                     : `${formatNumber(scaledEffectiveDamage)}² ÷ (${formatNumber(effectiveBlockArmor)} × 4) = ${hoverResult(formatNumber(afterBlock), `blockReducedDamage = ${damageVarName}² ÷ (effectiveBlockArmor × 4)`)}`;
+                const blockStaggerDamage = scenarioData.blockStaggerDamage;
+
+                // Build per-type breakdown of theoretical block-reduced values, marking stagger types
+                const blockRatio = scaledEffectiveDamage > 0 ? afterBlock / scaledEffectiveDamage : 0;
+                const activeTypes = DAMAGE_TYPE_NAMES.filter(typeName => (inputDamageMap[typeName] || 0) > 0.01);
+                let staggerBreakdownHtml = '';
+                if (activeTypes.length > 1) {
+                    staggerBreakdownHtml = activeTypes.map(typeName => {
+                        const icon = DAMAGE_TYPE_ICONS[typeName] || '';
+                        const reducedValue = (inputDamageMap[typeName] || 0) * blockRatio;
+                        const isStaggerType = STAGGER_TYPES.includes(typeName);
+                        const staggerMarker = isStaggerType ? ' ⚡' : '';
+                        const tooltip = isStaggerType
+                            ? `${typeName} is a stagger type — contributes to the stagger check.`
+                            : `${typeName} is not a stagger type — does not contribute to the stagger check.`;
+                        return `<div class="f-eq">${icon} ${hoverResult(formatNumber(reducedValue), tooltip)}${staggerMarker}</div>`;
+                    }).join('');
+                }
+
                 body = `${check}
                     <div class="f-eq">${compared}</div>
-                    ${staggerWarning(`Block-reduced damage compared to stagger threshold: ${formatNumber(afterBlock)} &gt; ${formatNumber(staggerBar)} (= 40% of ${formatNumber(inputs.maxHealth)} max health) → block bypassed.`)}
-                    <div class="f-eq">After Block → ${hoverResult(formatNumber(scenarioData.blockReducedDamage), 'The player was staggered, so block armor damage reduction was not applied.')}</div>`;
+                    ${staggerBreakdownHtml}
+                    ${staggerWarning(formatNumber(blockStaggerDamage), `${formatNumber(blockStaggerDamage)} &gt; ${formatNumber(staggerBar)} (= 40% of ${formatNumber(inputs.maxHealth)} max health) → block bypassed.`)}`;
             } else if (isBlockLinear) {
                 body = `${check}
                     <div class="f-eq">${formatNumber(scaledEffectiveDamage)} − ${formatNumber(effectiveBlockArmor)} = ${hoverResult(formatNumber(afterBlock), `blockReducedDamage = ${damageVarName} − effectiveBlockArmor`)}</div>
@@ -1493,51 +1523,58 @@ function renderFormula(data, inputs) {
             </div>`;
         }
 
-        // Resistance modifiers step
+        // Resistance modifiers step (always shown)
         const hasResistance = Object.keys(inputs.resistanceModifiers || {}).length > 0;
-        let stepResistance = '';
-        let nextStepNumber = 4;
+        let stepResistance;
         if (hasResistance) {
             const resistanceParts = [];
             const beforeResistanceMap = isShield && scenarioData.damageBreakdown.afterBlock
                 ? scenarioData.damageBreakdown.afterBlock
                 : inputDamageMap;
             const afterResistanceMap = scenarioData.damageBreakdown.afterResistance;
-            const beforeLabel = isShield ? 'blockReduced' : (hasPercentile ? 'scaledEffective' : 'effective');
+            const beforeLabel = isShield ? 'blockReduced' : (hasRiskFactor ? 'scaledEffective' : 'effective');
 
-            for (const [typeName, multiplier] of Object.entries(inputs.resistanceModifiers)) {
-                const percent = Math.round(multiplier * 100);
-                const icon = DAMAGE_TYPE_ICONS[typeName] || '';
+            for (const typeName of DAMAGE_TYPE_NAMES) {
                 const beforeValue = beforeResistanceMap[typeName] || 0;
+                if (beforeValue < 0.001) continue;
                 const afterValue = afterResistanceMap[typeName] || 0;
-                if (beforeValue > 0.001) {
+                const icon = DAMAGE_TYPE_ICONS[typeName] || '';
+                const multiplier = inputs.resistanceModifiers[typeName];
+
+                if (multiplier != null) {
                     const typeNameLower = typeName.charAt(0).toLowerCase() + typeName.slice(1);
-                    const formula = `resistanceReduced${typeName}Damage = ${beforeLabel}${typeName}Damage × ${typeNameLower}ResistanceMultiplier`;
+                    const formula = `resistanceMultiplied${typeName}Damage = ${beforeLabel}${typeName}Damage × ${typeNameLower}ResistanceMultiplier`;
                     const equation = `${formatNumber(beforeValue)} × ${formatNumber(multiplier)} = ${formatNumber(afterValue)}`;
                     const tooltip = `${formula}<br>${equation}`;
                     resistanceParts.push(`<div class="f-eq">${icon} ${formatNumber(beforeValue)} → ${hoverResult(formatNumber(afterValue), tooltip)}</div>`);
                 } else {
-                    resistanceParts.push(`<div class="f-eq f-resistance-line">${icon} ${typeName}: ×${formatNumber(multiplier)} (${percent}%) — no damage</div>`);
+                    resistanceParts.push(`<div class="f-eq">${icon} ${formatNumber(beforeValue)} → ${hoverResult(formatNumber(afterValue), `No resistance modifier — ${typeName} damage passes through unchanged.`)}</div>`);
                 }
             }
 
-            // Build summation tooltip for the total "After Resistance" line
+            // Build inline summation for the total "After Resistance" line
             const activeResistanceTypes = DAMAGE_TYPE_NAMES.filter(typeName => (afterResistanceMap[typeName] || 0) > 0.001);
-            const formulaTerms = activeResistanceTypes.map(typeName => `resistanceReduced${typeName}Damage`);
+            const formulaTerms = activeResistanceTypes.map(typeName => `resistanceMultiplied${typeName}Damage`);
             const valueTerms = activeResistanceTypes.map(typeName => formatNumber(afterResistanceMap[typeName] || 0));
-            const resistanceTooltip = `resistanceReducedDamage = ${formulaTerms.join(' + ')}<br>${valueTerms.join(' + ')} = ${formatNumber(scenarioData.resistanceReducedDamage)}`;
+            const resistanceTooltip = `resistanceMultipliedDamage = ${formulaTerms.join(' + ')}`;
 
             stepResistance = `<div class="f-step">
-                ${stepLabel('4 — ', 'Resistance Reduced Damage')}
+                ${stepLabel('4 — ', 'Resistance-Multiplied Damage')}
                 ${resistanceParts.join('')}
-                <div class="f-eq">After Resistance → ${hoverResult(formatNumber(scenarioData.resistanceReducedDamage), resistanceTooltip)}</div>
+                <div class="f-eq">${valueTerms.join(' + ')} = ${hoverResult(formatNumber(scenarioData.resistanceMultipliedDamage), resistanceTooltip)}</div>
             </div>`;
-            nextStepNumber = 5;
+        } else {
+            stepResistance = `<div class="f-step">
+                ${stepLabel('4 — ', 'Resistance-Multiplied Damage')}
+                <div class="f-skipped">No resistance modifiers — step skipped</div>
+            </div>`;
         }
 
-        // Body armor uses resistance-reduced damage (or block-reduced if no resistance)
-        const armorInputDamage = hasResistance ? scenarioData.resistanceReducedDamage : scenarioData.blockReducedDamage;
-        const armorInputLabel = hasResistance ? 'resistanceReducedDamage' : 'blockReducedDamage';
+        // Body armor uses resistance-multiplied damage (or block-reduced if no resistance)
+        const armorInputDamage = hasResistance ? scenarioData.resistanceMultipliedDamage : scenarioData.blockReducedDamage;
+        const armorInputLabel = hasResistance
+            ? 'resistanceMultipliedDamage'
+            : (isShield ? 'blockReducedDamage' : (hasRiskFactor ? 'scaledEffectiveDamage' : 'effectiveDamage'));
         const armorInputMap = hasResistance
             ? scenarioData.damageBreakdown.afterResistance
             : (isShield && scenarioData.damageBreakdown.afterBlock
@@ -1553,130 +1590,168 @@ function renderFormula(data, inputs) {
             thresholdTooltip('armor', armorInputLabel, inputs.armor, armorInputDamage, isArmorLinear)
         )}</div>`;
 
-        const armorBeforeLabel = hasResistance ? 'resistanceReduced' : (isShield ? 'blockReduced' : (hasPercentile ? 'scaledEffective' : 'effective'));
-        const armorBreakdownHtml = buildProportionalBreakdown(armorInputMap, afterArmorMap, armorInputDamage, scenarioData.finalReducedDamage, armorBeforeLabel, 'armorReduced');
+        const armorBeforeLabel = hasResistance ? 'resistanceMultiplied' : (isShield ? 'blockReduced' : (hasRiskFactor ? 'scaledEffective' : 'effective'));
+        const armorBreakdownHtml = buildProportionalBreakdown(armorInputMap, afterArmorMap, armorInputDamage, scenarioData.armorReducedDamage, armorBeforeLabel, 'armorReduced', true);
 
         let armorBody;
         if (isArmorLinear) {
             armorBody = `${armorCheck}
-                <div class="f-eq">${formatNumber(armorInputDamage)} − ${formatNumber(inputs.armor)} = ${hoverResult(formatNumber(scenarioData.finalReducedDamage), `finalDamage = ${armorInputLabel} − armor`)}</div>
+                <div class="f-eq">${formatNumber(armorInputDamage)} − ${formatNumber(inputs.armor)} = ${hoverResult(formatNumber(scenarioData.armorReducedDamage), `armorReducedDamage = ${armorInputLabel} − armor`)}</div>
                 ${armorBreakdownHtml}`;
         } else {
             armorBody = `${armorCheck}
-                <div class="f-eq">${formatNumber(armorInputDamage)}² ÷ (${formatNumber(inputs.armor)} × 4) = ${hoverResult(formatNumber(scenarioData.finalReducedDamage), `finalDamage = ${armorInputLabel}² ÷ (armor × 4)`)}</div>
+                <div class="f-eq">${formatNumber(armorInputDamage)}² ÷ (${formatNumber(inputs.armor)} × 4) = ${hoverResult(formatNumber(scenarioData.armorReducedDamage), `armorReducedDamage = ${armorInputLabel}² ÷ (armor × 4)`)}</div>
                 ${armorBreakdownHtml}`;
         }
 
         if (!isShield && scenarioData.stagger === 'YES') {
+            const armorStaggerDamage = scenarioData.armorStaggerDamage;
             armorBody += `
-                ${staggerWarning(`Final damage compared to stagger threshold: ${formatNumber(scenarioData.finalReducedDamage)} &gt; ${formatNumber(staggerBar)} (= 40% of ${formatNumber(inputs.maxHealth)} max health).`)}`;
+                ${staggerWarning(formatNumber(armorStaggerDamage), `${formatNumber(armorStaggerDamage)} &gt; ${formatNumber(staggerBar)} (= 40% of ${formatNumber(inputs.maxHealth)} max health).`)}`;
         }
 
         const stepArmor = `<div class="f-step">
-            ${stepLabel(`${nextStepNumber} — `, 'Armor Reduced Damage')}
+            ${stepLabel('5 — ', 'Armor Reduced Damage')}
             ${armorBody}
         </div>`;
-        nextStepNumber++;
 
-        // Damage over time step (only shown if there are DoT types)
+        // Remaining Health step (merged with damage breakdown when DoT types are present)
         const hasDot = scenarioData.dotBreakdown.fire.total > 0.001 ||
                        scenarioData.dotBreakdown.spirit.total > 0.001 ||
                        scenarioData.dotBreakdown.poison.total > 0.001;
-        let stepDot = '';
-        if (hasDot) {
-            const afterArmor = scenarioData.damageBreakdown.afterArmor;
-            const afterBlock = scenarioData.damageBreakdown.afterBlock;
-            const afterResistance = scenarioData.damageBreakdown.afterResistance;
-            const isShieldScenario = scenario !== 'noShield';
+        const afterArmor = scenarioData.damageBreakdown.afterArmor;
+        const afterBlock = scenarioData.damageBreakdown.afterBlock;
+        const afterResistance = scenarioData.damageBreakdown.afterResistance;
+        const isShieldScenario = scenario !== 'noShield';
 
-            function buildDotTotalTooltip(typeName) {
-                const effectiveValue = hasPercentile
-                    ? data.scaledDamageMap[typeName]
-                    : data.effectiveDamageMap[typeName];
-                const effectiveLabel = hasPercentile ? 'scaledEffective' : 'effective';
-                const lines = [`${effectiveLabel}${typeName}Damage = ${formatNumber(effectiveValue)}`];
-                if (isShieldScenario && afterBlock) {
-                    lines.push(`After block: ${formatNumber(afterBlock[typeName])}`);
-                }
-                if (hasResistance) {
-                    lines.push(`After resistance: ${formatNumber(afterResistance[typeName])}`);
-                }
-                lines.push(`After armor: ${formatNumber(afterArmor[typeName])}`);
-                return lines.join('<br>');
+        // Calculate eliminated DoT damage (types where per-tick is below threshold)
+        const dotThresholdChecks = [
+            { key: 'fire',   icon: '🔥', typeName: 'Fire',   threshold: 0.2, tickCount: 5, duration: '5s' },
+            { key: 'spirit', icon: '👻', typeName: 'Spirit', threshold: 0.2, tickCount: 6, duration: '3s' },
+            { key: 'poison', icon: '☣️', typeName: 'Poison', threshold: null, tickCount: null, duration: null },
+        ];
+        let eliminatedDotTotal = 0;
+        for (const dotCheck of dotThresholdChecks) {
+            const dotData = scenarioData.dotBreakdown[dotCheck.key];
+            if (dotData.total > 0.001 && dotData.ticks.length === 0) {
+                eliminatedDotTotal += dotData.total;
             }
-
-            const dotParts = [];
-            if (scenarioData.dotBreakdown.fire.total > 0.001) {
-                const fireTicks = scenarioData.dotBreakdown.fire.ticks;
-                const fireTotal = hoverResult(formatNumber(scenarioData.dotBreakdown.fire.total), buildDotTotalTooltip('Fire'));
-                if (fireTicks.length === 0) {
-                    dotParts.push(`🔥 Fire: ${fireTotal} → 0 (per-tick ${formatNumber(scenarioData.dotBreakdown.fire.total / 5)} below 0.2 threshold)`);
-                } else {
-                    dotParts.push(`🔥 Fire: ${fireTotal} → ${fireTicks.length} ticks over 5s`);
-                }
-            }
-            if (scenarioData.dotBreakdown.spirit.total > 0.001) {
-                const spiritTicks = scenarioData.dotBreakdown.spirit.ticks;
-                const spiritTotal = hoverResult(formatNumber(scenarioData.dotBreakdown.spirit.total), buildDotTotalTooltip('Spirit'));
-                if (spiritTicks.length === 0) {
-                    dotParts.push(`👻 Spirit: ${spiritTotal} → 0 (per-tick ${formatNumber(scenarioData.dotBreakdown.spirit.total / 3)} below 0.2 threshold)`);
-                } else {
-                    dotParts.push(`👻 Spirit: ${spiritTotal} → ${spiritTicks.length} ticks over 3s`);
-                }
-            }
-            if (scenarioData.dotBreakdown.poison.total > 0.001) {
-                const poisonTicks = scenarioData.dotBreakdown.poison.ticks;
-                const poisonTotal = hoverResult(formatNumber(scenarioData.dotBreakdown.poison.total), buildDotTotalTooltip('Poison'));
-                if (poisonTicks.length === 0) {
-                    dotParts.push(`☠ Poison: ${poisonTotal} → 0 (per-tick below 0.2 threshold)`);
-                } else {
-                    const poisonDuration = poisonTicks[poisonTicks.length - 1].time + 1;
-                    dotParts.push(`☠ Poison: ${poisonTotal} → ${poisonTicks.length} ticks over ${Math.round(poisonDuration)}s`);
-                }
-            }
-            let instantLine = '';
-            if (scenarioData.instantDamage > 0.001) {
-                const instantTypes = ['Blunt', 'Slash', 'Pierce', 'Frost', 'Lightning'];
-                const instantParts = instantTypes
-                    .filter(typeName => (afterArmor[typeName] || 0) > 0.001)
-                    .map(typeName => `${typeName}: ${formatNumber(afterArmor[typeName])}`);
-                const instantTooltip = `Sum of non-DoT types after armor:<br>${instantParts.join('<br>')}`;
-                const instantValue = hoverResult(formatNumber(scenarioData.instantDamage), instantTooltip);
-                instantLine = `<div class="f-eq f-dot-extraction">Instant: ${instantValue} HP immediately</div>`;
-            }
-            stepDot = `<div class="f-step">
-                ${stepLabel(`${nextStepNumber} — `, 'Damage Breakdown')}
-                ${instantLine}
-                ${dotParts.map(part => `<div class="f-eq f-dot-extraction">${part}</div>`).join('')}
-            </div>`;
-            nextStepNumber++;
         }
 
+        const adjustedTotalDamage = scenarioData.armorReducedDamage - eliminatedDotTotal;
+        const displayTotalDamage = adjustedTotalDamage;
+        const displayRemainingHealth = inputs.maxHealth - adjustedTotalDamage;
+
+        // Adjusted Total Damage step (always shown)
+        let stepAdjusted;
+        if (eliminatedDotTotal > 0.001) {
+            const eliminatedParts = [];
+            for (const dotCheck of dotThresholdChecks) {
+                const dotData = scenarioData.dotBreakdown[dotCheck.key];
+                if (dotData.total > 0.001 && dotData.ticks.length === 0) {
+                    const perTick = dotCheck.tickCount != null
+                        ? formatNumber(dotData.total / dotCheck.tickCount)
+                        : formatNumber(dotData.total);
+                    const zeroTooltip = dotCheck.threshold != null
+                        ? `per-tick ${perTick} &lt; ${dotCheck.threshold} minimum threshold → damage eliminated<br>(threshold only applies to Fire &amp; Spirit, not Poison)`
+                        : `DoT damage eliminated`;
+                    const zeroValue = hoverResult('0', zeroTooltip);
+                    eliminatedParts.push(`<div class="f-eq">${dotCheck.icon} ${formatNumber(dotData.total)} → ${zeroValue}</div>`);
+                }
+            }
+            const adjustedTooltip = `adjustedTotalDamage = armorReducedDamage − eliminatedDotDamage<br>${formatNumber(scenarioData.armorReducedDamage)} − ${formatNumber(eliminatedDotTotal)} = ${formatNumber(adjustedTotalDamage)}`;
+            stepAdjusted = `<div class="f-step">
+                ${stepLabel('6 — ', 'Adjusted Total Damage')}
+                ${eliminatedParts.join('')}
+                <div class="f-eq">${formatNumber(scenarioData.armorReducedDamage)} − ${formatNumber(eliminatedDotTotal)} = ${hoverResult(formatNumber(adjustedTotalDamage), adjustedTooltip)}</div>
+            </div>`;
+        } else {
+            stepAdjusted = `<div class="f-step">
+                ${stepLabel('6 — ', 'Adjusted Total Damage')}
+                <div class="f-skipped">No DoT damage to adjust — step skipped</div>
+            </div>`;
+        }
+
+        let breakdownHtml = '';
+        if (hasDot) {
+            const breakdownParts = [];
+            let dotDamageTotal = 0;
+
+            // Instant damage line (grouped: Instant: 🔨 val, ⚔️ val, ... = total)
+            if (scenarioData.instantDamage > 0.001) {
+                const instantTypes = ['Blunt', 'Slash', 'Pierce', 'Frost', 'Lightning'];
+                const activeInstantTypes = instantTypes.filter(typeName => (afterArmor[typeName] || 0) > 0.001);
+                const typeSummands = activeInstantTypes.map(typeName => `adjusted${typeName}Damage`);
+                const typeValues = activeInstantTypes.map(typeName => formatNumber(afterArmor[typeName]));
+                const instantFormula = `instantDamage = ${typeSummands.join(' + ')}`;
+                const instantEquation = `${typeValues.join(' + ')} = ${formatNumber(scenarioData.instantDamage)}`;
+                const instantTooltip = `${instantFormula}<br>${instantEquation}`;
+                const instantItems = activeInstantTypes
+                    .map(typeName => `${DAMAGE_TYPE_ICONS[typeName]} ${formatNumber(afterArmor[typeName])}`)
+                    .join(', ');
+                breakdownParts.push(`<div class="f-eq f-dot-extraction">Instant: ${instantItems} = ${hoverResult(formatNumber(scenarioData.instantDamage), instantTooltip)}</div>`);
+            }
+
+            // DoT damage line (grouped: DoT: 🔥 val, ☣️ val, ... = total)
+            const dotItems = [];
+            const allDotLabels = [];
+            const allDotValues = [];
+            for (const dotCheck of dotThresholdChecks) {
+                const dotData = scenarioData.dotBreakdown[dotCheck.key];
+                if (dotData.total < 0.001) continue;
+
+                const isEliminated = dotData.ticks.length === 0;
+
+                if (isEliminated) {
+                    dotItems.push(`${dotCheck.icon} 0`);
+                    allDotLabels.push(`adjusted${dotCheck.typeName}Damage`);
+                    allDotValues.push('0');
+                } else {
+                    dotDamageTotal += dotData.total;
+                    dotItems.push(`${dotCheck.icon} ${formatNumber(dotData.total)}`);
+                    allDotLabels.push(`adjusted${dotCheck.typeName}Damage`);
+                    allDotValues.push(formatNumber(dotData.total));
+                }
+            }
+            if (dotItems.length > 0) {
+                const dotFormula = `dotDamage = ${allDotLabels.join(' + ')}`;
+                const dotEquation = `${allDotValues.join(' + ')} = ${formatNumber(dotDamageTotal)}`;
+                const dotTooltip = `${dotFormula}<br>${dotEquation}`;
+                const dotTotalHtml = ` = ${hoverResult(formatNumber(dotDamageTotal), dotTooltip)}`;
+                breakdownParts.push(`<div class="f-eq f-dot-extraction">DoT: ${dotItems.join(', ')}${dotTotalHtml}</div>`);
+            }
+
+            breakdownHtml = breakdownParts.join('');
+        }
+
+        const damageVarLabel = 'adjustedTotalDamage';
+        const healthTooltip = `remainingHealth = maxHealth − ${damageVarLabel}<br>${formatNumber(inputs.maxHealth)} − ${formatNumber(displayTotalDamage)} = ${formatNumber(displayRemainingHealth)}`;
         const stepHealth = `<div class="f-step">
-            ${stepLabel(`${nextStepNumber} — `, 'Remaining Health')}
-            <div class="f-eq">${formatNumber(inputs.maxHealth)} − ${formatNumber(scenarioData.finalReducedDamage)} = ${hoverResult(
-                formatNumber(scenarioData.remainingHealth),
-                `remainingHealth = maxHealth − finalDamage<br>${formatNumber(inputs.maxHealth)} − ${formatNumber(scenarioData.finalReducedDamage)} = ${formatNumber(scenarioData.remainingHealth)}`,
-                scenarioData.remainingHealth <= 0 ? 'f-dead' : ''
+            ${stepLabel('7 — ', 'Remaining Health')}
+            ${breakdownHtml}
+            <div class="f-eq">${formatNumber(inputs.maxHealth)} − ${formatNumber(displayTotalDamage)} = ${hoverResult(
+                formatNumber(displayRemainingHealth),
+                healthTooltip,
+                displayRemainingHealth <= 0 ? 'f-dead' : ''
             )}</div>
         </div>`;
 
         return `<div class="f-col">
             <div class="f-col-title">${scenarioData.scenarioName}</div>
-            ${step2}${step3}${stepResistance}${stepArmor}${stepDot}${stepHealth}
+            ${step1AnalysisHtml}${step2}${step3}${stepResistance}${stepArmor}${stepAdjusted}${stepHealth}
         </div>`;
     }
 
-    formulaEl.innerHTML = `
-        <div class="f-shared">${step1Html}</div>
+    analysisEl.innerHTML = `
+        ${sharedHtml ? `<div class="f-shared">${sharedHtml}</div>` : ''}
         <div class="f-cols">
             ${buildCol('noShield', data.noShield)}
             ${buildCol('block', data.block)}
             ${buildCol('parry', data.parry)}
         </div>`;
 
-    formulaDetailsEl.hidden = false;
-    formulaDetailsEl.open = true;
+    analysisDetailsEl.hidden = false;
+    analysisDetailsEl.open = true;
 }
 
 /* ── Initialize ── */
@@ -1871,7 +1946,7 @@ async function initialize() {
             const key = getSelectedSimScenario();
             const scenarioData = data[key];
             const damage = scenarioData.instantDamage;
-            const totalDamage = scenarioData.finalReducedDamage;
+            const totalDamage = scenarioData.armorReducedDamage;
             const staggered = scenarioData.stagger === 'YES';
             const exactRemainingHealth = simState.currentHealth - damage;
             simState.currentHealth = Math.max(0, simState.currentHealth - damage);

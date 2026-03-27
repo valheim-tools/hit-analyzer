@@ -27,6 +27,11 @@ h1 {
     margin-bottom: 1.4rem;
 }
 
+.form-reset-row {
+    text-align: right;
+    margin-bottom: 0.6rem;
+}
+
 .section {
     background: #2d2a1e;
     border: 1px solid #544828;
@@ -232,7 +237,7 @@ button[type="submit"]:hover { background: #463c24; }
 }
 
 .modifier-line span { color: #c8a850; }
-.modifier-line .percentile-badge { color: #7898c8; }
+.modifier-line .risk-factor-badge { color: #7898c8; }
 
 table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
 
@@ -301,8 +306,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
     text-align: center;
 }
 
-/* ── Percentile badge ── */
-.percentile-badge {
+/* ── Risk factor badge ── */
+.risk-factor-badge {
     display: inline-block;
     font-size: 0.72rem;
     color: #7898c8;
@@ -481,8 +486,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
     line-height: 1;
 }
 
-/* ── Formula breakdown ── */
-.formula-details {
+/* ── Analysis breakdown ── */
+.analysis-details {
     background: #26231a;
     border: 1px solid #544828;
     border-radius: 6px;
@@ -490,9 +495,9 @@ tbody tr:nth-child(even) td { background: #24211a; }
     overflow: visible;
 }
 
-.formula-details[hidden] { display: none; }
+.analysis-details[hidden] { display: none; }
 
-.formula-toggle {
+.analysis-toggle {
     list-style: none;
     cursor: pointer;
     padding: 0.7rem 1.2rem;
@@ -506,9 +511,9 @@ tbody tr:nth-child(even) td { background: #24211a; }
     gap: 0.5rem;
 }
 
-.formula-toggle::-webkit-details-marker { display: none; }
+.analysis-toggle::-webkit-details-marker { display: none; }
 
-.formula-toggle::before {
+.analysis-toggle::before {
     content: '▶';
     font-size: 0.6rem;
     transition: transform 0.15s;
@@ -516,14 +521,14 @@ tbody tr:nth-child(even) td { background: #24211a; }
     flex-shrink: 0;
 }
 
-.formula-details[open] .formula-toggle::before { transform: rotate(90deg); }
+.analysis-details[open] .analysis-toggle::before { transform: rotate(90deg); }
 
-.formula-body {
+.analysis-body {
     padding: 1rem 1.2rem 1.2rem;
     border-top: 1px solid #544828;
 }
 
-.formula-hint {
+.analysis-hint {
     font-size: 0.75rem;
     color: #a89060;
     margin: 0;
@@ -532,7 +537,7 @@ tbody tr:nth-child(even) td { background: #24211a; }
     background: #1e1c14;
 }
 
-.formula-hint-sample {
+.analysis-hint-sample {
     text-decoration: underline;
     text-decoration-style: dotted;
     text-decoration-color: rgba(232, 216, 160, 0.4);
@@ -650,9 +655,11 @@ tbody tr:nth-child(even) td { background: #24211a; }
     margin: 0.1rem 0;
 }
 
+.f-stagger-warn strong { color: #e8d8a0; }
+
 .f-dead { color: #e06060; }
 
-.creature-link {
+.wiki-link {
     font-size: 0.7rem;
     color: #a89872;
     text-decoration: none;
@@ -663,8 +670,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
     transition: color 0.15s;
 }
 
-.creature-link:hover,
-.creature-link:focus {
+.wiki-link:hover,
+.wiki-link:focus {
     color: #c8a850;
 }
 

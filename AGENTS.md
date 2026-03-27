@@ -1,4 +1,4 @@
-# AGENTS.md — Valheim Damage Taken Calculator
+# AGENTS.md — Valheim Hit Simulator and Analyzer
 
 ## Architecture Overview
 
@@ -74,10 +74,14 @@ Resistance modifiers (§3) — applied per damage type between block and body ar
 
 Stagger threshold = 40% of `maxHealth`. A player staggered on block cannot be double-staggered by armor (`staggeredOnBlock` gates armor stagger check).
 
+DoT elimination — after armor reduction, DoT types (Fire, Spirit, Poison) are checked:
+- Fire/Spirit: if `perTickDamage < 0.2`, the damage is eliminated (set to 0)
+- The result is the **Adjusted Total Damage** = `armorReducedDamage − eliminatedDotDamage`
+
 ## Key Conventions
 
 **Naming — use explicit, unabbreviated variable and function names.** This is a hard rule for all new and modified code:
-- **No abbreviations**: `effectiveBlockArmor` not `effBA`, `parryMultiplier` not `parryMult`, `formatNumber` not `fmt`, `percentile` not `pct`.
+- **No abbreviations**: `effectiveBlockArmor` not `effBA`, `parryMultiplier` not `parryMult`, `formatNumber` not `fmt`, `riskFactor` not `rf`.
 - **No single-letter or two-letter names**: `event` not `e`, `button` not `btn`, `element` not `el`, `viewportWidth` not `vw`.
 - **Spell out `Health`**: `currentHealth` not `currentHp`, `simHealthCurrentEl` not `simHpCurrentEl`, `healthPercent` not `hpPct`.
 - **Boolean prefixes**: use `is`/`has` — `isBlockLinear` not `blockLinear`, `hasPercentile` not `hasPct`.

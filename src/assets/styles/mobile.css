@@ -99,7 +99,7 @@
         grid-template-columns: 1fr;
     }
 
-    .formula-body {
+    .analysis-body {
         padding: 0.6rem 0.6rem 0.8rem;
     }
 
@@ -270,8 +270,8 @@
         font-size: 0.74rem;
     }
 
-    /* Give the percentile badge breathing room when it wraps to its own line */
-    .modifier-line .percentile-badge {
+    /* Give the risk factor badge breathing room when it wraps to its own line */
+    .modifier-line .risk-factor-badge {
         margin-top: 0.3rem;
     }
 

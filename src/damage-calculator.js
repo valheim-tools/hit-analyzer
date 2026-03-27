@@ -20,7 +20,7 @@ const BLOCKABLE_TYPES = Object.freeze([
     'Poison', 'Spirit',
 ]);
 
-const STAGGER_TYPES = Object.freeze([
+export const STAGGER_TYPES = Object.freeze([
     'Blunt', 'Slash', 'Pierce', 'Lightning',
 ]);
 
@@ -339,7 +339,7 @@ function calculateScenario(player, effectiveDamageMap, useShield, isParry) {
 
     // --- Resistance phase (§3) ---
     currentDamageMap = applyResistanceModifiers(currentDamageMap, player.resistanceModifiers);
-    const resistanceReducedTotal = sumAllTypes(currentDamageMap);
+    const resistanceMultipliedTotal = sumAllTypes(currentDamageMap);
     const afterResistanceSnapshot = cloneDamageMap(currentDamageMap);
 
     // --- Armor phase (§4) ---
@@ -356,10 +356,12 @@ function calculateScenario(player, effectiveDamageMap, useShield, isParry) {
 
     const stagger = (staggeredOnBlock || armorStaggerDamage > staggerThreshold) ? 'YES' : 'NO';
 
-    // Min health to avoid stagger — binding stagger damage is the value that was compared
-    const bindingStaggerDamage = useShield ? blockStaggerDamage : armorStaggerDamage;
-    const minHealthForNoStagger = bindingStaggerDamage > 0
-        ? Math.ceil(bindingStaggerDamage / 0.4)
+    // Min health to avoid stagger — computed separately for block and armor phases
+    const minHealthForNoBlockStagger = blockStaggerDamage > 0
+        ? Math.ceil(blockStaggerDamage / 0.4)
+        : 0;
+    const minHealthForNoArmorStagger = armorStaggerDamage > 0
+        ? Math.ceil(armorStaggerDamage / 0.4)
         : 0;
 
     // --- DoT extraction (§5) ---
@@ -378,11 +380,15 @@ function calculateScenario(player, effectiveDamageMap, useShield, isParry) {
     return {
         scenarioName,
         blockReducedDamage: blockReducedTotal,
-        resistanceReducedDamage: resistanceReducedTotal,
-        finalReducedDamage: totalDamage,
+        resistanceMultipliedDamage: resistanceMultipliedTotal,
+        armorReducedDamage: totalDamage,
         remainingHealth,
         stagger,
-        minHealthForNoStagger,
+        staggeredOnBlock,
+        blockStaggerDamage,
+        armorStaggerDamage,
+        minHealthForNoBlockStagger,
+        minHealthForNoArmorStagger,
         instantDamage,
         dotBreakdown,
         damageBreakdown: {

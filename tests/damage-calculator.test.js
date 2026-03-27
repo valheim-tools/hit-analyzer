@@ -79,7 +79,7 @@ for (const testCase of cases) {
         approxEqual(data.baseDamage,             expected.baseDamage,           'baseDamage'),
         approxEqual(data.effectiveDamage,        expected.effectiveDamage,      'effectiveDamage'),
         approxEqual(result.blockReducedDamage,   expected.blockReducedDamage,   'blockReducedDamage'),
-        approxEqual(result.finalReducedDamage,   expected.finalReducedDamage,   'finalReducedDamage'),
+        approxEqual(result.armorReducedDamage,   expected.armorReducedDamage,   'armorReducedDamage'),
         approxEqual(result.remainingHealth,      expected.remainingHealth,      'remainingHealth'),
     ];
 
@@ -87,9 +87,13 @@ for (const testCase of cases) {
     if (result.stagger !== expected.stagger) {
         checks.push(`  FAIL stagger: expected ${expected.stagger}, got ${result.stagger}`);
     }
-    // minHealthForNoStagger (exact int)
-    if (result.minHealthForNoStagger !== expected.minHealthForNoStagger) {
-        checks.push(`  FAIL minHealthForNoStagger: expected ${expected.minHealthForNoStagger}, got ${result.minHealthForNoStagger}`);
+    // minHealthForNoBlockStagger (exact int)
+    if (result.minHealthForNoBlockStagger !== expected.minHealthForNoBlockStagger) {
+        checks.push(`  FAIL minHealthForNoBlockStagger: expected ${expected.minHealthForNoBlockStagger}, got ${result.minHealthForNoBlockStagger}`);
+    }
+    // minHealthForNoArmorStagger (exact int)
+    if (result.minHealthForNoArmorStagger !== expected.minHealthForNoArmorStagger) {
+        checks.push(`  FAIL minHealthForNoArmorStagger: expected ${expected.minHealthForNoArmorStagger}, got ${result.minHealthForNoArmorStagger}`);
     }
 
     // Optional: instantDamage assertion (new multi-type tests)
@@ -97,9 +101,9 @@ for (const testCase of cases) {
         checks.push(approxEqual(result.instantDamage, expected.instantDamage, 'instantDamage'));
     }
 
-    // Optional: resistanceReducedDamage assertion
-    if (expected.resistanceReducedDamage != null) {
-        checks.push(approxEqual(result.resistanceReducedDamage, expected.resistanceReducedDamage, 'resistanceReducedDamage'));
+    // Optional: resistanceMultipliedDamage assertion
+    if (expected.resistanceMultipliedDamage != null) {
+        checks.push(approxEqual(result.resistanceMultipliedDamage, expected.resistanceMultipliedDamage, 'resistanceMultipliedDamage'));
     }
 
     // Optional: dotBreakdown assertions

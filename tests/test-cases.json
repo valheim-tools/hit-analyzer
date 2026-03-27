@@ -10,10 +10,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 60.0,
       "blockReducedDamage": 60.0,
-      "finalReducedDamage": 30.0,
+      "armorReducedDamage": 30.0,
       "remainingHealth": 70.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 75
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 75
     }
   },
   {
@@ -27,10 +28,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 60.0,
       "blockReducedDamage": 40.0,
-      "finalReducedDamage": 13.333,
+      "armorReducedDamage": 13.333,
       "remainingHealth": 86.667,
       "stagger": "NO",
-      "minHealthForNoStagger": 100
+      "minHealthForNoBlockStagger": 100,
+      "minHealthForNoArmorStagger": 34
     }
   },
   {
@@ -44,10 +46,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 120.0,
       "blockReducedDamage": 47.841,
-      "finalReducedDamage": 13.623,
+      "armorReducedDamage": 13.623,
       "remainingHealth": 106.377,
       "stagger": "NO",
-      "minHealthForNoStagger": 120
+      "minHealthForNoBlockStagger": 120,
+      "minHealthForNoArmorStagger": 35
     }
   },
   {
@@ -61,10 +64,11 @@
       "baseDamage": 50.0,
       "effectiveDamage": 150.0,
       "blockReducedDamage": 150.0,
-      "finalReducedDamage": 130.0,
+      "armorReducedDamage": 130.0,
       "remainingHealth": -50.0,
       "stagger": "YES",
-      "minHealthForNoStagger": 325
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 325
     }
   },
   {
@@ -78,10 +82,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 150.0,
       "blockReducedDamage": 150.0,
-      "finalReducedDamage": 125.0,
+      "armorReducedDamage": 125.0,
       "remainingHealth": -45.0,
       "stagger": "YES",
-      "minHealthForNoStagger": 349
+      "minHealthForNoBlockStagger": 349,
+      "minHealthForNoArmorStagger": 0
     }
   },
   {
@@ -95,10 +100,11 @@
       "baseDamage": 0.0,
       "effectiveDamage": 0.0,
       "blockReducedDamage": 0.0,
-      "finalReducedDamage": 0.0,
+      "armorReducedDamage": 0.0,
       "remainingHealth": 100.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 0
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 0
     }
   },
   {
@@ -112,10 +118,11 @@
       "baseDamage": 50.0,
       "effectiveDamage": 50.0,
       "blockReducedDamage": 8.609,
-      "finalReducedDamage": 0.618,
+      "armorReducedDamage": 0.618,
       "remainingHealth": 99.382,
       "stagger": "NO",
-      "minHealthForNoStagger": 22
+      "minHealthForNoBlockStagger": 22,
+      "minHealthForNoArmorStagger": 2
     }
   },
   {
@@ -129,10 +136,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 72.0,
       "blockReducedDamage": 72.0,
-      "finalReducedDamage": 42.0,
+      "armorReducedDamage": 42.0,
       "remainingHealth": 58.0,
       "stagger": "YES",
-      "minHealthForNoStagger": 105
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 105
     }
   },
   {
@@ -146,10 +154,11 @@
       "baseDamage": 50.0,
       "effectiveDamage": 50.0,
       "blockReducedDamage": 50.0,
-      "finalReducedDamage": 30.0,
+      "armorReducedDamage": 30.0,
       "remainingHealth": 70.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 15,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 15,
       "instantDamage": 6.0,
       "dotBreakdown": {
         "fire": { "total": 24.0, "tickCount": 5 }
@@ -167,10 +176,11 @@
       "baseDamage": 130.0,
       "effectiveDamage": 195.0,
       "blockReducedDamage": 195.0,
-      "finalReducedDamage": 165.0,
+      "armorReducedDamage": 165.0,
       "remainingHealth": -15.0,
       "stagger": "YES",
-      "minHealthForNoStagger": 254,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 254,
       "instantDamage": 101.538,
       "dotBreakdown": {
         "poison": { "total": 63.462, "tickCount": 18 }
@@ -188,10 +198,11 @@
       "baseDamage": 90.0,
       "effectiveDamage": 90.0,
       "blockReducedDamage": 90.0,
-      "finalReducedDamage": 65.0,
+      "armorReducedDamage": 65.0,
       "remainingHealth": 35.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 0,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 0,
       "instantDamage": 0.0,
       "dotBreakdown": {
         "poison": { "total": 65.0, "tickCount": 19 }
@@ -209,10 +220,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 60.0,
       "blockReducedDamage": 8.571,
-      "finalReducedDamage": 0.612,
+      "armorReducedDamage": 0.612,
       "remainingHealth": 99.388,
       "stagger": "NO",
-      "minHealthForNoStagger": 15,
+      "minHealthForNoBlockStagger": 15,
+      "minHealthForNoArmorStagger": 2,
       "instantDamage": 0.408,
       "dotBreakdown": {
         "fire": { "total": 0.204, "tickCount": 0 }
@@ -230,10 +242,11 @@
       "baseDamage": 60.0,
       "effectiveDamage": 60.0,
       "blockReducedDamage": 60.0,
-      "finalReducedDamage": 30.0,
+      "armorReducedDamage": 30.0,
       "remainingHealth": 70.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 75,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 75,
       "instantDamage": 30.0
     }
   },
@@ -248,11 +261,12 @@
       "baseDamage": 60.0,
       "effectiveDamage": 60.0,
       "blockReducedDamage": 60.0,
-      "resistanceReducedDamage": 50.0,
-      "finalReducedDamage": 30.0,
+      "resistanceMultipliedDamage": 50.0,
+      "armorReducedDamage": 30.0,
       "remainingHealth": 70.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 60,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 60,
       "instantDamage": 24.0,
       "dotBreakdown": {
         "fire": { "total": 6.0, "tickCount": 5 }
@@ -270,11 +284,12 @@
       "baseDamage": 90.0,
       "effectiveDamage": 90.0,
       "blockReducedDamage": 90.0,
-      "resistanceReducedDamage": 0.0,
-      "finalReducedDamage": 0.0,
+      "resistanceMultipliedDamage": 0.0,
+      "armorReducedDamage": 0.0,
       "remainingHealth": 100.0,
       "stagger": "NO",
-      "minHealthForNoStagger": 0,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 0,
       "instantDamage": 0.0
     }
   },
@@ -289,12 +304,33 @@
       "baseDamage": 60.0,
       "effectiveDamage": 60.0,
       "blockReducedDamage": 60.0,
-      "resistanceReducedDamage": 120.0,
-      "finalReducedDamage": 90.0,
+      "resistanceMultipliedDamage": 120.0,
+      "armorReducedDamage": 90.0,
       "remainingHealth": 10.0,
       "stagger": "YES",
-      "minHealthForNoStagger": 225,
+      "minHealthForNoBlockStagger": 0,
+      "minHealthForNoArmorStagger": 225,
       "instantDamage": 90.0
+    }
+  },
+  {
+    "name": "Resistance / Very Weak to Slash (200%) / block — block passes, armor stagger triggers",
+    "mob":    { "damageTypes": { "Slash": 60.0 }, "starLevel": 0 },
+    "player": { "maxHealth": 120.0, "blockingSkill": 0.0, "blockArmor": 20.0, "armor": 30.0, "parryMultiplier": 1.0, "resistanceModifiers": { "Slash": 2.0 } },
+    "difficulty": "NORMAL",
+    "useShield": true,
+    "isParry": false,
+    "expected": {
+      "baseDamage": 60.0,
+      "effectiveDamage": 60.0,
+      "blockReducedDamage": 40.0,
+      "resistanceMultipliedDamage": 80.0,
+      "armorReducedDamage": 50.0,
+      "remainingHealth": 70.0,
+      "stagger": "YES",
+      "minHealthForNoBlockStagger": 100,
+      "minHealthForNoArmorStagger": 125,
+      "instantDamage": 50.0
     }
   }
 ]

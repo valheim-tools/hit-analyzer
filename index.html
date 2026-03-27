@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valheim Damage Taken Calculator</title>
+    <title>Valheim Hit Simulator and Analyzer</title>
     <link rel="stylesheet" href="./src/assets/styles/index.css?v=15">
     <link rel="stylesheet" href="./src/assets/styles/mobile.css?v=13">
 </head>
 <body>
 <div class="container">
 
-    <h1>⚔ Valheim Damage Taken Calculator</h1>
+    <h1>⚔ Valheim Hit Simulator and Analyzer</h1>
 
     <form id="calcForm">
         <div class="form-grid">
 
             <div class="section">
-                <h2>Mob Attack Stats <a href="https://valheim.fandom.com/wiki/Creatures" target="_blank" rel="noopener" class="creature-link">↗ creature list</a></h2>
+                <h2>Mob Attack Stats</h2>
                 <div class="preset-row">
-                    <label for="mobPreset">Mob Attack Preset</label>
+                    <label for="mobPreset">Mob Attack Preset <a href="https://valheim.fandom.com/wiki/Creatures" target="_blank" rel="noopener" class="wiki-link">↗ creatures</a></label>
                     <div class="mob-preset-dropdown" id="mobPresetDropdown">
                         <button type="button" class="mob-preset-trigger" id="mobPresetTrigger">
                             <span class="mob-preset-trigger-text">— Select a mob attack —</span>
@@ -38,14 +38,14 @@
                             <select class="damage-type-select" aria-label="Damage type">
                                 <optgroup label="⚔ Instant">
                                     <option value="Blunt">🔨 Blunt</option>
-                                    <option value="Slash">⚔ Slash</option>
+                                    <option value="Slash">⚔️ Slash</option>
                                     <option value="Pierce">🏹 Pierce</option>
-                                    <option value="Frost">❄ Frost</option>
+                                    <option value="Frost">❄️ Frost</option>
                                     <option value="Lightning">⚡ Lightning</option>
                                 </optgroup>
                                 <optgroup label="⏳ Damage over Time">
                                     <option value="Fire">🔥 Fire</option>
-                                    <option value="Poison">☠ Poison</option>
+                                    <option value="Poison">☣️ Poison</option>
                                     <option value="Spirit">👻 Spirit</option>
                                 </optgroup>
                             </select>
@@ -103,12 +103,12 @@
                     <input type="number" id="maxHealth" value="100" min="0" max="1000" step="0.1" required>
                 </div>
                 <div class="field">
-                    <label>Resistance Modifiers</label>
+                    <label>Resistance Modifiers <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">Percentage of damage taken for each type. 40% means you take 40% of that damage (60% reduction). 200% means you take double damage (weak to that type).</span></span></label>
                     <div id="resistanceTypeInputs" class="resistance-type-inputs"></div>
                     <button type="button" id="addResistanceTypeBtn" class="add-resistance-type-btn">+ Add resistance</button>
                 </div>
                 <div class="preset-row">
-                    <label for="shieldPreset">Shield Preset</label>
+                    <label for="shieldPreset">Shield Preset <a href="https://valheim.fandom.com/wiki/Shields" target="_blank" rel="noopener" class="wiki-link">↗ shields</a></label>
                     <div class="shield-preset-row">
                         <div class="shield-preset-dropdown" id="shieldPresetDropdown">
                             <button type="button" class="shield-preset-trigger" id="shieldPresetTrigger">
@@ -176,11 +176,14 @@
             </div>
 
         </div>
+        <div class="form-reset-row">
+            <button type="button" id="resetBtn">Reset</button>
+        </div>
     </form>
 
     <nav class="tab-nav" role="tablist">
         <button class="tab-btn active" data-tab="simulator" role="tab" aria-selected="true">⚔ Hit Simulator</button>
-        <button class="tab-btn" data-tab="calculator" role="tab" aria-selected="false">Detailed Damage Calculator</button>
+        <button class="tab-btn" data-tab="hit-analyzer" role="tab" aria-selected="false">Hit Analyzer</button>
     </nav>
 
     <!-- ── Tab: Hit Simulator ── -->
@@ -258,8 +261,8 @@
         </div>
     </div>
 
-    <!-- ── Tab: Detailed Damage Calculator ── -->
-    <div id="tab-calculator" class="tab-panel" hidden>
+    <!-- ── Tab: Hit Analyzer ── -->
+    <div id="tab-hit-analyzer" class="tab-panel" hidden>
 
         <div class="calc-summary">
             <h3>How damage taken is calculated</h3>
@@ -274,25 +277,28 @@
                 </div>
                 <div class="pipe-step">
                     <span class="pipe-num">3</span>
-                    <span class="pipe-text">Resistance modifiers scale damage up or down → <strong>Resistance-Reduced Damage</strong></span>
+                    <span class="pipe-text">Resistance modifiers scale damage up or down → <strong>Resistance-Multiplied Damage</strong></span>
                 </div>
                 <div class="pipe-step">
                     <span class="pipe-num">4</span>
-                    <span class="pipe-text">Resistance-reduced damage is reduced by body armor → <strong>Final Damage</strong></span>
+                    <span class="pipe-text">Resistance-multiplied damage is reduced by body armor → <strong>Armor Reduced Damage</strong></span>
                 </div>
                 <div class="pipe-step">
                     <span class="pipe-num">5</span>
-                    <span class="pipe-text">Final damage is subtracted from Max Health → <strong>Remaining Health</strong></span>
+                    <span class="pipe-text">DoT types with per-tick damage below threshold are eliminated → <strong>Adjusted Total Damage</strong></span>
+                </div>
+                <div class="pipe-step">
+                    <span class="pipe-num">6</span>
+                    <span class="pipe-text">Adjusted damage is subtracted from Max Health → <strong>Remaining Health</strong></span>
                 </div>
             </div>
         </div>
 
         <div class="btn-row">
             <button type="submit" form="calcForm">⚔ Hit</button>
-            <button type="button" id="resetBtn">Reset</button>
             <div class="btn-row-option">
-                <label class="btn-row-option-label" for="percentileInput">Percentile % <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">Confidence level (1.0–100). At 100% you see base damage. At 95% you see damage that 95% of hits will stay below.</span></span></label>
-                <input type="number" id="percentileInput" value="100" min="1" max="100" step="0.1">
+                <label class="btn-row-option-label" for="riskFactorInput">Risk Factor % <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">The % chance of taking more damage than shown (0–100). At 1% risk, 99% of hits will deal less or equal damage than displayed — but 1% of the time you can receive more.</span></span></label>
+                <input type="number" id="riskFactorInput" value="0" min="0" max="100" step="0.1">
             </div>
         </div>
 
@@ -316,10 +322,10 @@
             </div>
         </div>
 
-        <details id="formulaDetails" class="formula-details" hidden>
-            <summary class="formula-toggle">Step-by-step formula with values</summary>
-            <p class="formula-hint">💡 <strong>Hover</strong> (or <strong>tap</strong> on mobile) any <span class="formula-hint-sample">underlined text</span> to see a detailed explanation of how things are calculated.</p>
-            <div class="formula-body" id="formula"></div>
+        <details id="analysisDetails" class="analysis-details" hidden>
+            <summary class="analysis-toggle">Step-by-step analysis</summary>
+            <p class="analysis-hint">💡 <strong>Hover</strong> (or <strong>tap</strong> on mobile) any <span class="analysis-hint-sample">underlined text</span> to see more details of how things are calculated.</p>
+            <div class="analysis-body" id="analysis"></div>
         </details>
 
 

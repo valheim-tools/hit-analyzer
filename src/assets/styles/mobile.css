@@ -208,13 +208,8 @@
         gap: 0.4rem;
     }
 
-    #simClearLogBtn {
-        width: 100%;
-        padding: 0.85rem 0.5rem;
-        font-size: 0.72rem;
-    }
-
     #simResetBtn {
+        width: 100%;
         padding: 0.7rem 0.8rem;
         font-size: 0.72rem;
     }
@@ -310,8 +305,7 @@
     }
 
     #resetBtn,
-    #simResetBtn,
-    #simClearLogBtn {
+    #simResetBtn {
         touch-action: manipulation;
     }
 

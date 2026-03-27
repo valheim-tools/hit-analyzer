@@ -852,21 +852,6 @@ tbody tr:nth-child(even) td { background: #24211a; }
     letter-spacing: 2px;
 }
 
-#simClearLogBtn {
-    background: none;
-    border: 1px solid #544828;
-    color: #786450;
-    padding: 0.15rem 0.5rem;
-    font-size: 0.72rem;
-    font-family: inherit;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    border-radius: 3px;
-    transition: background 0.15s, color 0.15s;
-}
-
-#simClearLogBtn:hover { background: #2a2820; color: #a89872; }
 
 .sim-log {
     list-style: none;

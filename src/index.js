@@ -96,6 +96,7 @@ function switchTab(name) {
 /* ── Hit Simulator DOM refs ── */
 const simTakeHitBtnEl     = document.getElementById('simTakeHitBtn');
 const simResetBtnEl       = document.getElementById('simResetBtn');
+const simResetBtnMobileEl = document.getElementById('simResetBtnMobile');
 const simBarFillEl        = document.getElementById('simBarFill');
 const simHealthCurrentEl  = document.getElementById('simHealthCurrent');
 const simHealthMaxEl      = document.getElementById('simHealthMax');
@@ -1968,6 +1969,12 @@ async function initialize() {
     simRandomHitBtnEl.addEventListener('click', () => performHit(true));
 
     simResetBtnEl.addEventListener('click', () => {
+        cancelDotAnimation();
+        simLogEl.innerHTML = '';
+        initHitSimulator();
+    });
+
+    simResetBtnMobileEl.addEventListener('click', () => {
         cancelDotAnimation();
         simLogEl.innerHTML = '';
         initHitSimulator();

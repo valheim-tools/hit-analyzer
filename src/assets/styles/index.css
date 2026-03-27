@@ -702,11 +702,10 @@ tbody tr:nth-child(even) td { background: #24211a; }
 }
 
 #simResetBtn {
-    width: 100%;
     background: none;
     border: 1px solid #c8a850;
     color: #c8a850;
-    padding: 0.45rem 0.6rem;
+    padding: 0.2rem 0.6rem;
     font-size: 0.75rem;
     font-family: inherit;
     letter-spacing: 1px;
@@ -714,11 +713,14 @@ tbody tr:nth-child(even) td { background: #24211a; }
     cursor: pointer;
     border-radius: 3px;
     transition: background 0.15s;
-    margin-top: 0.6rem;
-    margin-bottom: 0.6rem;
 }
 
 #simResetBtn:hover { background: #362c18; }
+
+/* Mobile-only duplicate — hidden on desktop */
+#simResetBtnMobile {
+    display: none;
+}
 
 .sim-note {
     font-size: 0.75rem;

@@ -130,12 +130,6 @@ Tests are data-driven via `tests/test-cases.json`. To add a new scenario, add a 
 
 ## Git Workflow
 
-**Never work on the `main` branch.** For every task, create a new feature branch first:
-
-```powershell
-git checkout -b <descriptive-branch-name>
-```
-
 **Commit after every change.** Each meaningful edit (or small group of related edits) should be committed immediately with a clear message:
 
 ```powershell

@@ -332,7 +332,6 @@ tbody tr:nth-child(even) td { background: #24211a; }
     cursor: pointer;
     border-radius: 4px;
     transition: background 0.15s;
-    width: 100%;
     margin-bottom: 0.7rem;
 }
 
@@ -705,8 +704,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
     background: none;
     border: 1px solid #c8a850;
     color: #c8a850;
-    padding: 0.2rem 0.6rem;
-    font-size: 0.75rem;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
     font-family: inherit;
     letter-spacing: 1px;
     text-transform: uppercase;

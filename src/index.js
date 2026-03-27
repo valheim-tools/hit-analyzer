@@ -1532,7 +1532,7 @@ function renderAnalysis(data, inputs) {
                 ? scenarioData.damageBreakdown.afterBlock
                 : inputDamageMap;
             const afterResistanceMap = scenarioData.damageBreakdown.afterResistance;
-            const beforeLabel = isShield ? 'blockReduced' : (hasRiskFactor ? 'scaledEffective' : 'effective');
+            const beforeLabel = 'blockReduced';
 
             for (const typeName of DAMAGE_TYPE_NAMES) {
                 const beforeValue = beforeResistanceMap[typeName] || 0;
@@ -1570,16 +1570,10 @@ function renderAnalysis(data, inputs) {
             </div>`;
         }
 
-        // Body armor uses resistance-multiplied damage (or block-reduced if no resistance)
-        const armorInputDamage = hasResistance ? scenarioData.resistanceMultipliedDamage : scenarioData.blockReducedDamage;
-        const armorInputLabel = hasResistance
-            ? 'resistanceMultipliedDamage'
-            : (isShield ? 'blockReducedDamage' : (hasRiskFactor ? 'scaledEffectiveDamage' : 'effectiveDamage'));
-        const armorInputMap = hasResistance
-            ? scenarioData.damageBreakdown.afterResistance
-            : (isShield && scenarioData.damageBreakdown.afterBlock
-                ? scenarioData.damageBreakdown.afterBlock
-                : inputDamageMap);
+        // Body armor always uses resistance-multiplied damage (step 4 output) — even when step 4 is skipped, the value equals the pass-through
+        const armorInputDamage = scenarioData.resistanceMultipliedDamage;
+        const armorInputLabel = 'resistanceMultipliedDamage';
+        const armorInputMap = scenarioData.damageBreakdown.afterResistance;
         const afterArmorMap = scenarioData.damageBreakdown.afterArmor;
         const { isLinear: isArmorLinear } = armorBranch(armorInputDamage, inputs.armor);
         const halfArmorInputDamage = armorInputDamage / 2;
@@ -1590,7 +1584,7 @@ function renderAnalysis(data, inputs) {
             thresholdTooltip('armor', armorInputLabel, inputs.armor, armorInputDamage, isArmorLinear)
         )}</div>`;
 
-        const armorBeforeLabel = hasResistance ? 'resistanceMultiplied' : (isShield ? 'blockReduced' : (hasRiskFactor ? 'scaledEffective' : 'effective'));
+        const armorBeforeLabel = 'resistanceMultiplied';
         const armorBreakdownHtml = buildProportionalBreakdown(armorInputMap, afterArmorMap, armorInputDamage, scenarioData.armorReducedDamage, armorBeforeLabel, 'armorReduced', true);
 
         let armorBody;

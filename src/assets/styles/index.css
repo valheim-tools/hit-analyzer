@@ -1586,8 +1586,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
 }
 
 .shield-preset-trigger-icon {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
     border-radius: 2px;
     flex-shrink: 0;
@@ -1641,8 +1641,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
 }
 
 .shield-preset-option-icon {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
     border-radius: 2px;
     flex-shrink: 0;
@@ -1826,8 +1826,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
 }
 
 .mob-preset-trigger-icon {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
     border-radius: 2px;
     flex-shrink: 0;
@@ -1921,8 +1921,8 @@ tbody tr:nth-child(even) td { background: #24211a; }
 }
 
 .mob-preset-mob-icon {
-    width: 36px;
-    height: 36px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
     border-radius: 2px;
     flex-shrink: 0;

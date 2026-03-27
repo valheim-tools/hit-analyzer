@@ -349,6 +349,28 @@
         bottom: auto;
         top: 140%;
     }
+
+    /* ── Mob preset dropdown ── */
+    .mob-preset-trigger {
+        padding: 0 0.5rem;
+    }
+
+    .mob-preset-trigger-icon,
+    .mob-preset-mob-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* ── Shield preset dropdown ── */
+    .shield-preset-trigger {
+        padding: 0 0.5rem;
+    }
+
+    .shield-preset-trigger-icon,
+    .shield-preset-option-icon {
+        width: 24px;
+        height: 24px;
+    }
 }
 
 /* ── Extra-small screen tightening (320 px) ── */
@@ -406,42 +428,28 @@
         min-width: auto;
     }
 
-    /* ── Mob preset dropdown on mobile ── */
+    /* ── Mob preset dropdown ── */
     .mob-preset-trigger {
-        font-size: 0.78rem;
-        padding: 0 0.5rem;
+        font-size: 0.75rem;
+        padding: 0 0.4rem;
     }
 
-    .mob-preset-trigger-icon {
-        width: 28px;
-        height: 28px;
-    }
-
-    // ...existing code...
-
+    .mob-preset-trigger-icon,
     .mob-preset-mob-icon {
-        width: 28px;
-        height: 28px;
+        width: 22px;
+        height: 22px;
     }
 
-    /* ── Shield preset dropdown on mobile ── */
-    // ...existing code...
-
+    /* ── Shield preset dropdown ── */
     .shield-preset-trigger {
-        font-size: 0.78rem;
-        padding: 0 0.5rem;
+        font-size: 0.75rem;
+        padding: 0 0.4rem;
     }
 
-    .shield-preset-trigger-icon {
-        width: 28px;
-        height: 28px;
-    }
-
-    // ...existing code...
-
+    .shield-preset-trigger-icon,
     .shield-preset-option-icon {
-        width: 28px;
-        height: 28px;
+        width: 22px;
+        height: 22px;
     }
 
     /* ── Shield quality toggles on mobile ── */

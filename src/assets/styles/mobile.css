@@ -195,6 +195,19 @@
         letter-spacing: 1px;
     }
 
+    /* Stack hit log header vertically on mobile for full-width Clear Log button */
+    .sim-log-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.4rem;
+    }
+
+    #simClearLogBtn {
+        width: 100%;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.72rem;
+    }
+
     /* Hide "Hit " prefix in log entries on mobile, keep just "#N" */
     .sim-log-hit-prefix {
         display: none;

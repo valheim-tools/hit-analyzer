@@ -353,6 +353,7 @@
     /* ── Mob preset dropdown ── */
     .mob-preset-trigger {
         padding: 0 0.5rem;
+        min-height: 26px;
     }
 
     .mob-preset-trigger-icon,
@@ -364,6 +365,7 @@
     /* ── Shield preset dropdown ── */
     .shield-preset-trigger {
         padding: 0 0.5rem;
+        min-height: 26px;
     }
 
     .shield-preset-trigger-icon,
@@ -432,6 +434,7 @@
     .mob-preset-trigger {
         font-size: 0.75rem;
         padding: 0 0.4rem;
+        min-height: 24px;
     }
 
     .mob-preset-trigger-icon,
@@ -444,6 +447,7 @@
     .shield-preset-trigger {
         font-size: 0.75rem;
         padding: 0 0.4rem;
+        min-height: 24px;
     }
 
     .shield-preset-trigger-icon,

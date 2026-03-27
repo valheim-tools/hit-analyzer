@@ -1648,7 +1648,7 @@ tbody tr:nth-child(even) td { background: #24211a; }
     align-items: center;
     gap: 0.6rem;
     margin-top: 0.8rem;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     padding: 0.5rem 0.8rem;
     background: #26231a;
     border: 1px solid #3a3424;

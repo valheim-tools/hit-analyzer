@@ -719,6 +719,19 @@ function playDotAnimation(dotBreakdown) {
 let arenaCleanupTimer = null;
 let arenaReactionTimer = null;
 
+const ARENA_MOB_IMAGES = Object.freeze([
+    { src: 'src/assets/images/animations/greydwarf.png', alt: 'Greydwarf' },
+    { src: 'src/assets/images/animations/troll.png',     alt: 'Troll' },
+]);
+let currentArenaMobImageIndex = 0;
+
+function cycleArenaMobImage() {
+    currentArenaMobImageIndex = (currentArenaMobImageIndex + 1) % ARENA_MOB_IMAGES.length;
+    const { src, alt } = ARENA_MOB_IMAGES[currentArenaMobImageIndex];
+    arenaMobIconEl.src = src;
+    arenaMobIconEl.alt = alt;
+}
+
 const ARENA_ANIMATION_CLASSES = Object.freeze([
     'arena-animating',
     'arena-hit-no-shield',
@@ -1769,6 +1782,9 @@ function renderAnalysis(data, inputs) {
 /* ── Initialize ── */
 async function initialize() {
     initTooltipClamping();
+
+    // Arena mob icon cycle
+    arenaMobIconEl.addEventListener('click', cycleArenaMobImage);
 
     // Load mob attacks
     let mobData = {};

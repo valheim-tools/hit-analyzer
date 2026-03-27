@@ -960,7 +960,13 @@ tbody tr:nth-child(even) td { background: #24211a; }
     height: 5rem;
     object-fit: contain;
     filter: drop-shadow(0 0 6px rgba(200, 60, 60, 0.4));
-    transition: filter 0.15s;
+    transition: filter 0.15s, transform 0.15s;
+    cursor: pointer;
+}
+
+.arena-mob-icon:hover {
+    filter: drop-shadow(0 0 10px rgba(200, 60, 60, 0.7));
+    transform: scale(1.08);
 }
 
 .arena-mob-weapon {

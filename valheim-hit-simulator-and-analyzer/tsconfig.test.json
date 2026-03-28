@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist-test",
+    "rootDir": "src/app/core",
+    "paths": {
+      "./models": ["./src/app/core/models/index.ts"]
+    }
+  },
+  "include": [
+    "src/app/core/damage-calculator.ts",
+    "src/app/core/models/**/*.ts"
+  ]
+}
+

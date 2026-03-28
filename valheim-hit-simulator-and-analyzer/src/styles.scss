@@ -1,0 +1,197 @@
+@use 'styles/variables' as *;
+
+// ── Reset ────────────────────────────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+// ── Base ────────────────────────────────────────────────────────────────────
+body {
+  background: $color-bg-body;
+  color: $color-text-primary;
+  font-family: $font-serif;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: $color-gold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+.container { max-width: 860px; margin: 0 auto; }
+
+// ── Form controls ─────────────────────────────────────────────────────────
+label {
+  display: block;
+  font-size: 0.78rem;
+  color: $color-text-muted;
+  margin-bottom: 0.25rem;
+  overflow-wrap: break-word;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  width: 100%;
+  background: $color-bg-input;
+  border: 1px solid $color-gold-darker;
+  color: $color-text-primary;
+  padding: 0.38rem 0.6rem;
+  border-radius: $radius-md;
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+
+  &:focus { outline: none; border-color: $color-gold; }
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+}
+
+select option { background: $color-bg-section; }
+
+button[type="submit"] {
+  width: 100%;
+  background: $color-bg-btn;
+  color: $color-gold;
+  border: 1px solid $color-gold;
+  padding: 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: $radius-md;
+  margin-bottom: 2rem;
+  transition: background 0.15s;
+  &:hover { background: #463c24; }
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────
+.tip-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid $color-text-muted;
+  color: $color-text-muted;
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: help;
+  margin-left: 4px;
+  font-style: normal;
+  vertical-align: middle;
+}
+
+.tip-text {
+  visibility: hidden;
+  opacity: 0;
+  background: $color-bg-btn;
+  color: $color-text-primary;
+  border: 1px solid $color-gold;
+  border-radius: $radius-md;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.75rem;
+  white-space: normal;
+  width: max-content;
+  max-width: 400px;
+  position: absolute;
+  z-index: 20;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.15s;
+  pointer-events: none;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.tip-wrap:hover .tip-text,
+.tip-wrap:focus .tip-text,
+.tip-wrap:focus-within .tip-text { visibility: visible; opacity: 1; }
+
+.skull-wrap {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  .tip-text { bottom: 140%; left: 50%; transform: translateX(-50%); }
+}
+
+.skull-icon { font-size: 1.1rem; cursor: help; line-height: 1; }
+
+// ── Damage type badges ────────────────────────────────────────────────────
+.damage-type-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  vertical-align: middle;
+}
+
+.damage-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: $radius-md;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.dt-blunt     { background: #5a5a5a; color: #e0d0b0; }
+.dt-slash     { background: #7a7a7a; color: #ede5d0; }
+.dt-pierce    { background: #6b4c2a; color: #e0d0b0; }
+.dt-fire      { background: #8b3a00; color: #ffcc80; }
+.dt-frost     { background: #1a5a6a; color: #b0e8f0; }
+.dt-lightning { background: #7a6a10; color: #fff080; }
+.dt-poison    { background: #2a5a20; color: #a0e090; }
+.dt-spirit    { background: #5a2a6a; color: #d0a0e0; }
+
+.risk-factor-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  color: #7898c8;
+  background: #1a2030;
+  border: 1px solid #3a5070;
+  border-radius: $radius-sm;
+  padding: 0.1rem 0.45rem;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  letter-spacing: 0.5px;
+}
+
+.stagger-yes    { color: #e06060; }
+.stagger-no     { color: #60a060; }
+.health-safe    { color: #60a060; }
+.health-warning { color: $color-gold; }
+
+.wiki-link {
+  font-size: 0.7rem;
+  color: $color-text-muted;
+  text-decoration: none;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: normal;
+  margin-left: 0.4rem;
+  transition: color 0.15s;
+  &:hover, &:focus { color: $color-gold; }
+}
+
+@use 'styles/mobile';

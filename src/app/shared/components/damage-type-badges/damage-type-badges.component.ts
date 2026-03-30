@@ -14,15 +14,7 @@ interface BadgeEntry {
 @Component({
   selector: 'app-damage-type-badges',
   imports: [FormatNumberPipe],
-  template: `
-    <span class="damage-type-badges">
-      @for (badge of activeBadges(); track badge.typeName) {
-        <span class="damage-type-badge {{ badge.cssClass }}">
-          {{ badge.icon }} {{ badge.value | formatNumber }}
-        </span>
-      }
-    </span>
-  `,
+  templateUrl: './damage-type-badges.component.html',
 })
 export class DamageTypeBadgesComponent {
   readonly damageMap = input.required<DamageMap>();

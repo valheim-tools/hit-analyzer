@@ -24,92 +24,7 @@ export interface PresetGroup {
 @Component({
   selector: 'app-preset-dropdown',
   imports: [],
-  template: `
-    <div class="preset-dropdown" [class.open]="isOpen()">
-      <button
-        type="button"
-        class="preset-dropdown-trigger"
-        (click)="toggleDropdown()"
-        [attr.aria-expanded]="isOpen()"
-      >
-        @if (selectedItem()?.iconSrc) {
-          <img class="preset-dropdown-trigger-icon" [src]="selectedItem()!.iconSrc" alt="">
-        }
-        <span class="preset-dropdown-trigger-text">
-          {{ (selectedItem()?.triggerLabel ?? selectedItem()?.label) ?? placeholder() }}
-        </span>
-        <span class="preset-dropdown-trigger-arrow">▾</span>
-      </button>
-
-      @if (isOpen()) {
-        <div class="preset-dropdown-panel">
-          @if (isSearchable()) {
-            <input
-              #searchInput
-              type="text"
-              class="preset-dropdown-search"
-              [placeholder]="searchPlaceholder()"
-              autocomplete="off"
-              [value]="searchQuery()"
-              (input)="onSearchInput($event)"
-              (keydown.escape)="closeDropdown()"
-            >
-          }
-          <div class="preset-dropdown-list">
-            @if (showCustomOption()) {
-              <div
-                class="preset-dropdown-option preset-dropdown-custom-option"
-                (click)="selectItem('')"
-              >
-                <span class="preset-dropdown-option-text">Custom</span>
-              </div>
-            }
-            @for (group of filteredGroups(); track group.groupLabel; let groupIndex = $index) {
-              <div class="preset-dropdown-group-header">{{ group.groupLabel }}</div>
-              @if (group.subGroups) {
-                @for (subGroup of group.subGroups; track subGroup.subGroupLabel) {
-                  <div class="preset-dropdown-subgroup-header">
-                    @if (subGroup.iconSrc) {
-                      <img class="preset-dropdown-subgroup-icon"
-                           [src]="subGroup.iconSrc"
-                           [alt]="subGroup.subGroupLabel"
-                           [attr.loading]="getSubgroupImageLoading(groupIndex)">
-                    }
-                    {{ subGroup.subGroupLabel }}
-                  </div>
-                  @for (item of subGroup.items; track item.id) {
-                    <div
-                      class="preset-dropdown-option preset-dropdown-option-indented"
-                      [class.selected]="item.id === selectedId()"
-                      (click)="selectItem(item.id)"
-                    >
-                      <span class="preset-dropdown-option-text">{{ item.label }}</span>
-                    </div>
-                  }
-                }
-              } @else {
-                @for (item of (group.items ?? []); track item.id; let itemIndex = $index) {
-                  <div
-                    class="preset-dropdown-option"
-                    [class.selected]="item.id === selectedId()"
-                    (click)="selectItem(item.id)"
-                  >
-                    @if (item.iconSrc) {
-                      <img class="preset-dropdown-option-icon"
-                           [src]="item.iconSrc"
-                           [alt]="item.label"
-                           [attr.loading]="getOptionImageLoading(groupIndex, itemIndex)">
-                    }
-                    <span class="preset-dropdown-option-text">{{ item.label }}</span>
-                  </div>
-                }
-              }
-            }
-          </div>
-        </div>
-      }
-    </div>
-  `,
+  templateUrl: './preset-dropdown.component.html',
   styleUrl: './preset-dropdown.component.scss',
 })
 export class PresetDropdownComponent {
@@ -239,4 +154,3 @@ export class PresetDropdownComponent {
     return 'eager';
   }
 }
-

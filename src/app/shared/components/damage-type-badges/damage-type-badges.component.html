@@ -1,0 +1,8 @@
+<span class="damage-type-badges">
+  @for (badge of activeBadges(); track badge.typeName) {
+    <span class="damage-type-badge {{ badge.cssClass }}">
+      {{ badge.icon }} {{ badge.value | formatNumber }}
+    </span>
+  }
+</span>
+

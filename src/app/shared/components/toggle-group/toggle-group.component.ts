@@ -18,23 +18,7 @@ export interface ToggleOption {
       multi: true,
     },
   ],
-  template: `
-    <div class="toggle-group" [class.disabled]="isDisabled">
-      @for (option of options(); track option.value) {
-        <label class="toggle-btn">
-          <input
-            type="radio"
-            [name]="groupName()"
-            [value]="option.value"
-            [checked]="option.value == currentValue"
-            [disabled]="isDisabled"
-            (change)="onRadioChange(option.value)"
-          >
-          <span>{{ option.label }}</span>
-        </label>
-      }
-    </div>
-  `,
+  templateUrl: './toggle-group.component.html',
 })
 export class ToggleGroupComponent implements ControlValueAccessor {
   readonly options = input.required<ToggleOption[]>();

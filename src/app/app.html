@@ -1,0 +1,66 @@
+﻿<div class="container">
+  <h1>⚔ Valheim Hit Simulator and Analyzer</h1>
+  <!-- ── Input Forms ── -->
+  <div class="form-grid">
+    <app-mob-attack-form />
+    <app-player-defense-form />
+  </div>
+  <div class="form-reset-row">
+    <button type="button" id="resetBtn" (click)="onReset()">Reset</button>
+  </div>
+  <!-- ── Tab Navigation ── -->
+  <nav class="tab-nav" role="tablist">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'simulator'"
+      data-tab="simulator"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'simulator'"
+      (click)="switchTab('simulator')"
+    >Hit Simulator</button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab() === 'hit-analyzer'"
+      data-tab="hit-analyzer"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'hit-analyzer'"
+      (click)="switchTab('hit-analyzer')"
+    >Hit Analyzer</button>
+  </nav>
+  <!-- ── Tab: Hit Simulator ── -->
+  <div class="tab-panel" [hidden]="activeTab() !== 'simulator'">
+    <app-combat-arena />
+  </div>
+  <!-- ── Tab: Hit Analyzer ── -->
+  <div class="tab-panel" [hidden]="activeTab() !== 'hit-analyzer'">
+    <div class="calc-summary">
+      <h3>How damage taken is calculated</h3>
+      <div class="pipeline">
+        <div class="pipe-step"><span class="pipe-num">1</span><span class="pipe-text">Base damage is scaled by difficulty, star &amp; extra damage bonuses → <strong>Effective Damage</strong></span></div>
+        <div class="pipe-step"><span class="pipe-num">2</span><span class="pipe-text">Block armor is scaled by blocking skill &amp; parry multiplier → <strong>Effective Block Armor</strong></span></div>
+        <div class="pipe-step"><span class="pipe-num">3</span><span class="pipe-text">Effective damage is reduced by effective block armor → <strong>Block-Reduced Damage</strong></span></div>
+        <div class="pipe-step"><span class="pipe-num">4</span><span class="pipe-text">Resistance modifiers scale damage up or down → <strong>Resistance-Multiplied Damage</strong></span></div>
+        <div class="pipe-step"><span class="pipe-num">5</span><span class="pipe-text">Resistance-multiplied damage is reduced by body armor → <strong>Armor Reduced Damage</strong></span></div>
+        <div class="pipe-step"><span class="pipe-num">6</span><span class="pipe-text">DoT types with per-tick damage below threshold are disregarded → <strong>Adjusted Total Damage</strong></span></div>
+        <div class="pipe-step"><span class="pipe-num">7</span><span class="pipe-text">Adjusted damage is subtracted from Max Health → <strong>Remaining Health</strong></span></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button type="submit" (click)="onHit()">Hit</button>
+      <div class="btn-row-option">
+        <label class="btn-row-option-label" for="riskFactorInput">
+          Risk Factor %
+          <span class="tip-wrap"><i class="tip-icon">?</i><span class="tip-text">The % chance of taking more damage than shown (0-100). At 1% risk, 99% of hits will deal less or equal damage than displayed.</span></span>
+        </label>
+        <input type="number" id="riskFactorInput" [value]="riskFactor()" min="0" max="100" step="0.1" (change)="onRiskFactorChange($event)">
+      </div>
+    </div>
+    @if (calculationError()) {
+      <div id="error" style="display:block">{{ calculationError() }}</div>
+    }
+    @if (calculationResult()) {
+      <app-results-table [result]="calculationResult()" [formState]="calculationFormState()" [riskFactor]="riskFactor()" />
+      <app-step-analysis [result]="calculationResult()" [formState]="calculationFormState()" [riskFactor]="riskFactor()" />
+    }
+  </div>
+</div>

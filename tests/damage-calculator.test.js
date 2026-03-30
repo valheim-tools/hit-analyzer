@@ -6,7 +6,7 @@
  * Usage:  node tests/damage-calculator.test.js
  */
 
-import { calculate } from '../src/damage-calculator.js';
+import { calculate } from '../dist-test/damage-calculator.js';
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

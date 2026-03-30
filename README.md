@@ -9,9 +9,9 @@ Runs entirely in the browser as a static site — no backend required.
 ## Features
 
 - **Three scenarios in one calculation** — No Shield, Block, and Parry results side by side
-- **Damage pipeline** — Step-by-step breakdown: Effective Damage → Block-Reduced → Resistance-Multiplied → Armor Reduced → Adjusted Total → Remaining Health
+- **Damage pipeline** — Step-by-step breakdown: Effective Damage → Effective Block Armor → Block-Reduced → Resistance-Multiplied → Armor Reduced → Adjusted Total → Remaining Health
 - **Stagger detection** — Shows whether the player is staggered on block or on armor, as a single unified result
-- **Difficulty & star scaling** — Normal / Hard / Very Hard and 0–3 star mob bonuses (additive, not multiplicative)
+- **Combat Difficulty & star scaling** — Very Easy / Easy / Normal / Hard / Very Hard (50%–200% enemy damage) and 0–3 star mob bonuses (additive, not multiplicative)
 - **Calculation history** — Last 10 results saved in localStorage, with optional custom labels and per-entry delete
 - **Tooltips** — Inline `?` badges on key result rows explain each value
 - **Zero dependencies** — Pure vanilla JS ES modules, no build step
@@ -23,11 +23,12 @@ Runs entirely in the browser as a static site — no backend required.
 | Step | What happens |
 |------|-------------|
 | **1** | Base damage is scaled by difficulty, star & extra damage bonuses → **Effective Damage** |
-| **2** | Effective damage is reduced by block armor → **Block-Reduced Damage** |
-| **3** | Resistance modifiers scale damage up or down → **Resistance-Multiplied Damage** |
-| **4** | Resistance-multiplied damage is reduced by body armor → **Armor Reduced Damage** |
-| **5** | DoT types with per-tick damage below threshold are eliminated → **Adjusted Total Damage** |
-| **6** | Adjusted damage is subtracted from Max Health → **Remaining Health** |
+| **2** | Block armor is scaled by blocking skill & parry multiplier → **Effective Block Armor** |
+| **3** | Effective damage is reduced by effective block armor → **Block-Reduced Damage** |
+| **4** | Resistance modifiers scale damage up or down → **Resistance-Multiplied Damage** |
+| **5** | Resistance-multiplied damage is reduced by body armor → **Armor Reduced Damage** |
+| **6** | DoT types with per-tick damage below threshold are disregarded → **Adjusted Total Damage** |
+| **7** | Adjusted damage is subtracted from Max Health → **Remaining Health** |
 
 Stagger threshold = **40% of Max Health**. A block-stagger prevents a second armor-stagger on the same hit.
 

@@ -1,0 +1,174 @@
+<div id="hitSimulator">
+  <div class="sim-header">
+    <h2>Simulate Taking Hits</h2>
+    <button type="button" id="simResetBtn" (click)="onResetHealth()">Reset HP</button>
+  </div>
+
+  <p class="sim-note">💡 You can change any stat between hits, except <strong>Combat Difficulty</strong> which resets the simulator.</p>
+  <p class="sim-note">⚔ <strong>Base Hit</strong> always uses the unmodified maximum damage — no random variance applied.</p>
+  <p class="sim-note sim-note-rng">🎲 <strong>Random Hit</strong> applies Valheim's in-game damage variance: <strong>damage × √rng</strong>, where rng is a uniform random number between 0.75 and 1.0 — giving a range of ~86.6%–100% of the base damage per hit.</p>
+
+  <div class="sim-main-row">
+    <div class="sim-scenario-row">
+      @for (scenarioKey of scenarioKeys; track scenarioKey) {
+        <label class="sim-radio-label">
+          <input
+            type="radio"
+            name="simScenario"
+            [value]="scenarioKey"
+            [checked]="selectedScenario() === scenarioKey"
+            (change)="onSelectScenario(scenarioKey)"
+          >
+          {{ getScenarioLabel(scenarioKey) }}
+        </label>
+      }
+    </div>
+
+    <div class="sim-health-section">
+      <div class="sim-bar-track">
+        <div
+          class="sim-bar-fill"
+          [class]="healthBarClass"
+          [style.width.%]="simulatorState().healthPercent"
+        ></div>
+      </div>
+      <div class="sim-hp-readout">
+        <span>{{ simulatorState().isDead ? '0.000' : (simulatorState().currentHealth | formatNumber) }}</span>
+        <span class="sim-hp-sep"> / </span>
+        <span>{{ simulatorState().maxHealth | formatNumber }}</span>
+        <span class="sim-hp-label"> HP</span>
+        @if (simulatorState().isDead) {
+          <span> 💀</span>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="sim-error">{{ errorMessage() }}</div>
+  }
+
+  <!-- ── Combat Animation Arena ── -->
+  <div class="sim-arena"
+       [class.arena-parry-flash]="simulatorState().arenaScenarioKey === 'parry' && arenaIsAttacking()">
+    <div class="arena-ground"></div>
+
+    <div class="arena-mob" [class.arena-animating]="arenaIsAttacking()">
+      <img
+        class="arena-mob-icon"
+        [src]="arenaMobIconSrc"
+        alt="Monster"
+      >
+      <span class="arena-mob-weapon">⚔</span>
+    </div>
+
+    <img
+      class="arena-projectile"
+      [class.arena-animating]="arenaIsAttacking()"
+      src="assets/images/animations/projectile.png"
+      alt="Projectile"
+    >
+
+    <div
+      class="arena-player"
+      [class]="arenaAnimationClass()"
+      [class.arena-dead]="arenaIsDead() && !arenaAnimationClass().includes('arena-death')"
+      [class.skal]="arenaIsVikingSkal()"
+      (click)="onVikingClick()"
+    >
+      <img
+        class="arena-player-icon"
+        src="assets/images/animations/viking.png"
+        alt="Viking"
+      >
+      <img
+        class="arena-player-shield"
+        [src]="arenaShieldSrc()"
+        alt="Shield"
+      >
+      <img
+        class="arena-player-shield-broken"
+        src="assets/images/animations/red-shield.png"
+        alt="Broken Shield"
+      >
+      <span class="arena-stagger-badge">⚠ Staggered</span>
+      <span class="arena-death-overlay">💀</span>
+      <span class="arena-viking-skal">
+        Skål!
+        <img class="arena-viking-skal-icon" src="assets/images/animations/skal.png" alt="">
+      </span>
+    </div>
+  </div>
+
+  <div class="sim-hit-row">
+    <button
+      type="button"
+      class="sim-take-hit-btn"
+      [disabled]="isHitButtonsDisabled"
+      (click)="onBaseHit()"
+    >⚔ Base Hit</button>
+    <button
+      type="button"
+      class="sim-take-hit-btn sim-random-hit-btn"
+      [disabled]="isHitButtonsDisabled"
+      (click)="onRandomHit()"
+    >🎲 Random Hit</button>
+  </div>
+
+  <div class="sim-dot-speed-row">
+    <label class="dot-speed-label" for="dotSpeedSlider">DoT Speed</label>
+    <input
+      type="range"
+      id="dotSpeedSlider"
+      min="1" max="10"
+      [value]="dotSpeed()"
+      step="0.5"
+      class="dot-speed-slider"
+      (input)="onDotSpeedChange($event)"
+    >
+    <span class="dot-speed-value">{{ dotSpeed() }}×</span>
+  </div>
+
+  <button type="button" class="sim-reset-mobile" (click)="onResetHealth()">Reset HP</button>
+
+  <div class="sim-log-header">
+    <span class="sim-log-title">Hit Log</span>
+  </div>
+  <ul class="sim-log" #simLog>
+    @for (entry of simulatorState().log; track $index) {
+      @if (isHitLogEntry(entry)) {
+        <li class="sim-log-entry">
+          <span class="sim-log-hit-num"><span class="sim-log-hit-prefix">Hit </span>#{{ entry.data.hitNumber }}</span>
+          <span class="sim-log-scenario">[{{ getScenarioLabel(entry.data.scenarioKey) }}]</span>
+          <span class="sim-log-dmg">−{{ entry.data.damage | formatNumber }}</span>
+          <span class="sim-log-factor">
+            @if (entry.data.rngFactor !== null) {
+              <span title="RNG factor: ×{{ (entry.data.rngFactor | formatNumber) }}">×{{ entry.data.rngFactor | formatNumber }}</span>
+            }
+          </span>
+          @if (entry.data.isDead) {
+            <span class="sim-log-hp sim-log-dead tip-wrap">💀<span class="tip-text">{{ entry.data.exactRemainingHealth | formatNumber }}</span></span>
+          } @else {
+            <span class="sim-log-hp">{{ entry.data.remainingHealth | formatNumber }} HP</span>
+          }
+          @if (entry.data.isStaggered) {
+            <span class="sim-log-stagger">⚠<span class="sim-log-stagger-text"> Staggered</span></span>
+          }
+        </li>
+      } @else if (isDotLogEntry(entry)) {
+        <li class="sim-log-entry sim-log-dot-entry">
+          <span class="sim-log-dot-icon">{{ getDotTypeIcon(entry.data.dotTypeName) }}</span>
+          <span class="sim-log-dot-label">{{ entry.data.dotTypeName }} {{ entry.data.tickIndex + 1 }}/{{ entry.data.totalTicks }}</span>
+          <span class="sim-log-dmg sim-log-dot-dmg">−{{ entry.data.tickDamage | formatNumber }}</span>
+          @if (entry.data.isDead) {
+            <span class="sim-log-hp sim-log-dead">💀</span>
+          } @else {
+            <span class="sim-log-hp">{{ entry.data.remainingHealth | formatNumber }} HP</span>
+          }
+        </li>
+      }
+    }
+  </ul>
+</div>
+
+

@@ -27,16 +27,17 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
 
       - run: npm ci
 
-      - run: npm run build
+      - run: npm run build:pages
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/
+          path: dist/valheim-hit-simulator-and-analyzer/browser
 
       - id: deployment
         uses: actions/deploy-pages@v4

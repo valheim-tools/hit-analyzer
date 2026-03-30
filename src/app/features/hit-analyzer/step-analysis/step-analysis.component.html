@@ -1,0 +1,303 @@
+@if (result()) {
+  <div class="analysis-details">
+    <div class="analysis-title">Step-by-step analysis</div>
+    <p class="analysis-hint">
+      💡 <strong>Hover</strong> (or <strong>tap</strong> on mobile) any
+      <span class="analysis-hint-sample">underlined text</span> to see more details.
+    </p>
+
+    <div class="analysis-body">
+
+      <!-- ── Common inputs ────────────────────────────────────────────── -->
+      @if (analysisSharedData(); as shared) {
+        <div class="f-shared">
+          <div class="f-eq f-type-badges">
+            <strong style="color: #ccaf5e">Base damage:</strong>
+            <span class="damage-type-badges">
+              @for (badge of shared.badges; track badge.cssClass) {
+                <span class="damage-type-badge" [class]="badge.cssClass">{{ badge.icon }} {{ badge.value | formatNumber }}</span>
+              }
+            </span>
+            = {{ shared.total | formatNumber }}
+          </div>
+        </div>
+      }
+
+      <!-- ── Three scenario columns ──────────────────────────────────── -->
+      <div class="f-cols">
+        @for (scenario of scenarioAnalyses(); track scenario.title) {
+          <div class="f-col">
+            <div class="f-col-title">{{ scenario.title }}</div>
+
+            <!-- ── Step 1: Effective Damage ──────────────────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">1 — @if (scenario.step1.hasRiskFactor) {Scaled Effective Damage} @else {Effective Damage}</div>
+              <div class="f-eq">
+                {{ scenario.step1.baseDamage | formatNumber }} × (1 + {{ scenario.step1.difficultyBonus }} + {{ scenario.step1.starLevelBonus }} + ({{ scenario.step1.extraDamagePercent | formatNumber }} ÷ 100))
+                = {{ scenario.step1.baseDamage | formatNumber }} × {{ scenario.step1.totalMultiplier | formatNumber }} =
+                <span class="tip-wrap f-hover-wrap" tabindex="0">
+                  <strong class="f-hover-result">{{ scenario.step1.effectiveDamage | formatNumber }}</strong>
+                  <span class="tip-text">
+                    effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>
+                    {{ scenario.step1.baseDamage | formatNumber }} × (1 + {{ scenario.step1.difficultyBonus }} + {{ scenario.step1.starLevelBonus }} + ({{ scenario.step1.extraDamagePercent | formatNumber }} ÷ 100)) = {{ scenario.step1.baseDamage | formatNumber }} × {{ scenario.step1.totalMultiplier | formatNumber }} = {{ scenario.step1.effectiveDamage | formatNumber }}
+                  </span>
+                </span>
+              </div>
+              @if (scenario.step1.hasRiskFactor) {
+                <div class="f-eq">
+                  {{ scenario.step1.effectiveDamage | formatNumber }} × √{{ scenario.step1.rngValue | formatNumber }}
+                  = {{ scenario.step1.effectiveDamage | formatNumber }} × {{ scenario.step1.rngFactor | formatNumber }} =
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <strong class="f-hover-result">{{ scenario.step1.scaledEffectiveDamage | formatNumber }}</strong>
+                    <span class="tip-text">
+                      {{ scenario.step1.riskFactorValue }}% risk: scaledEffectiveDamage = effectiveDamage × √rng<br>
+                      rng = 0.75 + 0.25 × {{ scenario.step1.rngBasePercentile }} = {{ scenario.step1.rngValue | formatNumber }}<br>
+                      {{ scenario.step1.effectiveDamage | formatNumber }} × √{{ scenario.step1.rngValue | formatNumber }} = {{ scenario.step1.effectiveDamage | formatNumber }} × {{ scenario.step1.rngFactor | formatNumber }} = {{ scenario.step1.scaledEffectiveDamage | formatNumber }}
+                    </span>
+                  </span>
+                  <span class="risk-factor-badge">{{ scenario.step1.riskFactorValue }}% risk</span>
+                </div>
+              }
+            </div>
+
+            <!-- ── Step 2: Effective Block Armor ─────────────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">2 — Effective Block Armor</div>
+              @if (scenario.step2.isSkipped) {
+                <div class="f-skipped">No shield — step skipped</div>
+              } @else {
+                <div class="f-eq">
+                  @if (scenario.step2.isParry) {
+                    {{ scenario.step2.blockArmor | formatNumber }} × (1 + 0.005 × {{ scenario.step2.blockingSkill }}) × {{ scenario.step2.parryMultiplier }}
+                  } @else {
+                    {{ scenario.step2.blockArmor | formatNumber }} × (1 + 0.005 × {{ scenario.step2.blockingSkill }})
+                  }
+                </div>
+                <div class="f-eq">
+                  @if (scenario.step2.isParry) {
+                    {{ scenario.step2.blockArmor | formatNumber }} × {{ scenario.step2.skillFactor | formatNumber }} × {{ scenario.step2.parryMultiplier }} =
+                  } @else {
+                    {{ scenario.step2.blockArmor | formatNumber }} × {{ scenario.step2.skillFactor | formatNumber }} =
+                  }
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <strong class="f-hover-result">{{ scenario.step2.effectiveBlockArmor | formatNumber }}</strong>
+                    <span class="tip-text">
+                      @if (scenario.step2.isParry) {
+                        effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill) × parryMultiplier<br>
+                        {{ scenario.step2.blockArmor | formatNumber }} × (1 + 0.005 × {{ scenario.step2.blockingSkill }}) × {{ scenario.step2.parryMultiplier }} = {{ scenario.step2.blockArmor | formatNumber }} × {{ scenario.step2.skillFactor | formatNumber }} × {{ scenario.step2.parryMultiplier }} = {{ scenario.step2.effectiveBlockArmor | formatNumber }}
+                      } @else {
+                        effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill)<br>
+                        {{ scenario.step2.blockArmor | formatNumber }} × (1 + 0.005 × {{ scenario.step2.blockingSkill }}) = {{ scenario.step2.blockArmor | formatNumber }} × {{ scenario.step2.skillFactor | formatNumber }} = {{ scenario.step2.effectiveBlockArmor | formatNumber }}
+                      }
+                    </span>
+                  </span>
+                </div>
+              }
+            </div>
+
+            <!-- ── Step 3: Block Reduced Damage ──────────────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">3 — Block Reduced Damage</div>
+              @if (scenario.step3.isSkipped) {
+                <div class="f-skipped">No shield — step skipped</div>
+              } @else {
+                <div class="f-branch-check">
+                  {{ scenario.step3.effectiveBlockArmor | formatNumber }} &lt; {{ scenario.step3.inputDamage | formatNumber }} ÷ 2 (= {{ scenario.step3.halfInputDamage | formatNumber }})?
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <span class="f-hover-decision">{{ scenario.step3.isLinear ? 'YES' : 'NO' }} → {{ scenario.step3.isLinear ? 'linear' : 'quadratic' }}</span>
+                    <span class="tip-text">
+                      Rule: if effectiveBlockArmor &lt; @if (scenario.step1.hasRiskFactor) {scaledEffectiveDamage} @else {effectiveDamage} ÷ 2, use the linear reduction.<br>
+                      Otherwise, use the quadratic reduction.<br>
+                      @if (scenario.step3.isLinear) {Chosen branch: reducedDamage = damage − armor} @else {Chosen branch: reducedDamage = damage² ÷ (armor × 4)}
+                      @if (scenario.step3.isExactTie) {<br>Because the check is strict (&lt;), an exact tie still uses the quadratic branch.}
+                    </span>
+                  </span>
+                </div>
+                <div class="f-eq">
+                  @if (scenario.step3.isLinear) {
+                    {{ scenario.step3.inputDamage | formatNumber }} − {{ scenario.step3.effectiveBlockArmor | formatNumber }} =
+                  } @else {
+                    {{ scenario.step3.inputDamage | formatNumber }}² ÷ ({{ scenario.step3.effectiveBlockArmor | formatNumber }} × 4) =
+                  }
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <strong class="f-hover-result">{{ scenario.step3.afterBlockDamage | formatNumber }}</strong>
+                    <span class="tip-text">
+                      @if (scenario.step3.isLinear) {
+                        blockReducedDamage = @if (scenario.step1.hasRiskFactor) {scaledEffectiveDamage} @else {effectiveDamage} − effectiveBlockArmor
+                      } @else {
+                        blockReducedDamage = @if (scenario.step1.hasRiskFactor) {scaledEffectiveDamage} @else {effectiveDamage}² ÷ (effectiveBlockArmor × 4)
+                      }
+                    </span>
+                  </span>
+                </div>
+                @if (scenario.step3.staggeredOnBlock) {
+                  <div class="f-stagger-warn">
+                    ⚠ Staggered →
+                    <span class="tip-wrap f-hover-wrap" tabindex="0">
+                      <strong class="f-hover-result">{{ scenario.step3.inputDamage | formatNumber }}</strong>
+                      <span class="tip-text">
+                        Stagger check: {{ scenario.step3.blockStaggerDamage | formatNumber }} &gt; {{ scenario.step3.staggerThreshold | formatNumber }}
+                        (= 40% of {{ scenario.step3.maxHealth | formatNumber }} max health) → block bypassed, full damage passes.
+                      </span>
+                    </span>
+                  </div>
+                } @else {
+                  @for (breakdown of scenario.step3.typeBreakdowns; track breakdown.typeName) {
+                    <div class="f-eq">
+                      {{ breakdown.icon }} {{ breakdown.beforeValue | formatNumber }} →
+                      <span class="tip-wrap f-hover-wrap" tabindex="0">
+                        <strong class="f-hover-result">{{ breakdown.afterValue | formatNumber }}</strong>
+                        <span class="tip-text">
+                          {{ breakdown.outputVarPrefix }}{{ breakdown.typeName }}Damage = @if (scenario.step1.hasRiskFactor) {scaledEffective} @else {effective}{{ breakdown.typeName }}Damage × ({{ breakdown.outputVarPrefix }}Damage ÷ @if (scenario.step1.hasRiskFactor) {scaledEffectiveDamage} @else {effectiveDamage})<br>
+                          {{ breakdown.beforeValue | formatNumber }} × ({{ breakdown.outputTotal | formatNumber }} ÷ {{ breakdown.inputTotal | formatNumber }}) = {{ breakdown.beforeValue | formatNumber }} × {{ breakdown.ratio | formatNumber }} = {{ breakdown.afterValue | formatNumber }}
+                        </span>
+                      </span>
+                    </div>
+                  }
+                }
+              }
+            </div>
+
+            <!-- ── Step 4: Resistance-Multiplied Damage ───────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">4 — Resistance-Multiplied Damage</div>
+              @if (scenario.step4.isSkipped) {
+                <div class="f-skipped">No resistance modifiers — step skipped</div>
+              } @else {
+                @for (resistance of scenario.step4.typeResistances; track resistance.typeName) {
+                  <div class="f-eq">
+                    {{ resistance.icon }} {{ resistance.beforeValue | formatNumber }} →
+                    <span class="tip-wrap f-hover-wrap" tabindex="0">
+                      <strong class="f-hover-result">{{ resistance.afterValue | formatNumber }}</strong>
+                      <span class="tip-text">
+                        resistanceMultiplied{{ resistance.typeName }}Damage = @if (!scenario.step2.isSkipped) {blockReduced} @else {@if (scenario.step1.hasRiskFactor) {scaledEffective} @else {effective}}{{ resistance.typeName }}Damage × {{ resistance.lowerTypeName }}ResistanceMultiplier<br>
+                        {{ resistance.beforeValue | formatNumber }} × {{ resistance.multiplier | formatNumber }} = {{ resistance.afterValue | formatNumber }}
+                      </span>
+                    </span>
+                  </div>
+                }
+                <div class="f-eq">
+                  @for (sum of scenario.step4.activeSums; track sum.typeName; let isLast = $last) {
+                    {{ sum.value | formatNumber }}@if (!isLast) { + }
+                  } =
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <strong class="f-hover-result">{{ scenario.step4.afterResistanceDamage | formatNumber }}</strong>
+                    <span class="tip-text">
+                      resistanceMultipliedDamage =
+                      @for (sum of scenario.step4.activeSums; track sum.typeName; let isLast = $last) {
+                        resistanceMultiplied{{ sum.typeName }}Damage@if (!isLast) { +}
+                      }
+                    </span>
+                  </span>
+                </div>
+              }
+            </div>
+
+            <!-- ── Step 5: Armor Reduced Damage ──────────────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">5 — Armor Reduced Damage</div>
+              <div class="f-branch-check">
+                {{ scenario.step5.armor | formatNumber }} &lt; {{ scenario.step5.armorInputDamage | formatNumber }} ÷ 2 (= {{ scenario.step5.halfArmorInput | formatNumber }})?
+                <span class="tip-wrap f-hover-wrap" tabindex="0">
+                  <span class="f-hover-decision">{{ scenario.step5.isLinear ? 'YES' : 'NO' }} → {{ scenario.step5.isLinear ? 'linear' : 'quadratic' }}</span>
+                  <span class="tip-text">
+                    Rule: if armor &lt; resistanceMultipliedDamage ÷ 2, use the linear reduction.<br>
+                    Otherwise, use the quadratic reduction.<br>
+                    @if (scenario.step5.isLinear) {Chosen branch: reducedDamage = damage − armor} @else {Chosen branch: reducedDamage = damage² ÷ (armor × 4)}
+                    @if (scenario.step5.isExactArmorThreshold) {<br>Because the check is strict (&lt;), an exact tie still uses the quadratic branch.}
+                  </span>
+                </span>
+              </div>
+              <div class="f-eq">
+                @if (scenario.step5.isLinear) {
+                  {{ scenario.step5.armorInputDamage | formatNumber }} − {{ scenario.step5.armor | formatNumber }} =
+                } @else {
+                  {{ scenario.step5.armorInputDamage | formatNumber }}² ÷ ({{ scenario.step5.armor | formatNumber }} × 4) =
+                }
+                <span class="tip-wrap f-hover-wrap" tabindex="0">
+                  <strong class="f-hover-result">{{ scenario.step5.armorReducedDamage | formatNumber }}</strong>
+                  <span class="tip-text">
+                    @if (scenario.step5.isLinear) {
+                      armorReducedDamage = resistanceMultipliedDamage − armor
+                    } @else {
+                      armorReducedDamage = resistanceMultipliedDamage² ÷ (armor × 4)
+                    }
+                  </span>
+                </span>
+              </div>
+              @for (breakdown of scenario.step5.typeBreakdowns; track breakdown.typeName) {
+                <div class="f-eq">
+                  {{ breakdown.icon }} {{ breakdown.beforeValue | formatNumber }} →
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <strong class="f-hover-result">{{ breakdown.afterValue | formatNumber }}</strong>
+                    <span class="tip-text">
+                      {{ breakdown.outputVarPrefix }}{{ breakdown.typeName }}Damage = resistanceMultiplied{{ breakdown.typeName }}Damage × ({{ breakdown.outputVarPrefix }}Damage ÷ resistanceMultipliedDamage)<br>
+                      {{ breakdown.beforeValue | formatNumber }} × ({{ breakdown.outputTotal | formatNumber }} ÷ {{ breakdown.inputTotal | formatNumber }}) = {{ breakdown.beforeValue | formatNumber }} × {{ breakdown.ratio | formatNumber }} = {{ breakdown.afterValue | formatNumber }}
+                    </span>
+                  </span>
+                  @if (breakdown.isStaggerType) { 🌀 }
+                </div>
+              }
+            </div>
+
+            <!-- ── Step 6: Adjusted Total Damage ─────────────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">6 — Adjusted Total Damage</div>
+              @if (!scenario.step6.hasDisregardedDot) {
+                <div class="f-skipped">
+                  {{ scenario.step6.hasAnyDot ? 'No DoT damage below threshold' : 'No DoT damage — step skipped' }}
+                </div>
+              } @else {
+                @for (dot of scenario.step6.dotDisregardEntries; track dot.icon) {
+                  <div class="f-eq">
+                    {{ dot.icon }} {{ dot.total | formatNumber }} →
+                    <span class="tip-wrap f-hover-wrap" tabindex="0">
+                      <strong class="f-hover-result">0</strong>
+                      <span class="tip-text">
+                        @if (dot.hasThreshold) {
+                          per-tick {{ (dot.perTick ?? 0) | formatNumber }} &lt; {{ dot.threshold }} minimum threshold → damage disregarded<br>
+                          (threshold only applies to Fire &amp; Spirit, not Poison)
+                        } @else {
+                          DoT damage disregarded
+                        }
+                      </span>
+                    </span>
+                  </div>
+                }
+                <div class="f-eq">
+                  {{ scenario.step6.armorReducedDamage | formatNumber }} − {{ scenario.step6.disregardedTotal | formatNumber }} =
+                  <span class="tip-wrap f-hover-wrap" tabindex="0">
+                    <strong class="f-hover-result">{{ scenario.step6.adjustedTotal | formatNumber }}</strong>
+                    <span class="tip-text">
+                      adjustedTotalDamage = armorReducedDamage − disregardedDotDamage<br>
+                      {{ scenario.step6.armorReducedDamage | formatNumber }} − {{ scenario.step6.disregardedTotal | formatNumber }} = {{ scenario.step6.adjustedTotal | formatNumber }}
+                    </span>
+                  </span>
+                </div>
+              }
+            </div>
+
+            <!-- ── Step 7: Remaining Health ───────────────────────────── -->
+            <div class="f-step">
+              <div class="f-step-label">7 — Remaining Health</div>
+              <div class="f-eq">
+                {{ scenario.step7.maxHealth | formatNumber }} − {{ scenario.step7.adjustedTotal | formatNumber }} =
+                <span class="tip-wrap f-hover-wrap" tabindex="0">
+                  <strong [class]="scenario.step7.isDead ? 'f-hover-result f-dead' : 'f-hover-result'">
+                    @if (scenario.step7.isDead) { 💀 }{{ scenario.step7.remainingHealth | formatNumber }}
+                  </strong>
+                  <span class="tip-text">
+                    remainingHealth = maxHealth − adjustedTotalDamage<br>
+                    {{ scenario.step7.maxHealth | formatNumber }} − {{ scenario.step7.adjustedTotal | formatNumber }} = {{ scenario.step7.remainingHealth | formatNumber }}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+}

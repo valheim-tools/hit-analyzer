@@ -1,0 +1,125 @@
+@if (result()) {
+
+  <!-- ── Damage Summary ────────────────────────────────────────────────── -->
+  @if (damageSummaryData(); as summary) {
+    <p class="damage-summary">
+      @if (summary.hasParts) {
+        Damage modifier:
+        <span>{{ summary.parts.join(' | ') }} ({{ summary.totalBonus >= 0 ? '+' : '' }}{{ summary.totalBonus }}% total)</span>
+      } @else {
+        No damage modifier
+      }
+    </p>
+  }
+
+  <!-- ── Modifier Line ─────────────────────────────────────────────────── -->
+  @if (modifierLineData(); as modifier) {
+    <p class="modifier-line">
+      @if (modifier.hasRiskFactor) {
+        Scaled Effective Damage = {{ modifier.baseDamage | formatNumber }}
+        @if (modifier.hasEffectiveDamageStep) {
+          → {{ modifier.effectiveDamage | formatNumber }}
+        }
+        → <span>{{ modifier.scaledEffectiveDamage | formatNumber }}</span>
+        <br>
+        <span class="risk-factor-badge">{{ modifier.riskFactorValue }}% risk (×{{ modifier.rngFactor | formatNumber }})</span>
+      } @else {
+        @if (modifier.hasEffectiveDamageStep) {
+          Effective Damage = {{ modifier.baseDamage | formatNumber }} → <span>{{ modifier.effectiveDamage | formatNumber }}</span>
+        } @else {
+          Effective Damage = <span>{{ modifier.baseDamage | formatNumber }}</span>
+        }
+      }
+    </p>
+  }
+
+  <!-- ── Results Table ─────────────────────────────────────────────────── -->
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          @for (header of columnHeaders(); track $index) {
+            <th>{{ header }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of tableRows(); track $index) {
+          <tr [class]="row.rowClass">
+
+            <!-- Label column -->
+            <td>
+              {{ row.labelText }}
+              @if (row.labelTooltip) {
+                <span class="tip-wrap">
+                  <i class="tip-icon">?</i>
+                  <span class="tip-text">{{ row.labelTooltip }}</span>
+                </span>
+              }
+            </td>
+
+            <!-- Data columns -->
+            @for (cell of row.cells; track $index) {
+              <td>
+                @switch (cell.kind) {
+
+                  @case ('number') {
+                    {{ cell.numericValue | formatNumber }}
+                  }
+
+                  @case ('skull') {
+                    <span class="skull-wrap tip-wrap">
+                      <span class="skull-icon">💀</span>
+                      <span class="tip-text">{{ cell.numericValue | formatNumber }}</span>
+                    </span>
+                  }
+
+                  @case ('stagger') {
+                    @if (cell.staggerValue === 'yes') {
+                      <span class="stagger-yes">yes</span>
+                    } @else if (cell.staggerValue === 'no') {
+                      <span class="stagger-no">no</span>
+                    } @else {
+                      <span class="stagger-no">N/A</span>
+                    }
+                  }
+
+                  @case ('health-check') {
+                    @if (cell.healthStatus === 'na') {
+                      <span class="stagger-no">N/A</span>
+                    } @else if (cell.healthStatus === 'zero') {
+                      <span class="stagger-no">0</span>
+                    } @else {
+                      <span [class]="cell.healthStatus === 'safe' ? 'health-safe' : 'health-warning'">{{ cell.healthValue }}</span>
+                    }
+                  }
+
+                  @case ('damage-lines') {
+                    @for (line of cell.lines ?? []; track $index) {
+                      <div class="dot-line">
+                        @if (line.displayText !== undefined) {
+                          {{ line.icon }} {{ line.displayText }}
+                        } @else if (line.displayValue !== null) {
+                          {{ line.icon }} {{ line.displayValue | formatNumber }}
+                        } @else {
+                          <span class="stagger-no">—</span>
+                        }
+                      </div>
+                    }
+                    @if (cell.linesSum !== undefined) {
+                      <div class="dot-line dot-line-sum">∑ {{ cell.linesSum | formatNumber }}</div>
+                    }
+                  }
+
+                }
+              </td>
+            }
+
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+}

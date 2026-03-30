@@ -92,3 +92,82 @@ Overhaul the calculator to process per-type damage maps (`{ Blunt: 40, Fire: 20 
   - Add backward-compat tests for plain `baseDamage`
 - Update [`damage-calculator.test.js`](tests/damage-calculator.test.js) to handle the new output shape.
 
+---
+
+## UI Fixes (Angular port)
+
+### Fix 1 — Mob preset search shows mob header but no attacks
+
+**File:** `src/app/shared/components/preset-dropdown/preset-dropdown.component.ts`
+
+In `filteredGroups` computed, when a subgroup's `subGroupLabel` matches the query but none of its items' `label` fields contain the query (attack labels are `"Log Swing V (70 Blunt)"` — they do NOT embed the mob name), the subgroup is retained with an **empty items array**. The mob header row renders but zero attack rows appear beneath it.
+
+**Fix:** When `subGroup.subGroupLabel.toLowerCase().includes(query)` is true, keep **all** of the subgroup's original items (not the filtered-to-zero list).
+
+```typescript
+// Before
+const matchingSubGroups = group.subGroups
+  .map(subGroup => ({
+    ...subGroup,
+    items: subGroup.items.filter(item => item.label.toLowerCase().includes(query)),
+  }))
+  .filter(subGroup => subGroup.items.length > 0 || subGroup.subGroupLabel.toLowerCase().includes(query));
+
+// After
+const matchingSubGroups = group.subGroups
+  .map(subGroup => {
+    const subGroupNameMatches = subGroup.subGroupLabel.toLowerCase().includes(query);
+    const matchingItems = subGroup.items.filter(item => item.label.toLowerCase().includes(query));
+    return {
+      ...subGroup,
+      items: subGroupNameMatches ? subGroup.items : matchingItems,
+    };
+  })
+  .filter(subGroup => subGroup.items.length > 0);
+```
+
+---
+
+### Fix 2 — Mob header text not bold
+
+**File:** `src/app/shared/components/preset-dropdown/preset-dropdown.component.scss`
+
+Add `font-weight: 700;` and a slightly brighter colour to `.preset-dropdown-subgroup-header`.
+
+---
+
+### Fix 3 — Dropdown option text too large
+
+**File:** `src/app/shared/components/preset-dropdown/preset-dropdown.component.scss`
+
+Reduce `.preset-dropdown-option { font-size }` from `0.8rem` → `0.72rem`.  
+Icon size (`width/height: 30px`) and button/trigger dimensions stay unchanged.
+
+---
+
+### Fix 4 — HP bar too bright
+
+**File:** `src/styles.scss`
+
+Change `.sim-bar-fill { background-color: $color-gold }` (`#ccaf5e`) to a darker, less saturated gold (`#7a6e38`).
+
+---
+
+### Fix 5 — Dropdown images not pre-loaded
+
+**File:** `src/app/shared/components/preset-dropdown/preset-dropdown.component.ts`
+
+`getSubgroupImageLoading` currently returns `'eager'` only for the first 2 groups; `getOptionImageLoading` only for the first 8 items.  
+Change both to always return `'eager'` so all preset icons are fetched as soon as the component mounts (dropdown hidden state does not block eager loading in Chrome/Firefox).
+
+---
+
+### Fix 6 — +Add Resistance / +Add Extra Damage Bonus buttons hard to see
+
+**Files:**
+- `src/app/features/player-defense-form/player-defense-form.component.scss` (`.add-resistance-type-btn`)
+- `src/app/features/mob-attack-form/mob-attack-form.component.scss` (`.add-extra-damage-btn`)
+
+Both use `border: 1px dashed $color-gold-darker` (`#544828`) on a `#2d2a1e` background — very low contrast.
+
+**Fix:** Raise border to `#8a7040`, text colour to `#b8a060`, add `background: rgba(84, 72, 40, 0.25)` at rest and `rgba(84, 72, 40, 0.4)` on hover.

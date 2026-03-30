@@ -1,0 +1,135 @@
+<section class="section">
+  <h2>Player Defense Stats</h2>
+
+  @if (form) {
+    <form [formGroup]="form">
+
+      <!-- Max Health -->
+      <div class="field">
+        <label>Max Health (0 – 1000)</label>
+        <input type="number" formControlName="maxHealth" min="0" max="1000" step="0.1" required>
+      </div>
+
+      <!-- Resistance Modifiers -->
+      <div class="field">
+        <label>Resistance Modifiers
+          <span class="tip-wrap" appTooltip>
+            <i class="tip-icon">?</i>
+            <span class="tip-text">Percentage of damage taken for each type. 40% means you take 40% of that damage (60% reduction). 200% means you take double damage (weak to that type).</span>
+          </span>
+        </label>
+        <div class="resistance-type-inputs" formArrayName="resistanceModifiers">
+          @for (row of resistanceModifiersArray.controls; track $index) {
+            <div class="resistance-type-row" [formGroupName]="$index">
+              <select class="resistance-type-select" formControlName="type"
+                      (change)="onResistanceTypeChange()" aria-label="Damage type">
+                <optgroup label="🗡️ Instant">
+                  @for (type of getAvailableTypesForRow($index); track type) {
+                    @if (INSTANT_DAMAGE_TYPE_NAMES.includes(type)) {
+                      <option [value]="type">{{ DAMAGE_TYPE_ICONS[type] }} {{ type }}</option>
+                    }
+                  }
+                </optgroup>
+                <optgroup label="⏳ Damage over Time">
+                  @for (type of getAvailableTypesForRow($index); track type) {
+                    @if (DOT_DAMAGE_TYPE_NAMES.includes(type)) {
+                      <option [value]="type">{{ DAMAGE_TYPE_ICONS[type] }} {{ type }}</option>
+                    }
+                  }
+                </optgroup>
+              </select>
+              <input
+                type="number"
+                class="resistance-percent-value"
+                formControlName="percent"
+                min="0" max="200" step="1"
+                aria-label="Resistance percent"
+              >
+              <span class="resistance-percent-symbol">%</span>
+              <button
+                type="button"
+                class="resistance-type-remove"
+                title="Remove"
+                aria-label="Remove resistance modifier"
+                (click)="removeResistanceRow($index)"
+              >✕</button>
+            </div>
+          }
+        </div>
+        @if (!allResistanceTypesUsed) {
+          <button type="button" class="add-resistance-type-btn" (click)="addResistanceRow()">
+            + Add resistance
+          </button>
+        }
+      </div>
+
+      <!-- Shield Preset -->
+      <div class="preset-row">
+        <label>
+          Shield Preset
+          <a href="https://valheim.fandom.com/wiki/Shields" target="_blank" rel="noopener" class="wiki-link">↗ shields</a>
+        </label>
+        <div class="shield-preset-row">
+          <app-preset-dropdown
+            [groups]="shieldPresetGroups()"
+            [selectedId]="selectedShieldPresetId"
+            placeholder="Custom"
+            searchPlaceholder="Search shields…"
+            (selectedChange)="onShieldPresetSelected($event)"
+          />
+          @if (hasShieldPreset) {
+            <app-toggle-group
+              [options]="shieldQualityOptions"
+              groupName="shieldQuality"
+              formControlName="shieldQuality"
+            />
+          }
+        </div>
+      </div>
+
+      <!-- Block Armor + Parry Multiplier -->
+      <div class="field-row">
+        <div class="field">
+          <label>Block Armor (0 – 500)</label>
+          <input type="number" formControlName="blockArmor" min="0" max="500" step="0.1" required>
+        </div>
+        <div class="field">
+          <label>Parry Multiplier</label>
+          <div class="parry-multiplier-row">
+            <select formControlName="parryMultiplierPreset" (change)="onParryPresetChange()">
+              @for (preset of PARRY_MULTIPLIER_PRESETS; track preset) {
+                <option [value]="preset">×{{ preset }}</option>
+              }
+              <option value="custom">Custom…</option>
+            </select>
+            @if (isParryCustom()) {
+              <div class="custom-parry-field">
+                <input
+                  type="number"
+                  formControlName="parryMultiplierCustom"
+                  min="0.1" max="100" step="0.1"
+                  placeholder="Custom"
+                  aria-label="Custom parry multiplier"
+                >
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Blocking Skill + Armor -->
+      <div class="field-row">
+        <div class="field">
+          <label>Blocking Skill (0 – 100)</label>
+          <input type="number" formControlName="blockingSkill" min="0" max="100" step="0.1" required>
+        </div>
+        <div class="field">
+          <label>Armor (0 – 500)</label>
+          <input type="number" formControlName="armor" min="0" max="500" step="0.1" required>
+        </div>
+      </div>
+
+    </form>
+  }
+</section>
+

@@ -2,61 +2,75 @@
 
 ## Architecture Overview
 
-Pure static-site application — all calculation logic runs client-side in vanilla JavaScript ES modules. No backend required.
+Angular single-page application — all calculation logic runs client-side in TypeScript. No backend required.
 
-- **Frontend**: `index.html` at the project root, source code in `src/`. Served as static files by any HTTP server (e.g., `serve.ps1` via Node.js).
-- All calculation logic lives in `src/damage-calculator.js`. The UI (`src/index.js`) is a thin wrapper that collects form values and renders results.
+- **Frontend**: Angular app at the project root. Served via `ng serve` during development.
+- All calculation logic lives in `src/app/core/damage-calculator.ts`. The UI components are organized by feature.
 
 ## File Structure
 
 ```
-index.html                              # Single-page UI (web root entry point)
-src/
-├── assets/
-│   └── styles/
-│       ├── index.css                   # Styles
-│       └── mobile.css                  # Mobile-specific styles
-├── data/
-│   └── mob-attacks.json                # Mob attack data (synced from output/valheim_mob_damage.json)
-├── damage-calculator.js                # All game math — single source of truth
-├── index.js                            # UI logic — form handling, rendering, tab navigation, hit simulator
-└── mobile.js                           # Mobile UI helpers
-tests/
-├── damage-calculator.test.js           # Zero-dependency Node.js test runner
-└── test-cases.json                     # Data-driven test fixtures
-build.js                                # Production build script (minifies to dist/)
-serve.ps1                               # Static file server (Node.js, port 3001) — kills existing process on port before starting
-package.json                            # npm test / npm run serve / npm run build
-AGENTS.md                               # This file
-README.md                               # Project documentation
+├── angular.json                                # Angular CLI configuration
+├── package.json                                # npm scripts: start, build, test, test:calc
+├── tsconfig.json                               # TypeScript configuration
+├── src/
+│   ├── index.html                              # Single-page entry point
+│   ├── main.ts                                 # Angular bootstrap
+│   ├── styles.scss                             # Global styles
+│   ├── app/
+│   │   ├── app.ts                              # Root component — tab navigation, calculation orchestration
+│   │   ├── app.config.ts                       # App configuration (providers, HTTP, etc.)
+│   │   ├── core/
+│   │   │   ├── damage-calculator.ts            # All game math — single source of truth
+│   │   │   ├── damage-calculator.service.ts    # Injectable wrapper around damage-calculator.ts
+│   │   │   ├── form-state.service.ts           # Centralized form state management
+│   │   │   ├── hit-simulator.service.ts        # Hit simulator state & DoT animation
+│   │   │   ├── mob-preset.service.ts           # Mob attack preset data loading
+│   │   │   ├── shield-preset.service.ts        # Shield preset data loading
+│   │   │   ├── constants/                      # Shared constants (damage types, scenarios, etc.)
+│   │   │   └── models/                         # TypeScript interfaces & types
+│   │   ├── features/
+│   │   │   ├── hit-analyzer/                   # Hit Analyzer tab (results table, step analysis)
+│   │   │   ├── hit-simulator/                  # Hit Simulator tab (combat arena)
+│   │   │   ├── mob-attack-form/                # Mob attack stats form
+│   │   │   └── player-defense-form/            # Player defense stats form
+│   │   └── shared/
+│   │       ├── components/                     # Shared UI components (badges, dropdowns, toggles)
+│   │       ├── directives/                     # Shared directives (tooltip)
+│   │       └── pipes/                          # Shared pipes (formatNumber)
+│   └── assets/
+│       ├── data/
+│       │   ├── mob-attacks.json                # Mob attack data
+│       │   └── shields.json                    # Shield preset data
+│       └── images/                             # All UI images (animations, creature/shield presets)
+├── tests/
+│   ├── damage-calculator.test.js               # Zero-dependency Node.js test runner
+│   └── test-cases.json                         # Data-driven test fixtures
+AGENTS.md                                       # This file
+README.md                                       # Project documentation
+DAMAGE_FORMULA.md                               # Damage formula documentation
+STAGGER_MECHANICS.md                            # Stagger mechanics documentation
+PLAN.md                                         # Migration plan notes
 ```
 
-- `damage-calculator.js` is a pure ES module with no DOM dependency — importable from both the browser and Node.js tests.
-- `index.js` is browser-only (DOM access).
+- `damage-calculator.ts` is a pure-function module with no DOM dependency — importable from both Angular services and Node.js tests.
 
 ## Developer Workflows
 
 ```powershell
-# Serve the app locally and open the browser
-.\serve.ps1
+# Serve the app locally
+npm start
 
-# Serve on a custom port
-.\serve.ps1 -Port 8080
-
-# Run tests
+# Run Angular tests
 npm test
 
-# Or directly
-node tests/damage-calculator.test.js
+# Run damage calculator unit tests
+npm run test:calc
 ```
-
-> `serve.ps1` must be run from the project root — it serves the project root directory.
-> `serve.ps1` automatically kills any process already listening on the target port before starting.
-
 
 ## Damage Pipeline
 
-Every calculation produces **three scenarios in one call**: No Shield, Block, Parry (see `damage-calculator.js → calculate()`).
+Every calculation produces **three scenarios in one call**: No Shield, Block, Parry (see `damage-calculator.ts → calculate()`).
 
 ```
 effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent / 100)
@@ -75,8 +89,8 @@ Resistance modifiers (§3) — applied per damage type between block and body ar
 Stagger threshold = 40% of `maxHealth`. A player staggered on block cannot be double-staggered by armor (`staggeredOnBlock` gates armor stagger check).
 
 DoT elimination — after armor reduction, DoT types (Fire, Spirit, Poison) are checked:
-- Fire/Spirit: if `perTickDamage < 0.2`, the damage is eliminated (set to 0)
-- The result is the **Adjusted Total Damage** = `armorReducedDamage − eliminatedDotDamage`
+- Fire/Spirit: if `perTickDamage < 0.2`, the damage is disregarded (set to 0)
+- The result is the **Adjusted Total Damage** = `armorReducedDamage − disregardedDotDamage`
 
 ## Key Conventions
 
@@ -90,9 +104,16 @@ DoT elimination — after armor reduction, DoT types (Fire, Spirit, Poison) are 
 
 When in doubt, prefer a longer descriptive name over a shorter ambiguous one.
 
-**`damage-calculator.js`** is a static-function-only module — all exports are pure functions, no class instantiation.
+**Angular Reactive Forms — never use string-based control access.** This is a hard rule for all Angular components:
+- **Declare typed form control interfaces** (`FormGroup<T>`, `FormArray<T>`, `FormControl<T | null>`) for every form.
+- **Access controls via `.controls.fieldName`** — `this.form.controls.parryMultiplierPreset.value`, not `this.form.get('parryMultiplierPreset')?.value`.
+- **Build forms with `new FormGroup<T>({})`** and `new FormControl<T>(...)` directly — no `FormBuilder` injection needed.
+- **Event handlers must not call `.get('string')`** in templates either. If a `(change)` handler previously passed `form.get('name')!.value`, remove the argument and read the control inside the method via `this.form.controls.fieldName`.
+- `formControlName="..."` attribute binding in templates is unavoidable and fine — the ban applies only to TypeScript `.get(string)` calls.
 
-**Difficulty** values: `NORMAL`, `HARD`, `VERY_HARD` — stored as keys in the `DIFFICULTY` frozen object.
+**`damage-calculator.ts`** is a static-function-only module — all exports are pure functions, no class instantiation.
+
+**Combat Difficulty** values: `VERY_EASY`, `EASY`, `NORMAL`, `HARD`, `VERY_HARD` — stored as keys in the `DIFFICULTY` frozen object. Enemy damage rates: 50% / 75% / 100% / 150% / 200%.
 
 **Parry multiplier** can be supplied two ways:
 - `parryMultiplier` — direct numeric value (preferred by the UI)
@@ -118,17 +139,15 @@ Tests are data-driven via `tests/test-cases.json`. To add a new scenario, add a 
 
 | File | Purpose |
 |---|---|
-| `src/damage-calculator.js` | All game math — single source of truth |
-| `src/index.js` | UI logic — form state, rendering, calculation history |
-| `index.html` | Single-page HTML |
-| `src/assets/styles/index.css` | Styles |
-| `tests/damage-calculator.test.js` | Zero-dependency Node.js test runner |
+| `src/app/core/damage-calculator.ts` | All game math — single source of truth |
+| `src/app/core/damage-calculator.service.ts` | Injectable Angular service wrapping the calculator |
+| `src/app/core/form-state.service.ts` | Centralized form state with localStorage persistence |
+| `src/app/app.ts` | Root component — tabs, calculation orchestration |
+| `src/styles.scss` | Global styles |
+| `tests/damage-calculator.test.js` | Node.js test runner |
 | `tests/test-cases.json` | All test fixtures — extend here first |
-| `serve.ps1` | Static file server (Node.js) |
-| `build.js` | Production build — minifies to dist/ |
-| `package.json` | npm scripts for test, serve, and build |
+| `package.json` | npm scripts: start, build, test, test:calc |
 
 ## Git Workflow
-
 
 **Never push without explicit permission.** Commits stay local until the user explicitly asks to push. Do not run `git push` on your own.

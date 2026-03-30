@@ -1,0 +1,127 @@
+@use '../../../styles/variables' as *;
+
+// ── Damage type inputs ──────────────────────────────────────────────────────
+
+.damage-type-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.damage-type-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.damage-type-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.damage-type-value {
+  flex: 0 0 80px;
+  width: 80px;
+  min-width: 0;
+  height: 30px;
+}
+
+.damage-type-remove {
+  background: transparent;
+  border: 1px solid $color-gold-darker;
+  color: $color-danger;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: $color-danger-hover;
+    border-color: $color-danger-hover;
+  }
+}
+
+.add-damage-type-btn {
+  background: transparent;
+  border: 1px dashed $color-gold-darker;
+  color: $color-text-muted;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: $radius-md;
+  margin-top: 0.3rem;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: $color-gold;
+    border-color: $color-gold;
+  }
+}
+
+// ── Extra damage ────────────────────────────────────────────────────────────
+
+.extra-damage-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.extra-damage-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.extra-damage-value {
+  flex: 1;
+  min-width: 0;
+}
+
+.extra-damage-percent-symbol {
+  flex-shrink: 0;
+  color: $color-text-muted;
+  font-size: 0.85rem;
+}
+
+.extra-damage-remove {
+  background: transparent;
+  border: 1px solid $color-gold-darker;
+  color: $color-danger;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: $color-danger-hover;
+    border-color: $color-danger-hover;
+  }
+}
+
+.add-extra-damage-btn {
+  background: rgba(84, 72, 40, 0.25);
+  border: 1px dashed #8a7040;
+  color: #b8a060;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: $radius-md;
+  margin-top: 0.3rem;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+  &:hover {
+    color: $color-gold;
+    border-color: $color-gold;
+    background: rgba(84, 72, 40, 0.4);
+  }
+}
+
+

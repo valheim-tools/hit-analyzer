@@ -1,0 +1,118 @@
+<section class="section">
+  <h2>Mob Attack Stats</h2>
+
+  @if (form) {
+    <form [formGroup]="form">
+
+      <!-- Mob Preset -->
+      <div class="preset-row">
+        <label>
+          Mob Attack Preset
+          <a href="https://valheim.fandom.com/wiki/Creatures" target="_blank" rel="noopener" class="wiki-link">↗ creatures</a>
+        </label>
+        <app-preset-dropdown
+          [groups]="mobPresetGroups()"
+          [selectedId]="selectedMobPresetId"
+          placeholder="Custom"
+          searchPlaceholder="Search mobs…"
+          (selectedChange)="onMobPresetSelected($event)"
+        />
+      </div>
+
+      <!-- Damage Types -->
+      <div class="field">
+        <label>Base Damage Types</label>
+        <div class="damage-type-inputs" formArrayName="damageTypes">
+          @for (row of damageTypesArray.controls; track row) {
+            <div class="damage-type-row" [formGroupName]="$index">
+              <select class="damage-type-select" formControlName="type" (change)="onDamageTypeChange()" aria-label="Damage type">
+                <optgroup label="🗡️ Instant">
+                  @for (type of INSTANT_DAMAGE_TYPE_NAMES; track type) {
+                    <option [value]="type">{{ DAMAGE_TYPE_ICONS[type] }} {{ type }}</option>
+                  }
+                </optgroup>
+                <optgroup label="⏳ Damage over Time">
+                  @for (type of DOT_DAMAGE_TYPE_NAMES; track type) {
+                    <option [value]="type">{{ DAMAGE_TYPE_ICONS[type] }} {{ type }}</option>
+                  }
+                </optgroup>
+              </select>
+              <input
+                type="number"
+                class="damage-type-value"
+                formControlName="value"
+                min="0" max="1000" step="0.1"
+                aria-label="Damage value"
+                (change)="onDamageTypeChange()"
+              >
+              <button
+                type="button"
+                class="damage-type-remove"
+                title="Remove"
+                aria-label="Remove damage type"
+                (click)="removeDamageTypeRow($index)"
+              >✕</button>
+            </div>
+          }
+        </div>
+        <button type="button" class="add-damage-type-btn" (click)="addDamageTypeRow()">
+          + Add damage type
+        </button>
+      </div>
+
+      <!-- Star Level -->
+      <div class="field">
+        <label>Star Level — <span>{{ starLevelBonusLabels[currentStarLevel] }}</span>% additional damage bonus</label>
+        <app-toggle-group
+          [options]="starLevelOptions"
+          groupName="starLevel"
+          formControlName="starLevel"
+        />
+      </div>
+
+      <!-- Combat Difficulty -->
+      <div class="field">
+        <label>Combat Difficulty — <span>{{ difficultyBonusLabels[currentDifficulty] }}</span></label>
+        <app-toggle-group
+          id="difficultyGroup"
+          [options]="difficultyOptions"
+          groupName="difficulty"
+          formControlName="difficulty"
+        />
+      </div>
+
+      <!-- Extra Damage Bonus -->
+      <div class="field">
+        <label>Extra Damage Bonus</label>
+        <div class="extra-damage-inputs">
+          @if (hasExtraDamage()) {
+            <div class="extra-damage-row">
+              <input
+                type="number"
+                class="extra-damage-value"
+                formControlName="extraDamagePercent"
+                min="0" max="10000" step="0.1"
+                aria-label="Extra damage bonus percentage"
+              >
+              <span class="extra-damage-percent-symbol">%</span>
+              <button
+                type="button"
+                class="extra-damage-remove"
+                title="Remove"
+                aria-label="Remove extra damage bonus"
+                (click)="removeExtraDamageRow()"
+              >✕</button>
+            </div>
+          }
+        </div>
+        @if (!hasExtraDamage()) {
+          <button type="button" class="add-extra-damage-btn" (click)="addExtraDamageRow()">
+            + Add extra damage bonus
+          </button>
+        }
+      </div>
+
+    </form>
+  }
+</section>
+

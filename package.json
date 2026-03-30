@@ -1,19 +1,45 @@
 {
   "name": "valheim-hit-simulator-and-analyzer",
   "version": "2.3.0",
-  "description": "Valheim Hit Simulator and Analyzer — static site, no backend required",
+  "description": "Valheim Hit Simulator and Analyzer — Angular application",
   "type": "module",
   "scripts": {
-    "test": "node tests/damage-calculator.test.js",
-    "build": "node build.js",
-    "serve": "powershell -ExecutionPolicy Bypass -File serve.ps1"
+    "ng": "ng",
+    "start": "npx kill-port 4200 && ng serve",
+    "build": "ng build",
+    "build:pages": "ng build --base-href=./",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "test:calc": "tsc -p tsconfig.test.json && node tests/damage-calculator.test.js"
   },
-  "keywords": ["valheim", "damage", "calculator"],
+  "keywords": [
+    "valheim",
+    "damage",
+    "calculator"
+  ],
   "license": "MIT",
   "private": true,
+  "packageManager": "npm@11.9.0",
+  "dependencies": {
+    "@angular/common": "^21.2.0",
+    "@angular/compiler": "^21.2.0",
+    "@angular/core": "^21.2.0",
+    "@angular/forms": "^21.2.0",
+    "@angular/platform-browser": "^21.2.0",
+    "@angular/router": "^21.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "^0.16.1"
+  },
   "devDependencies": {
-    "esbuild": "^0.25.0",
-    "html-minifier-terser": "^7.2.0"
+    "@angular/build": "^21.2.5",
+    "@angular/cli": "^21.2.5",
+    "@angular/compiler-cli": "^21.2.0",
+    "@playwright/test": "^1.58.2",
+    "jsdom": "^28.0.0",
+    "kill-port": "^2.0.1",
+    "prettier": "^3.8.1",
+    "typescript": "~5.9.2",
+    "vitest": "^4.0.8"
   }
 }
-

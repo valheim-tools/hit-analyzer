@@ -76,6 +76,18 @@
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+
+  // Shield quality toggle — keep at natural width instead of stretching
+  app-toggle-group {
+    flex: 0 0 auto;
+    width: fit-content;
+  }
+
+  // Shield preset dropdown stretches to fill remaining flex space
+  app-preset-dropdown {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 // ── Parry multiplier ────────────────────────────────────────────────────────

@@ -3,17 +3,6 @@
 // app-toggle-group host is a block so the inner .toggle-group fills the field
 app-toggle-group { display: block; }
 
-// Shield quality toggle lives inside a flex row — keep it at natural width
-.shield-preset-row app-toggle-group {
-  flex: 0 0 auto;
-  .toggle-group { width: auto; }
-}
-
-// Shield preset dropdown stretches to fill the remaining flex space
-.shield-preset-row app-preset-dropdown {
-  flex: 1;
-  min-width: 0;
-}
 
 .toggle-group {
   display: flex;

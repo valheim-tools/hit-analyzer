@@ -1,0 +1,63 @@
+@use 'variables' as *;
+
+// ── Labels ───────────────────────────────────────────────────────────────────
+
+label {
+  display: block;
+  font-size: 0.78rem;
+  color: $color-text-muted;
+  margin-bottom: 0.25rem;
+  overflow-wrap: break-word;
+}
+
+// ── Text & number inputs, selects ────────────────────────────────────────────
+
+input[type="number"],
+input[type="text"],
+select {
+  width: 100%;
+  background: $color-bg-input;
+  border: 1px solid $color-gold-darker;
+  color: $color-text-primary;
+  padding: 0.38rem 0.6rem;
+  border-radius: $radius-md;
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: border-color 0.15s;
+
+  &:focus { outline: none; border-color: $color-gold; }
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+}
+
+select option { background: $color-bg-section; }
+
+// ── Submit button ────────────────────────────────────────────────────────────
+
+button[type="submit"] {
+  width: 100%;
+  background: $color-bg-btn;
+  color: $color-gold;
+  border: 1px solid $color-gold;
+  padding: 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: $radius-md;
+  margin-bottom: 2rem;
+  transition: background 0.15s;
+  &:hover { background: #463c24; }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  button[type="submit"] { touch-action: manipulation; }
+}
+

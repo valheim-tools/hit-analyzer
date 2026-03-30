@@ -1,0 +1,35 @@
+@use 'variables' as *;
+
+// ── Base element styles ──────────────────────────────────────────────────────
+
+body {
+  background: $color-bg-body;
+  color: $color-text-primary;
+  font-family: $font-serif;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+h1 {
+  text-align: center;
+  font-size: 1.6rem;
+  color: $color-gold;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+}
+
+.container { max-width: 860px; margin: 0 auto; }
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  body { padding: 1rem 0.5rem; }
+  h1 { font-size: 1.15rem; letter-spacing: 1px; }
+}
+
+@media (max-width: $bp-xsmall) {
+  body { padding: 0.6rem 0.35rem; }
+  h1 { font-size: 1rem; letter-spacing: 0; margin-bottom: 1.2rem; }
+}
+

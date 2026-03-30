@@ -1,0 +1,68 @@
+@use 'variables' as *;
+
+// ── Form grid ────────────────────────────────────────────────────────────────
+
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 1.4rem;
+}
+
+.form-reset-row {
+  text-align: right;
+  margin-bottom: 0.6rem;
+}
+
+// ── Section card ─────────────────────────────────────────────────────────────
+
+.section {
+  background: $color-bg-section;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-lg;
+  padding: 1.2rem 1.4rem;
+  min-width: 0;
+
+  h2 {
+    font-size: 0.8rem;
+    color: $color-gold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 1px solid $color-gold-darker;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.preset-row {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $color-gold-faint;
+}
+
+// ── Field spacing ────────────────────────────────────────────────────────────
+
+.field { margin-bottom: 0.8rem; }
+.field:last-child { margin-bottom: 0; }
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+
+  .field { margin-bottom: 0; }
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  .form-grid { grid-template-columns: 1fr; }
+  .section { padding: 0.8rem 0.7rem; }
+}
+
+@media (max-width: $bp-xsmall) {
+  .section { padding: 0.6rem 0.5rem; }
+  .section h2 { font-size: 0.7rem; letter-spacing: 1px; }
+}
+

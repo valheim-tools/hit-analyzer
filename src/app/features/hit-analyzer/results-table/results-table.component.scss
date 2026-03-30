@@ -1,2 +1,115 @@
-// No component-specific overrides — all results-table styles live in styles.scss
+@use '../../../../styles/variables' as *;
 
+// ── Damage summary & modifier line ──────────────────────────────────────────
+
+.damage-summary {
+  font-size: 0.82rem;
+  color: $color-text-muted;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  span { color: $color-gold; }
+}
+
+.modifier-line {
+  font-size: 0.82rem;
+  color: $color-text-muted;
+  text-align: center;
+  margin-bottom: 1rem;
+  span { color: $color-gold; }
+}
+
+// ── Results table ────────────────────────────────────────────────────────────
+
+.table-scroll {
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-lg;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 0.80rem; }
+
+thead th {
+  background: #272210;
+  color: $color-gold;
+  padding: 0.62rem 1rem;
+  text-align: right;
+  font-weight: normal;
+  letter-spacing: 1px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  border-bottom: 2px solid #6a5430;
+
+  &:first-child { width: 38%; text-align: left; color: transparent; border-right: 1px solid #3a3020; border-top-left-radius: $radius-lg; }
+  &:last-child  { border-top-right-radius: $radius-lg; }
+  &:nth-child(2) { color: #c89870; }
+  &:nth-child(3) { color: #7898c8; }
+  &:nth-child(4) { color: $color-gold; }
+  &:not(:first-child) { border-left: 1px solid #3a3020; }
+}
+
+tbody td {
+  padding: 0.52rem 1rem;
+  border-bottom: 1px solid $color-bg-section;
+  color: #d0c090;
+  vertical-align: middle;
+
+  &:first-child { background: #252219; color: #9a8a62; font-size: 0.83rem; border-right: 1px solid #343020; }
+  &:not(:first-child) { text-align: right; border-left: 1px solid #2a271e; }
+}
+
+tbody tr:has(+ .divider) td { border-bottom: none; }
+tbody tr:nth-child(even) td { background: #24211a; }
+tbody tr:nth-child(even) td:first-child { background: #252219; }
+tbody tr:not(.divider):hover td { background: #2e2b1c; }
+tbody tr:not(.divider):hover td:first-child { background: #2b281a; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:last-child td:first-child { border-bottom-left-radius: $radius-lg; }
+tbody tr:last-child td:last-child  { border-bottom-right-radius: $radius-lg; }
+
+.divider td { padding: 0; height: 1px; background: $color-gold-darker; border-bottom: none; }
+
+.row-key-result td {
+  border-top: 1px solid #4a4020;
+  padding-top: 0.72rem;
+  padding-bottom: 0.72rem;
+  &:first-child { color: #b09848; }
+}
+
+.row-secondary td { font-size: 0.76rem; color: #a89870; &:first-child { font-size: 0.71rem; color: #726650; } }
+
+.dot-line { line-height: 1.6; white-space: nowrap; }
+.dot-line-sum {
+  border-top: 1px solid #3a3420;
+  margin-top: 0.15rem;
+  padding-top: 0.15rem;
+  color: $color-gold;
+  font-size: 0.9em;
+}
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  .table-scroll { border-radius: $radius-md; }
+
+  table { min-width: 380px; font-size: 0.78rem; }
+
+  thead th {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+  }
+
+  tbody td { padding: 0.35rem 0.5rem; }
+  tbody td:first-child { padding: 0.35rem 0.5rem; }
+
+  .modifier-line { font-size: 0.74rem; }
+  .modifier-line .risk-factor-badge { margin-top: 0.3rem; }
+}
+
+@media (max-width: $bp-xsmall) {
+  table { min-width: 320px; font-size: 0.72rem; }
+  thead th { padding: 0.35rem 0.35rem; font-size: 0.72rem; }
+  tbody td { padding: 0.3rem 0.35rem; }
+}

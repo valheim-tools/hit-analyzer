@@ -1,0 +1,58 @@
+@use 'variables' as *;
+
+// ── Tab navigation ───────────────────────────────────────────────────────────
+
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid $color-gold-darker;
+  margin-top: 1.4rem;
+  gap: 0.2rem;
+}
+
+.tab-btn {
+  background: #26231a;
+  border: 1px solid $color-gold-darker;
+  border-bottom: none;
+  color: #786450;
+  padding: 0.5rem 1.4rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: $radius-md $radius-md 0 0;
+  position: relative;
+  bottom: -1px;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover { color: $color-text-muted; background: $color-bg-section; }
+
+  &.active {
+    color: $color-gold;
+    background: $color-bg-body;
+    border-color: $color-gold-darker;
+    border-bottom-color: $color-bg-body;
+  }
+}
+
+.tab-panel { margin-top: 1.4rem; }
+.tab-panel[hidden] { display: none; }
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  .tab-nav { flex-wrap: wrap; }
+
+  .tab-btn {
+    flex: 1 1 auto;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+}
+
+@media (max-width: $bp-xsmall) {
+  .tab-btn { padding: 0.4rem 0.35rem; font-size: 0.62rem; letter-spacing: 0; }
+}
+

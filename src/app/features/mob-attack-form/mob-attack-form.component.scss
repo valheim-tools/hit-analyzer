@@ -124,4 +124,23 @@
   }
 }
 
+// ── Responsive ───────────────────────────────────────────────────────────────
 
+@media (max-width: $bp-mobile) {
+  .extra-damage-row { flex-wrap: wrap; }
+  .custom-extra-damage-field { flex: 1 1 100%; }
+}
+
+@media (max-width: $bp-xsmall) {
+  // Combat Difficulty toggle: 2 rows (3 + 2) on extra-small screens
+  // #difficultyGroup is the app-toggle-group host; .toggle-group is the inner div
+  #difficultyGroup .toggle-group {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  #difficultyGroup .toggle-btn {
+    flex: 1 1 33%;
+    &:nth-child(n+4) span { border-top: 1px solid $color-gold-darker; }
+  }
+}

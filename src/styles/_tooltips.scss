@@ -1,0 +1,83 @@
+@use 'variables' as *;
+
+// ── Tooltip wrapper ──────────────────────────────────────────────────────────
+
+.tip-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid $color-text-muted;
+  color: $color-text-muted;
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: help;
+  margin-left: 4px;
+  font-style: normal;
+  vertical-align: middle;
+}
+
+.tip-text {
+  visibility: hidden;
+  opacity: 0;
+  background: $color-bg-btn;
+  color: $color-text-primary;
+  border: 1px solid $color-gold;
+  border-radius: $radius-md;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.75rem;
+  white-space: normal;
+  width: max-content;
+  max-width: min(400px, calc(100vw - 1rem));
+  position: absolute;
+  z-index: 20;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.15s;
+  pointer-events: none;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: normal;
+  font-style: normal;
+}
+
+.tip-wrap:hover .tip-text,
+.tip-wrap:focus .tip-text,
+.tip-wrap:focus-within .tip-text { visibility: visible; opacity: 1; }
+
+// JS-driven tooltip visibility (mirrors CSS :hover)
+.tip-wrap.tip-active > .tip-text { visibility: visible; opacity: 1; }
+
+// ── Skull tooltip ────────────────────────────────────────────────────────────
+
+.skull-wrap {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  .tip-text { bottom: 140%; left: 50%; transform: translateX(-50%); }
+}
+
+.skull-icon { font-size: 1.1rem; cursor: help; line-height: 1; }
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  .tip-wrap {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(200, 168, 80, 0.15);
+  }
+
+  .tip-icon { padding: 6px; margin: -6px; margin-left: 2px; }
+
+  .tip-text { bottom: auto; top: 140%; }
+}
+

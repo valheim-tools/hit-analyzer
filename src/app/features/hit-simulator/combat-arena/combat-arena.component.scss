@@ -1,2 +1,612 @@
-// No component-specific overrides — all combat arena styles live in styles.scss
+@use '../../../../styles/variables' as *;
 
+// ── Hit Simulator container ──────────────────────────────────────────────────
+
+#hitSimulator {
+  background: $color-bg-section;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-lg;
+  padding: 1.2rem 1.4rem;
+}
+
+.sim-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid $color-gold-darker;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+
+  h2 { font-size: 0.8rem; color: $color-gold; text-transform: uppercase; letter-spacing: 2px; }
+}
+
+#simResetBtn, .sim-reset-mobile {
+  background: none;
+  border: 1px solid $color-gold;
+  color: $color-gold;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  transition: background 0.15s;
+  &:hover { background: $color-bg-btn; }
+}
+
+.sim-reset-mobile { display: none; }
+
+.sim-note { font-size: 0.75rem; color: $color-text-muted; font-style: italic; margin-bottom: 1rem; line-height: 1.4; strong { color: $color-gold; font-style: normal; } }
+.sim-note-rng { margin-top: 0; }
+
+// ── Scenario + health row ────────────────────────────────────────────────────
+
+.sim-main-row { display: flex; align-items: center; gap: 0; margin-bottom: 1rem; }
+
+.sim-scenario-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  padding-right: 1.2rem;
+  margin-right: 1.2rem;
+  border-right: 1px solid $color-gold-faint;
+}
+
+.sim-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: $color-text-muted;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  input[type="radio"] { width: auto; accent-color: $color-gold; cursor: pointer; }
+}
+
+.sim-health-section { flex: 1; min-width: 0; }
+
+.sim-bar-track {
+  width: 100%;
+  height: 18px;
+  background: $color-bg-input;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-md;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+
+.sim-bar-fill {
+  height: 100%;
+  width: 100%;
+  border-radius: $radius-sm;
+  transition: width 0.25s ease, background-color 0.25s ease;
+  background-color: #7a6e38;
+
+  &.sim-bar-warning  { background-color: #b8882a; }
+  &.sim-bar-critical { background-color: #b03030; }
+  &.sim-bar-dead     { background-color: #5a2020; width: 0% !important; transition: none; }
+  &.sim-dot-fire     { background-color: #d05010; }
+  &.sim-dot-poison   { background-color: #408030; }
+  &.sim-dot-spirit   { background-color: #803090; }
+}
+
+.sim-hp-readout { font-size: 0.92rem; color: $color-text-primary; font-family: 'Courier New', monospace; }
+.sim-hp-sep, .sim-hp-label { color: #786450; }
+
+.sim-error { background: #481c1c; border: 1px solid #a03030; color: #e08080; padding: 0.45rem 0.8rem; border-radius: $radius-md; margin-bottom: 0.7rem; font-size: 0.82rem; }
+
+// ── Hit buttons ──────────────────────────────────────────────────────────────
+
+.sim-take-hit-btn {
+  width: 100%;
+  background: $color-bg-btn;
+  color: $color-gold;
+  border: 1px solid $color-gold;
+  padding: 0.65rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: $radius-md;
+  margin-bottom: 1rem;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) { background: #463c24; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; border-color: $color-gold-darker; color: #786450; }
+}
+
+.sim-hit-row {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.7rem;
+  .sim-take-hit-btn { flex: 1; margin-bottom: 0; }
+}
+
+// ── Hit log ──────────────────────────────────────────────────────────────────
+
+.sim-log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; border-top: 1px solid $color-gold-faint; padding-top: 1rem; margin-top: 0.75rem; }
+.sim-log-title { font-size: 0.72rem; color: $color-gold; text-transform: uppercase; letter-spacing: 2px; }
+
+.sim-log {
+  list-style: none;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid $color-gold-faint;
+  border-radius: $radius-md;
+  background: #1e1c13;
+  &:empty { border-color: transparent; background: transparent; }
+}
+
+.sim-log-entry {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.32rem 0.7rem;
+  border-bottom: 1px solid #2a2820;
+  font-size: 0.79rem;
+  font-family: 'Courier New', monospace;
+  color: $color-text-muted;
+  &:last-child { border-bottom: none; }
+}
+
+.sim-log-hit-num  { color: #786450; flex-shrink: 0; min-width: 3.5rem; }
+.sim-log-hit-prefix { /* inline */ }
+.sim-log-scenario { color: $color-gold; flex-shrink: 0; font-size: 0.72rem; min-width: 5rem; }
+.sim-log-dmg      { color: #e06060; flex-shrink: 0; min-width: 4.5rem; }
+.sim-log-hp       { color: #d0c090; flex-shrink: 0; min-width: 5.5rem; }
+.sim-log-hp.sim-log-dead { color: #e06060; }
+.sim-log-stagger  { color: #c87840; font-size: 0.74rem; flex-shrink: 0; }
+.sim-log-factor   { color: #7898c8; font-size: 0.74rem; flex-shrink: 0; min-width: 3rem; cursor: help; }
+
+.sim-log-dot-entry { opacity: 0.85; }
+.sim-log-dot-icon  { flex-shrink: 0; min-width: 1.2rem; }
+.sim-log-dot-label { color: #a89872; flex-shrink: 0; min-width: 6rem; font-size: 0.76rem; }
+.sim-log-dot-dmg   { color: #c87840; }
+
+// ── DoT Speed Slider ─────────────────────────────────────────────────────────
+
+.sim-dot-speed-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  margin-bottom: 4px;
+  padding: 0.5rem 0.8rem;
+  background: #26231a;
+  border: 1px solid $color-gold-faint;
+  border-radius: $radius-md;
+}
+
+.dot-speed-label { font-size: 0.72rem; color: $color-text-muted; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+
+.dot-speed-slider {
+  flex: 1;
+  min-width: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: $color-gold-faint;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: $color-gold;
+    cursor: pointer;
+    border: 2px solid $color-bg-body;
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: $color-gold;
+    cursor: pointer;
+    border: 2px solid $color-bg-body;
+  }
+}
+
+.dot-speed-value { font-size: 0.8rem; color: $color-gold; font-weight: bold; min-width: 2rem; text-align: right; font-family: 'Courier New', monospace; flex-shrink: 0; }
+
+// ── Combat Arena ─────────────────────────────────────────────────────────────
+
+.sim-arena {
+  position: relative;
+  height: 120px;
+  background: linear-gradient(180deg, #18160e 0%, #1e1b12 60%, #252218 100%);
+  border: 1px solid $color-gold-faint;
+  border-radius: $radius-lg;
+  margin-bottom: 0.8rem;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+}
+
+.arena-ground {
+  position: absolute;
+  bottom: 18px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, $color-gold-darker 20%, $color-gold-darker 80%, transparent 95%);
+}
+
+.arena-mob {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease;
+}
+
+.arena-mob-icon {
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(200, 60, 60, 0.4));
+  transition: filter 0.15s;
+}
+
+.arena-mob-weapon { font-size: 1.1rem; position: absolute; top: -4px; right: -12px; opacity: 0; transition: opacity 0.1s; }
+
+.arena-projectile {
+  position: absolute;
+  left: 15%;
+  top: 50%;
+  transform: translate(0, -50%);
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+  opacity: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.arena-player {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.15s ease;
+  cursor: pointer;
+}
+
+.arena-player-icon {
+  width: 5rem;
+  height: 5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px rgba(80, 140, 200, 0.3));
+  transition: filter 0.3s, opacity 0.3s, transform 0.15s;
+}
+
+.arena-player:hover .arena-player-icon { filter: drop-shadow(0 0 10px rgba(80, 140, 200, 0.6)); transform: scale(1.08); }
+
+.arena-viking-skal {
+  position: absolute;
+  top: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #f0c060;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  z-index: 10;
+}
+
+.arena-viking-skal-icon { width: 1.2rem; height: 1.2rem; object-fit: contain; }
+
+.arena-player.skal .arena-viking-skal { animation: vikingSkalFloat 1.8s ease-out forwards; }
+
+@keyframes vikingSkalFloat {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0); }
+  12%  { opacity: 1; transform: translateX(-50%) translateY(-0.3rem); }
+  70%  { opacity: 1; transform: translateX(-50%) translateY(-1.4rem); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-2rem); }
+}
+
+.arena-player-shield {
+  width: 4.5rem; height: 4.5rem; object-fit: contain;
+  position: absolute; top: 4px; left: -14px;
+  opacity: 0; transition: opacity 0.15s; z-index: 3;
+}
+
+.arena-player-shield-broken {
+  width: 4.5rem; height: 4.5rem; object-fit: contain;
+  position: absolute; top: 4px; left: -14px;
+  opacity: 0; z-index: 3; pointer-events: none;
+}
+
+.arena-stagger-badge {
+  position: absolute;
+  bottom: -2px;
+  font-size: 0.6rem;
+  color: #c87840;
+  background: rgba(30, 28, 19, 0.9);
+  border: 1px solid #c87840;
+  border-radius: $radius-sm;
+  padding: 1px 5px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.arena-death-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.2rem; opacity: 0; pointer-events: none; filter: drop-shadow(0 0 8px rgba(200, 40, 40, 0.8)); }
+
+// ─── Arena Keyframes ─────────────────────────────────────────────────────────
+
+@keyframes arenaMobIdle {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(200, 60, 60, 0.3)); }
+  50%      { filter: drop-shadow(0 0 10px rgba(200, 60, 60, 0.6)); }
+}
+
+@keyframes arenaAttackLunge {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(30px) rotate(5deg); }
+  60%  { transform: translateX(30px) rotate(5deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arenaWeaponSlash {
+  0%   { opacity: 0; transform: rotate(0deg); }
+  15%  { opacity: 1; transform: rotate(-30deg); }
+  50%  { opacity: 1; transform: rotate(20deg); }
+  70%  { opacity: 0.5; transform: rotate(10deg); }
+  100% { opacity: 0; transform: rotate(0deg); }
+}
+
+@keyframes arenaProjectileFly {
+  0%   { left: 18%; opacity: 0; transform: translate(0, -50%) scale(0.6); }
+  10%  { opacity: 1; transform: translate(0, -50%) scale(1); }
+  70%  { opacity: 1; left: 72%; transform: translate(0, -50%) scale(1.2); }
+  85%  { opacity: 0.6; left: 78%; transform: translate(0, -50%) scale(1.4); }
+  100% { opacity: 0; left: 80%; transform: translate(0, -50%) scale(0.5); }
+}
+
+@keyframes arenaPlayerHit {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(12px) rotate(-3deg); }
+  40%  { transform: translateX(-4px) rotate(1deg); }
+  60%  { transform: translateX(6px) rotate(-1deg); }
+  80%  { transform: translateX(-2px); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arenaPlayerBlock {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(6px) rotate(-1deg); }
+  50%  { transform: translateX(3px); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arenaShieldBlock {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  60%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes arenaPlayerParry {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(3px); }
+  30%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes arenaShieldParry {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  70%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes arenaParryFlash {
+  0%   { box-shadow: inset 0 0 0 0 transparent; }
+  15%  { box-shadow: inset 0 0 30px rgba(255, 220, 100, 0.3); }
+  50%  { box-shadow: inset 0 0 15px rgba(255, 200, 60, 0.1); }
+  100% { box-shadow: inset 0 0 0 0 transparent; }
+}
+
+@keyframes arenaPlayerStagger {
+  0%   { transform: translateX(0) rotate(0deg); }
+  10%  { transform: translateX(16px) rotate(-8deg); }
+  25%  { transform: translateX(-10px) rotate(6deg); }
+  40%  { transform: translateX(8px) rotate(-4deg); }
+  55%  { transform: translateX(-5px) rotate(3deg); }
+  70%  { transform: translateX(3px) rotate(-1deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+@keyframes arenaStaggerBadgeFade {
+  0%   { opacity: 0; transform: translateY(4px); }
+  15%  { opacity: 1; transform: translateY(0); }
+  75%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-2px); }
+}
+
+@keyframes arenaPlayerDeath {
+  0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
+  30%  { transform: translateX(10px) rotate(-10deg); opacity: 0.8; }
+  60%  { transform: translateX(-5px) rotate(15deg); opacity: 0.4; }
+  100% { transform: translateX(0) rotate(25deg); opacity: 0.15; }
+}
+
+@keyframes arenaDeathSkull {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  30%  { opacity: 1; transform: translate(-50%, -50%) scale(1.3); }
+  50%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes arenaPlayerDamageFlash {
+  0%   { filter: drop-shadow(0 0 6px rgba(80, 140, 200, 0.3)); }
+  20%  { filter: drop-shadow(0 0 12px rgba(224, 96, 96, 0.8)) brightness(1.3); }
+  100% { filter: drop-shadow(0 0 6px rgba(80, 140, 200, 0.3)) brightness(1); }
+}
+
+@keyframes arenaShieldBreak {
+  0%   { opacity: 0; transform: scale(1) rotate(0deg); }
+  8%   { opacity: 1; transform: scale(1.3) rotate(-8deg); }
+  20%  { opacity: 1; transform: scale(1.1) rotate(5deg); }
+  40%  { opacity: 0.8; transform: scale(0.9) rotate(-3deg) translateY(4px); }
+  65%  { opacity: 0.4; transform: scale(0.7) rotate(8deg) translateY(12px); }
+  100% { opacity: 0; transform: scale(0.4) rotate(15deg) translateY(22px); }
+}
+
+@keyframes arenaMobStagger {
+  0%   { transform: translateX(0) rotate(0deg); }
+  10%  { transform: translateX(-14px) rotate(6deg); }
+  25%  { transform: translateX(8px) rotate(-4deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+// ─── Arena animation classes ─────────────────────────────────────────────────
+
+.arena-mob.arena-animating { animation: arenaAttackLunge 0.93s ease-out forwards; .arena-mob-icon { animation: none; } .arena-mob-weapon { animation: arenaWeaponSlash 0.93s ease-out forwards; } }
+.arena-projectile.arena-animating { animation: arenaProjectileFly 0.8s ease-out forwards; }
+.arena-mob.arena-mob-stagger { animation: arenaMobStagger 1s ease-out forwards; }
+
+.arena-player {
+  &.arena-hit-no-shield { animation: arenaPlayerHit 0.8s ease-out forwards; .arena-player-icon { animation: arenaPlayerDamageFlash 0.8s ease-out forwards; } }
+  &.arena-hit-block { animation: arenaPlayerBlock 0.67s ease-out forwards; .arena-player-shield { animation: arenaShieldBlock 0.8s ease-out forwards; } }
+  &.arena-hit-parry { animation: arenaPlayerParry 0.53s ease-out forwards; .arena-player-shield { animation: arenaShieldParry 0.67s ease-out forwards; } }
+  &.arena-stagger { animation: arenaPlayerStagger 1.2s ease-out forwards; .arena-stagger-badge { animation: arenaStaggerBadgeFade 1.33s ease-out forwards; } }
+  &.arena-shield-break { .arena-player-shield { animation: none !important; opacity: 0 !important; } .arena-player-shield-broken { animation: arenaShieldBreak 1.2s ease-out forwards; } }
+  &.arena-death { .arena-player-icon { animation: arenaPlayerDeath 1.07s ease-out forwards; } .arena-death-overlay { animation: arenaDeathSkull 1.07s 0.27s ease-out forwards; } }
+  &.arena-dead { .arena-player-icon { opacity: 0.15; transform: rotate(25deg); } .arena-death-overlay { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+}
+
+.sim-arena.arena-parry-flash { animation: arenaParryFlash 0.67s ease-out forwards; }
+
+// ── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  #hitSimulator {
+    padding: 0.8rem 0.7rem;
+    overflow: hidden;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sim-header {
+    #simResetBtn { display: none; }
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+
+  .sim-arena {
+    height: 90px;
+    padding: 0 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .arena-mob-icon,
+  .arena-player-icon { width: 3.7rem; height: 3.7rem; }
+
+  .arena-player-shield,
+  .arena-player-shield-broken {
+    width: 3.4rem;
+    height: 3.4rem;
+    top: 2px;
+    left: -10px;
+  }
+
+  .arena-mob-weapon { font-size: 0.85rem; top: -2px; right: -8px; }
+
+  .arena-stagger-badge { font-size: 0.5rem; padding: 0 3px; }
+
+  .arena-death-overlay { font-size: 1.6rem; }
+
+  .arena-projectile { font-size: 1.2rem; }
+
+  .sim-main-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+
+  .sim-scenario-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.7rem 1.2rem;
+    padding-right: 0;
+    margin-right: 0;
+    border-right: none;
+    border-bottom: 1px solid #3a3420;
+    padding-bottom: 0.8rem;
+  }
+
+  .sim-hit-row { flex-direction: column; gap: 0.5rem; }
+
+  .sim-take-hit-btn {
+    padding: 0.7rem 0.4rem;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    touch-action: manipulation;
+  }
+
+  .sim-log-header { flex-direction: column; align-items: stretch; gap: 0.4rem; }
+
+  .sim-reset-mobile {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    font-size: 0.72rem;
+    border-radius: $radius-sm;
+    margin-top: 0.6rem;
+    margin-bottom: 0.4rem;
+    touch-action: manipulation;
+  }
+
+  .sim-log-hit-prefix { display: none; }
+  .sim-log-hit-num { min-width: auto; }
+
+  .sim-log { overflow-x: hidden; max-width: 100%; box-sizing: border-box; }
+
+  .sim-log-entry {
+    flex-wrap: wrap;
+    gap: 0.2rem 0.3rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 0.72rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sim-log-hp { flex: 0 1 auto; }
+
+  .sim-log-scenario,
+  .sim-log-dmg,
+  .sim-log-factor,
+  .sim-log-hp,
+  .sim-log-stagger { flex-shrink: 1; min-width: auto; }
+
+  .sim-log-stagger { font-size: 0.65rem; }
+  .sim-log-stagger-text { display: none; }
+
+  #simResetBtn { touch-action: manipulation; }
+}
+
+@media (max-width: $bp-xsmall) {
+  .sim-log-entry { font-size: 0.72rem; gap: 0.35rem; padding: 0.25rem 0.4rem; }
+  .sim-log-hit-num { min-width: auto; }
+}

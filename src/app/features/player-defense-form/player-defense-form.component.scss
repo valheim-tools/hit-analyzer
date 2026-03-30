@@ -99,4 +99,14 @@
   }
 }
 
+// ── Responsive ───────────────────────────────────────────────────────────────
 
+@media (max-width: $bp-mobile) {
+  .parry-multiplier-row { flex-wrap: wrap; }
+  .custom-parry-field { flex: 1 1 100%; }
+}
+
+@media (max-width: $bp-xsmall) {
+  // Shield quality toggle buttons
+  .shield-preset-row .toggle-btn span { padding: 0.25rem 0.4rem; font-size: 0.72rem; }
+}

@@ -35,17 +35,16 @@ jobs:
 
       # SPA routing: GitHub Pages serves 404.html for unknown routes,
       # so a copy of index.html lets Angular handle all client-side routes.
-      - run: cp dist/valheim-hit-simulator-and-analyzer/browser/index.html dist/valheim-hit-simulator-and-analyzer/browser/404.html
+      - run: cp dist/hit-analyzer/browser/index.html dist/hit-analyzer/browser/404.html
 
       # Prevent Jekyll processing (which can strip files starting with _)
-      - run: touch dist/valheim-hit-simulator-and-analyzer/browser/.nojekyll
+      - run: touch dist/hit-analyzer/browser/.nojekyll
 
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/valheim-hit-simulator-and-analyzer/browser
+          path: dist/hit-analyzer/browser
 
       - id: deployment
         uses: actions/deploy-pages@v4
-

@@ -305,9 +305,16 @@ To avoid stagger, you need the combined bar (1st + 2nd check) to stay below thre
 bar_total = stagger_1st + stagger_2nd < maxHP × 0.4
 ```
 
+In the simulator UI, this maps to **Min health to avoid stagger** (overall stagger avoidance).
+For shield scenarios there is also **Min health to avoid block bypass** (the 1st stagger check only).
+If a hit causes a guard break on the 1st check, both minimum-health values are the same,
+because preventing the block bypass is required to prevent stagger at all.
+The underlying result field for this metric is `minHealthToAvoidStagger`
+(renamed from `minHealthForNoArmorStagger`).
+
 For the Bonemass scenario above:
 
-| Body armor | Min HP to not stagger | Notes |
+| Body armor | Min health to avoid stagger | Notes |
 |---|---|---|
 | 46 | ~198 HP | Stagger₁ = 53.2, Stagger₂ ≈ 25.0 |
 | 64 | ~178 HP | Stagger₁ = 53.2, Stagger₂ ≈ 17.9 |

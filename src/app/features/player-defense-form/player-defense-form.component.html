@@ -4,18 +4,93 @@
   @if (form) {
     <form [formGroup]="form">
 
-      <!-- Max Health -->
-      <div class="field">
-        <label>Max Health (0 – 1000)</label>
-        <input type="number" formControlName="maxHealth" min="0" max="1000" step="0.1" required>
+      <div class="shield-preset-influence-group">
+        <!-- Shield Preset -->
+        <div class="preset-row">
+          <label>
+            Shield Preset
+            <a href="https://valheim.fandom.com/wiki/Shields" target="_blank" rel="noopener" class="wiki-link">↗ shields</a>
+          </label>
+          <div class="shield-preset-row">
+            <app-preset-dropdown
+              [groups]="shieldPresetGroups()"
+              [selectedId]="selectedShieldPresetId"
+              placeholder="Custom"
+              searchPlaceholder="Search shields…"
+              (selectedChange)="onShieldPresetSelected($event)"
+            />
+            @if (hasShieldPreset) {
+              <app-toggle-group
+                [options]="shieldQualityOptions"
+                groupName="shieldQuality"
+                formControlName="shieldQuality"
+              />
+            }
+          </div>
+        </div>
+
+        <!-- Block Armor + Parry Multiplier -->
+        <div class="field-row">
+          <div class="field">
+            <label>Block Armor (0 – 500)</label>
+            <input type="number" formControlName="blockArmor" min="0" max="500" step="0.1" required>
+          </div>
+          <div class="field">
+            <label>Parry Multiplier</label>
+            <div class="parry-multiplier-row">
+              <select formControlName="parryMultiplierPreset" (change)="onParryPresetChange()">
+                @for (preset of PARRY_MULTIPLIER_PRESETS; track preset) {
+                  <option [value]="preset">×{{ preset }}</option>
+                }
+                <option value="custom">Custom…</option>
+              </select>
+              @if (isParryCustom()) {
+                <div class="custom-parry-field">
+                  <input
+                    type="number"
+                    formControlName="parryMultiplierCustom"
+                    min="0.1" max="100" step="0.1"
+                    placeholder="Custom"
+                    aria-label="Custom parry multiplier"
+                  >
+                </div>
+              }
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Resistance Modifiers -->
-      <div class="field">
-        <label>Resistance Modifiers
+      <!-- Max Health + Blocking Skill -->
+      <div class="field-row">
+        <div class="field">
+          <label>Max Health (0 – 1000)</label>
+          <input type="number" formControlName="maxHealth" min="0" max="1000" step="0.1" required>
+        </div>
+        <div class="field">
+          <label>Blocking Skill (0 – 100)</label>
+          <input type="number" formControlName="blockingSkill" min="0" max="100" step="0.1" required>
+        </div>
+      </div>
+
+      <!-- ── Armor + Resistance group (configurable via Armor Builder) ── -->
+      <div class="armor-resistance-group">
+        <!-- Armor + Gear icon -->
+        <div class="armor-row">
+          <div class="field armor-field">
+            <label>Armor (0 – 500)</label>
+            <input type="number" formControlName="armor" min="0" max="500" step="0.1" required>
+          </div>
+          <a routerLink="/armor-builder" class="armor-builder-link" title="Open Armor Builder">
+            ⚙
+          </a>
+        </div>
+
+        <!-- Resistance Modifiers -->
+        <div class="field">
+          <label>Resistance Modifiers
           <span class="tip-wrap" appTooltip>
             <i class="tip-icon">?</i>
-            <span class="tip-text">Percentage of damage taken for each type. 40% means you take 40% of that damage (60% reduction). 200% means you take double damage (weak to that type).</span>
+            <span class="tip-text">Percentage of damage taken for each type. 40% means you take 40% of that damage (60% reduction). 200% means you take double damage (very weak to that type).</span>
           </span>
         </label>
         <div class="resistance-type-inputs" formArrayName="resistanceModifiers">
@@ -38,14 +113,27 @@
                   }
                 </optgroup>
               </select>
-              <input
-                type="number"
-                class="resistance-percent-value"
-                formControlName="percent"
-                min="0" max="200" step="1"
-                aria-label="Resistance percent"
-              >
-              <span class="resistance-percent-symbol">%</span>
+              <select class="resistance-preset-select"
+                      formControlName="preset"
+                      (change)="onResistancePresetChange($index)"
+                      aria-label="Resistance level">
+                @for (resistancePreset of RESISTANCE_PRESETS; track resistancePreset.percent) {
+                  <option [value]="resistancePreset.percent">
+                    {{ resistancePreset.label }} ({{ resistancePreset.percent }}%)
+                  </option>
+                }
+                <option value="custom">Custom…</option>
+              </select>
+              @if (isResistanceCustom($index)) {
+                <input
+                  type="number"
+                  class="resistance-percent-value"
+                  formControlName="percent"
+                  min="0" max="200" step="1"
+                  aria-label="Resistance percent"
+                >
+                <span class="resistance-percent-symbol">%</span>
+              }
               <button
                 type="button"
                 class="resistance-type-remove"
@@ -62,71 +150,6 @@
           </button>
         }
       </div>
-
-      <!-- Shield Preset -->
-      <div class="preset-row">
-        <label>
-          Shield Preset
-          <a href="https://valheim.fandom.com/wiki/Shields" target="_blank" rel="noopener" class="wiki-link">↗ shields</a>
-        </label>
-        <div class="shield-preset-row">
-          <app-preset-dropdown
-            [groups]="shieldPresetGroups()"
-            [selectedId]="selectedShieldPresetId"
-            placeholder="Custom"
-            searchPlaceholder="Search shields…"
-            (selectedChange)="onShieldPresetSelected($event)"
-          />
-          @if (hasShieldPreset) {
-            <app-toggle-group
-              [options]="shieldQualityOptions"
-              groupName="shieldQuality"
-              formControlName="shieldQuality"
-            />
-          }
-        </div>
-      </div>
-
-      <!-- Block Armor + Parry Multiplier -->
-      <div class="field-row">
-        <div class="field">
-          <label>Block Armor (0 – 500)</label>
-          <input type="number" formControlName="blockArmor" min="0" max="500" step="0.1" required>
-        </div>
-        <div class="field">
-          <label>Parry Multiplier</label>
-          <div class="parry-multiplier-row">
-            <select formControlName="parryMultiplierPreset" (change)="onParryPresetChange()">
-              @for (preset of PARRY_MULTIPLIER_PRESETS; track preset) {
-                <option [value]="preset">×{{ preset }}</option>
-              }
-              <option value="custom">Custom…</option>
-            </select>
-            @if (isParryCustom()) {
-              <div class="custom-parry-field">
-                <input
-                  type="number"
-                  formControlName="parryMultiplierCustom"
-                  min="0.1" max="100" step="0.1"
-                  placeholder="Custom"
-                  aria-label="Custom parry multiplier"
-                >
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-
-      <!-- Blocking Skill + Armor -->
-      <div class="field-row">
-        <div class="field">
-          <label>Blocking Skill (0 – 100)</label>
-          <input type="number" formControlName="blockingSkill" min="0" max="100" step="0.1" required>
-        </div>
-        <div class="field">
-          <label>Armor (0 – 500)</label>
-          <input type="number" formControlName="armor" min="0" max="500" step="0.1" required>
-        </div>
       </div>
 
     </form>

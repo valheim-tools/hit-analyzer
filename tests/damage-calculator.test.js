@@ -31,6 +31,7 @@ for (const testCase of cases) {
 
     // Build inputs in the same shape the UI sends
     const inputs = {
+        damageTypes:        testCase.mob.damageTypes,
         starLevel:          testCase.mob.starLevel,
         extraDamagePercent: testCase.mob.extraDamagePercent ?? 0,
         difficulty:         testCase.difficulty,
@@ -38,21 +39,8 @@ for (const testCase of cases) {
         blockingSkill:      testCase.player.blockingSkill,
         blockArmor:         testCase.player.blockArmor,
         armor:              testCase.player.armor,
+        parryMultiplier:    testCase.player.parryMultiplier,
     };
-
-    // Support both damageTypes map and legacy baseDamage
-    if (testCase.mob.damageTypes != null) {
-        inputs.damageTypes = testCase.mob.damageTypes;
-    } else {
-        inputs.baseDamage = testCase.mob.baseDamage;
-    }
-
-    // Resolve parry multiplier — prefer explicit, fall back to parryBonus enum
-    if (testCase.player.parryMultiplier != null) {
-        inputs.parryMultiplier = testCase.player.parryMultiplier;
-    } else {
-        inputs.parryBonus = testCase.player.parryBonus;
-    }
 
     // Resistance modifiers (optional)
     if (testCase.player.resistanceModifiers != null) {
@@ -91,9 +79,9 @@ for (const testCase of cases) {
     if (result.minHealthForNoBlockStagger !== expected.minHealthForNoBlockStagger) {
         checks.push(`  FAIL minHealthForNoBlockStagger: expected ${expected.minHealthForNoBlockStagger}, got ${result.minHealthForNoBlockStagger}`);
     }
-    // minHealthForNoArmorStagger (exact int)
-    if (result.minHealthForNoArmorStagger !== expected.minHealthForNoArmorStagger) {
-        checks.push(`  FAIL minHealthForNoArmorStagger: expected ${expected.minHealthForNoArmorStagger}, got ${result.minHealthForNoArmorStagger}`);
+    // minHealthToAvoidStagger (exact int)
+    if (result.minHealthToAvoidStagger !== expected.minHealthToAvoidStagger) {
+        checks.push(`  FAIL minHealthToAvoidStagger: expected ${expected.minHealthToAvoidStagger}, got ${result.minHealthToAvoidStagger}`);
     }
 
     // Optional: instantDamage assertion (new multi-type tests)

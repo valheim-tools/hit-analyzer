@@ -1,12 +1,11 @@
 import { Component, input, computed } from '@angular/core';
-import { CalculationResult, ScenarioResult, FormState, DamageTypeName } from '../../../core/models';
+import { CalculationResult, ScenarioResult, FormState, DamageTypeName, DotBreakdown } from '../../../core/models';
 import {
   INSTANT_DAMAGE_TYPE_NAMES, DAMAGE_TYPE_ICONS,
   DIFFICULTY_LABELS, DIFFICULTY_DAMAGE_BONUS_PERCENT,
-  SIM_SCENARIO_LABELS, DAMAGE_DISPLAY_THRESHOLD,
+  SIM_SCENARIO_KEYS, SIM_SCENARIO_LABELS, DAMAGE_DISPLAY_THRESHOLD, DOT_TYPE_CONFIGS,
 } from '../../../core/constants';
-import { DOT_TYPE_CONFIGS } from '../../../core/damage-calculator';
-import { FormatNumberPipe } from '../../../shared/pipes/format-number.pipe';
+import { formatNumber } from '../../../shared/pipes/format-number.pipe';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -16,61 +15,45 @@ const DOT_TYPE_DEFINITIONS = DOT_TYPE_CONFIGS.map(config => ({
   fixedDuration: config.totalDuration,
 }));
 
+// ── View models ──────────────────────────────────────────────────────────────
 
-// ── Cell / row models ────────────────────────────────────────────────────────
-
-export type CellKind = 'number' | 'skull' | 'stagger' | 'health-check' | 'damage-lines';
-export type StaggerValue = 'yes' | 'no' | 'na';
-export type HealthStatus = 'safe' | 'warning' | 'zero' | 'na';
-
-export interface DamageLine {
-  icon: string;
-  /** null → render a dash */
-  displayValue: number | null;
-  /** when set, render `icon displayText` instead of a formatted number */
-  displayText?: string;
+export interface DamageDisplayLine {
+  text: string;
+  cssClass: string;
 }
 
-/** Flat (non-discriminated) interface so Angular templates can access all
- *  fields without type-narrowing issues inside @switch cases. */
-export interface TableCell {
-  kind: CellKind;
-  numericValue?: number;   // 'number' | 'skull'
-  staggerValue?: StaggerValue;      // 'stagger'
-  healthStatus?: HealthStatus;      // 'health-check'
-  healthValue?: number;             // 'health-check'
-  lines?: DamageLine[];             // 'damage-lines'
-  linesSum?: number;                // 'damage-lines'
-}
+export interface ScenarioDisplay {
+  instantDamageLines: DamageDisplayLine[];
+  instantDamageSumText: string | null;
 
-export interface TableRowData {
-  labelText: string;
-  labelTooltip?: string;
-  rowClass: string;
-  cells: TableCell[];
-}
+  dotDamageLines: DamageDisplayLine[];
+  dotDamageSumText: string | null;
 
-export interface ModifierLineData {
-  hasRiskFactor: boolean;
-  riskFactorValue: number;
-  baseDamage: number;
-  effectiveDamage: number;
-  scaledEffectiveDamage: number;
-  rngFactor: number;
-  hasEffectiveDamageStep: boolean;
-}
+  dotTickLines: DamageDisplayLine[];
 
-export interface DamageSummaryData {
-  hasParts: boolean;
-  parts: string[];
-  totalBonus: number;
+  remainingHealthBeforeDoTText: string;
+  isRemainingHealthBeforeDoTLethal: boolean;
+
+  remainingHealthText: string;
+  isRemainingHealthLethal: boolean;
+
+  staggeredText: string;
+  staggeredCssClass: string;
+
+  blockBypassedText: string;
+  blockBypassedCssClass: string;
+
+  minHealthBlockBypassText: string;
+  minHealthBlockBypassCssClass: string;
+
+  minHealthStaggerText: string;
+  minHealthStaggerCssClass: string;
 }
 
 // ── Component ────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-results-table',
-  imports: [FormatNumberPipe],
   templateUrl: './results-table.component.html',
   styleUrls: ['./results-table.component.scss'],
 })
@@ -81,17 +64,17 @@ export class ResultsTableComponent {
 
   readonly columnHeaders = computed<string[]>(() => {
     const calculationResult = this.result();
-    if (!calculationResult) return ['No Shield', 'Block', 'Parry'];
+    if (!calculationResult) return SIM_SCENARIO_KEYS.map(key => SIM_SCENARIO_LABELS[key]);
     return [
-      calculationResult.noShield.scenarioName,
-      calculationResult.block.scenarioName,
-      calculationResult.parry.scenarioName,
+      SIM_SCENARIO_LABELS[calculationResult.noShield.scenario],
+      SIM_SCENARIO_LABELS[calculationResult.block.scenario],
+      SIM_SCENARIO_LABELS[calculationResult.parry.scenario],
     ];
   });
 
   // ── Damage summary ────────────────────────────────────────────────────────
 
-  readonly damageSummaryData = computed<DamageSummaryData | null>(() => {
+  readonly damageSummary = computed<{ label: string; highlight: string | null } | null>(() => {
     const calculationResult = this.result();
     const formState = this.formState();
     if (!calculationResult || !formState) return null;
@@ -106,196 +89,236 @@ export class ResultsTableComponent {
     const parts: string[] = [];
     if (difficultyBonus !== 0) parts.push(`${difficultyLabel} ${difficultyBonus > 0 ? '+' : ''}${difficultyBonus}%`);
     if (starLevelBonus)        parts.push(`${formState.starLevel}★ +${starLevelBonus}%`);
-    if (extraDamagePercent) parts.push(`Extra +${extraDamagePercent}%`);
+    if (extraDamagePercent)    parts.push(`Extra +${extraDamagePercent}%`);
 
-    return { hasParts: parts.length > 0, parts, totalBonus };
+    if (parts.length === 0) {
+      return { label: 'No damage modifier', highlight: null };
+    }
+
+    const sign = totalBonus >= 0 ? '+' : '';
+    return {
+      label: 'Damage modifier: ',
+      highlight: `${parts.join(' | ')} (${sign}${totalBonus}% total)`,
+    };
   });
 
   // ── Modifier line ─────────────────────────────────────────────────────────
 
-  readonly modifierLineData = computed<ModifierLineData | null>(() => {
+  readonly modifierLine = computed<{ label: string; highlight: string; badgeText: string | null } | null>(() => {
     const calculationResult = this.result();
     if (!calculationResult) return null;
 
     const riskFactorValue = this.riskFactor();
     const hasRiskFactor = riskFactorValue > 0;
     const { baseDamage, effectiveDamage, scaledEffectiveDamage } = calculationResult;
-    const rngFactor = hasRiskFactor && effectiveDamage > 0
-      ? scaledEffectiveDamage / effectiveDamage
-      : 1;
+    const hasEffectiveDamageStep = effectiveDamage !== baseDamage;
+
+    if (hasRiskFactor) {
+      const rngFactor = effectiveDamage > 0 ? scaledEffectiveDamage / effectiveDamage : 1;
+      const label = hasEffectiveDamageStep
+        ? `Scaled Effective Damage = ${formatNumber(baseDamage)} → ${formatNumber(effectiveDamage)} → `
+        : `Scaled Effective Damage = ${formatNumber(baseDamage)} → `;
+      return {
+        label,
+        highlight: formatNumber(scaledEffectiveDamage),
+        badgeText: `${riskFactorValue}% risk (×${formatNumber(rngFactor)})`,
+      };
+    }
+
+    if (hasEffectiveDamageStep) {
+      return {
+        label: `Effective Damage = ${formatNumber(baseDamage)} → `,
+        highlight: formatNumber(effectiveDamage),
+        badgeText: null,
+      };
+    }
 
     return {
-      hasRiskFactor,
-      riskFactorValue,
-      baseDamage,
-      effectiveDamage,
-      scaledEffectiveDamage,
-      rngFactor,
-      hasEffectiveDamageStep: effectiveDamage !== baseDamage,
+      label: 'Effective Damage = ',
+      highlight: formatNumber(baseDamage),
+      badgeText: null,
     };
   });
 
-  // ── Table rows ────────────────────────────────────────────────────────────
+  // ── Conditional row flags ─────────────────────────────────────────────────
 
-  readonly tableRows = computed<TableRowData[]>(() => {
+  private readonly scenarios = computed<ScenarioResult[]>(() => {
+    const calculationResult = this.result();
+    if (!calculationResult) return [];
+    return [calculationResult.noShield, calculationResult.block, calculationResult.parry];
+  });
+
+  readonly hasInstantDamage = computed<boolean>(() => {
+    const scenarios = this.scenarios();
+    return INSTANT_DAMAGE_TYPE_NAMES.some(typeName =>
+      scenarios.some(scenario => (scenario.instantMap[typeName] || 0) > DAMAGE_DISPLAY_THRESHOLD)
+    );
+  });
+
+  readonly hasDoT = computed<boolean>(() => {
+    const scenarios = this.scenarios();
+    return scenarios.some(scenario =>
+      DOT_TYPE_CONFIGS.some(dotConfig => scenario.dotBreakdown[dotConfig.key].total > 0.001)
+    );
+  });
+
+  // ── Per-scenario display values ───────────────────────────────────────────
+
+  readonly scenarioDisplayValues = computed<ScenarioDisplay[]>(() => {
     const calculationResult = this.result();
     const formState = this.formState();
     if (!calculationResult || !formState) return [];
 
-    const scenarios: ScenarioResult[] = [
-      calculationResult.noShield,
-      calculationResult.block,
-      calculationResult.parry,
-    ];
+    const scenarios = this.scenarios();
 
-    const rows: TableRowData[] = [];
-
-    // ── Instant Damage ────────────────────────────────────────────────────
     const activeInstantTypes = INSTANT_DAMAGE_TYPE_NAMES
       .filter(typeName => scenarios.some(scenario => (scenario.instantMap[typeName] || 0) > DAMAGE_DISPLAY_THRESHOLD))
       .map(typeName => ({ key: typeName, icon: DAMAGE_TYPE_ICONS[typeName] }));
 
-    if (activeInstantTypes.length > 0) {
-      rows.push({
-        labelText: 'Instant damage',
-        labelTooltip: 'Physical, Frost and Lightning damage applied immediately to health.',
-        rowClass: '',
-        cells: scenarios.map(scenario => {
-          const lines: DamageLine[] = activeInstantTypes.map(instantType => {
-            const value = scenario.instantMap[instantType.key] || 0;
-            return { icon: instantType.icon, displayValue: value > DAMAGE_DISPLAY_THRESHOLD ? value : null };
-          });
-          const linesSum = activeInstantTypes.length > 1
-            ? activeInstantTypes.reduce((acc, instantType) => acc + (scenario.instantMap[instantType.key] || 0), 0)
-            : undefined;
-          return { kind: 'damage-lines' as CellKind, lines, linesSum };
-        }),
-      });
-    }
-
-    // ── DoT Damage & Ticks ────────────────────────────────────────────────
-    const hasDoT = scenarios.some(scenario =>
-      DOT_TYPE_CONFIGS.some(dotConfig => scenario.dotBreakdown[dotConfig.key].total > 0.001)
+    const activeDotTypes = DOT_TYPE_DEFINITIONS.filter(dotType =>
+      scenarios.some(scenario => scenario.dotBreakdown[dotType.key].total > DAMAGE_DISPLAY_THRESHOLD)
     );
 
-    if (hasDoT) {
-      const activeDotTypes = DOT_TYPE_DEFINITIONS.filter(dotType =>
-        scenarios.some(scenario => scenario.dotBreakdown[dotType.key].total > DAMAGE_DISPLAY_THRESHOLD)
-      );
-
-      rows.push({
-        labelText: 'DoT damage',
-        rowClass: '',
-        cells: scenarios.map(scenario => {
-          const lines: DamageLine[] = activeDotTypes.map(dotType => {
-            const dotData = scenario.dotBreakdown[dotType.key];
-            if (dotData.total <= DAMAGE_DISPLAY_THRESHOLD) return { icon: dotType.icon, displayValue: null };
-            return { icon: dotType.icon, displayValue: dotData.ticks.length > 0 ? dotData.total : 0 };
-          });
-          const linesSum = activeDotTypes.length > 1
-            ? activeDotTypes.reduce((acc, dotType) => {
-                const dotData = scenario.dotBreakdown[dotType.key];
-                return acc + (dotData.ticks.length > 0 ? dotData.total : 0);
-              }, 0)
-            : undefined;
-          return { kind: 'damage-lines' as CellKind, lines, linesSum };
-        }),
-      });
-
-      rows.push({
-        labelText: 'DoT ticks',
-        rowClass: '',
-        cells: scenarios.map(scenario => {
-          const lines: DamageLine[] = activeDotTypes.map(dotType => {
-            const dotData = scenario.dotBreakdown[dotType.key];
-            if (dotData.total <= DAMAGE_DISPLAY_THRESHOLD) return { icon: dotType.icon, displayValue: null };
-            if (dotData.ticks.length === 0) return { icon: dotType.icon, displayValue: 0 };
-            const duration = dotType.fixedDuration ??
-              Math.round(dotData.ticks[dotData.ticks.length - 1].time + 1);
-            return { icon: dotType.icon, displayValue: null, displayText: `${dotData.ticks.length} ticks over ${duration}s` };
-          });
-          return { kind: 'damage-lines' as CellKind, lines };
-        }),
-      });
-    }
-
-    // ── Remaining Health Before DoT ───────────────────────────────────────
-    if (hasDoT) {
-      rows.push({
-        labelText: 'Remaining health before DoT',
-        rowClass: 'row-key-result',
-        cells: scenarios.map(scenario =>
-          scenario.remainingHealthBeforeDoT <= 0
-            ? { kind: 'skull'  as CellKind, numericValue: scenario.remainingHealthBeforeDoT }
-            : { kind: 'number' as CellKind, numericValue: scenario.remainingHealthBeforeDoT }
-        ),
-      });
-    }
-
-    // ── Remaining Health ──────────────────────────────────────────────────
-    rows.push({
-      labelText: 'Remaining health',
-      rowClass: 'row-key-result',
-      cells: scenarios.map(scenario =>
-        scenario.remainingHealth <= 0
-          ? { kind: 'skull'  as CellKind, numericValue: scenario.remainingHealth }
-          : { kind: 'number' as CellKind, numericValue: scenario.remainingHealth }
-      ),
-    });
-
-    // ── Staggered ─────────────────────────────────────────────────────────
-    rows.push({
-      labelText: 'Staggered',
-      rowClass: 'row-secondary',
-      cells: scenarios.map(scenario => ({
-        kind: 'stagger' as CellKind,
-        staggerValue: (scenario.stagger === 'YES' ? 'yes' : 'no') as StaggerValue,
-      })),
-    });
-
-    // ── Block Bypassed ──────────────────────────────────────────────────
-    rows.push({
-      labelText: 'Block bypassed',
-      rowClass: 'row-secondary',
-      cells: scenarios.map(scenario => ({
-        kind: 'stagger' as CellKind,
-        staggerValue: (
-          scenario.scenarioName === SIM_SCENARIO_LABELS.noShield ? 'na' :
-          scenario.staggeredOnBlock             ? 'yes' : 'no'
-        ) as StaggerValue,
-      })),
-    });
-
-    // ── Min Health to Avoid Block Bypass ──────────────────────────────────
-    rows.push({
-      labelText: 'Min health to avoid block bypass',
-      rowClass: 'row-secondary',
-      cells: scenarios.map(scenario => {
-        if (scenario.scenarioName === SIM_SCENARIO_LABELS.noShield) return { kind: 'health-check' as CellKind, healthStatus: 'na'   as HealthStatus, healthValue: 0 };
-        if (scenario.minHealthForNoBlockStagger === 0) return { kind: 'health-check' as CellKind, healthStatus: 'zero' as HealthStatus, healthValue: 0 };
-        return {
-          kind: 'health-check' as CellKind,
-          healthValue: scenario.minHealthForNoBlockStagger,
-          healthStatus: (formState.maxHealth >= scenario.minHealthForNoBlockStagger ? 'safe' : 'warning') as HealthStatus,
-        };
-      }),
-    });
-
-    // ── Min Health to Avoid Stagger ───────────────────────────────────────
-    rows.push({
-      labelText: 'Min health to avoid stagger',
-      rowClass: 'row-secondary',
-      cells: scenarios.map(scenario => {
-        if (scenario.minHealthForNoArmorStagger === 0) return { kind: 'health-check' as CellKind, healthStatus: 'zero' as HealthStatus, healthValue: 0 };
-        return {
-          kind: 'health-check' as CellKind,
-          healthValue: scenario.minHealthForNoArmorStagger,
-          healthStatus: (formState.maxHealth >= scenario.minHealthForNoArmorStagger ? 'safe' : 'warning') as HealthStatus,
-        };
-      }),
-    });
-
-    return rows;
+    return scenarios.map(scenario => ({
+      ...this.buildInstantDamageDisplay(scenario, activeInstantTypes),
+      ...this.buildDotDamageDisplay(scenario, activeDotTypes),
+      ...this.buildDotTickDisplay(scenario, activeDotTypes),
+      ...this.buildHealthDisplay(scenario),
+      ...this.buildStaggerDisplay(scenario),
+      ...this.buildBlockBypassDisplay(scenario),
+      ...this.buildMinHealthDisplays(scenario, formState.maxHealth),
+    }));
   });
+
+  // ── Display builders ──────────────────────────────────────────────────────
+
+  private buildInstantDamageDisplay(
+    scenario: ScenarioResult,
+    activeInstantTypes: { key: DamageTypeName; icon: string }[],
+  ): Pick<ScenarioDisplay, 'instantDamageLines' | 'instantDamageSumText'> {
+    const instantDamageLines: DamageDisplayLine[] = activeInstantTypes.map(instantType => {
+      const value = scenario.instantMap[instantType.key] || 0;
+      if (value > DAMAGE_DISPLAY_THRESHOLD) {
+        return { text: `${instantType.icon} ${formatNumber(value)}`, cssClass: 'dot-line' };
+      }
+      return { text: '—', cssClass: 'dot-line stagger-no' };
+    });
+    const instantDamageSumText = activeInstantTypes.length > 1
+      ? `∑ ${formatNumber(activeInstantTypes.reduce((acc, instantType) => acc + (scenario.instantMap[instantType.key] || 0), 0))}`
+      : null;
+    return { instantDamageLines, instantDamageSumText };
+  }
+
+  private buildDotDamageDisplay(
+    scenario: ScenarioResult,
+    activeDotTypes: { key: keyof DotBreakdown; icon: string; fixedDuration: number | null }[],
+  ): Pick<ScenarioDisplay, 'dotDamageLines' | 'dotDamageSumText'> {
+    const dotDamageLines: DamageDisplayLine[] = activeDotTypes.map(dotType => {
+      const dotData = scenario.dotBreakdown[dotType.key];
+      if (dotData.total <= DAMAGE_DISPLAY_THRESHOLD) {
+        return { text: '—', cssClass: 'dot-line stagger-no' };
+      }
+      const value = dotData.ticks.length > 0 ? dotData.total : 0;
+      return { text: `${dotType.icon} ${formatNumber(value)}`, cssClass: 'dot-line' };
+    });
+    const dotDamageSumText = activeDotTypes.length > 1
+      ? `∑ ${formatNumber(activeDotTypes.reduce((acc, dotType) => {
+          const dotData = scenario.dotBreakdown[dotType.key];
+          return acc + (dotData.ticks.length > 0 ? dotData.total : 0);
+        }, 0))}`
+      : null;
+    return { dotDamageLines, dotDamageSumText };
+  }
+
+  private buildDotTickDisplay(
+    scenario: ScenarioResult,
+    activeDotTypes: { key: keyof DotBreakdown; icon: string; fixedDuration: number | null }[],
+  ): Pick<ScenarioDisplay, 'dotTickLines'> {
+    const dotTickLines: DamageDisplayLine[] = activeDotTypes.map(dotType => {
+      const dotData = scenario.dotBreakdown[dotType.key];
+      if (dotData.total <= DAMAGE_DISPLAY_THRESHOLD) {
+        return { text: '—', cssClass: 'dot-line stagger-no' };
+      }
+      if (dotData.ticks.length === 0) {
+        return { text: `${dotType.icon} ${formatNumber(0)}`, cssClass: 'dot-line' };
+      }
+      const duration = dotType.fixedDuration ??
+        Math.round(dotData.ticks[dotData.ticks.length - 1].time + 1);
+      return { text: `${dotType.icon} ${dotData.ticks.length} ticks over ${duration}s`, cssClass: 'dot-line' };
+    });
+    return { dotTickLines };
+  }
+
+  private buildHealthDisplay(
+    scenario: ScenarioResult,
+  ): Pick<ScenarioDisplay, 'remainingHealthText' | 'isRemainingHealthLethal' | 'remainingHealthBeforeDoTText' | 'isRemainingHealthBeforeDoTLethal'> {
+    return {
+      remainingHealthBeforeDoTText: formatNumber(scenario.remainingHealthBeforeDoT),
+      isRemainingHealthBeforeDoTLethal: scenario.remainingHealthBeforeDoT <= 0,
+      remainingHealthText: formatNumber(scenario.remainingHealth),
+      isRemainingHealthLethal: scenario.remainingHealth <= 0,
+    };
+  }
+
+  private buildStaggerDisplay(
+    scenario: ScenarioResult,
+  ): Pick<ScenarioDisplay, 'staggeredText' | 'staggeredCssClass'> {
+    const isStaggered = scenario.stagger === 'YES';
+    return {
+      staggeredText: isStaggered ? 'yes' : 'no',
+      staggeredCssClass: isStaggered ? 'stagger-yes' : 'stagger-no',
+    };
+  }
+
+  private buildBlockBypassDisplay(
+    scenario: ScenarioResult,
+  ): Pick<ScenarioDisplay, 'blockBypassedText' | 'blockBypassedCssClass'> {
+    if (scenario.scenario === 'noShield') {
+      return { blockBypassedText: 'N/A', blockBypassedCssClass: 'stagger-no' };
+    }
+    if (scenario.staggeredOnBlock) {
+      return { blockBypassedText: 'yes', blockBypassedCssClass: 'stagger-yes' };
+    }
+    return { blockBypassedText: 'no', blockBypassedCssClass: 'stagger-no' };
+  }
+
+  private buildMinHealthDisplays(
+    scenario: ScenarioResult,
+    maxHealth: number,
+  ): Pick<ScenarioDisplay, 'minHealthBlockBypassText' | 'minHealthBlockBypassCssClass' | 'minHealthStaggerText' | 'minHealthStaggerCssClass'> {
+    const isNoShield = scenario.scenario === 'noShield';
+
+    let minHealthBlockBypassText: string;
+    let minHealthBlockBypassCssClass: string;
+    if (isNoShield) {
+      minHealthBlockBypassText = 'N/A';
+      minHealthBlockBypassCssClass = 'stagger-no';
+    } else if (scenario.minHealthForNoBlockStagger === 0) {
+      minHealthBlockBypassText = '0';
+      minHealthBlockBypassCssClass = 'stagger-no';
+    } else {
+      minHealthBlockBypassText = String(scenario.minHealthForNoBlockStagger);
+      minHealthBlockBypassCssClass = maxHealth >= scenario.minHealthForNoBlockStagger
+        ? 'health-safe' : 'health-warning';
+    }
+
+    let minHealthStaggerText: string;
+    let minHealthStaggerCssClass: string;
+    if (scenario.minHealthToAvoidStagger === 0) {
+      minHealthStaggerText = '0';
+      minHealthStaggerCssClass = 'stagger-no';
+    } else {
+      minHealthStaggerText = String(scenario.minHealthToAvoidStagger);
+      minHealthStaggerCssClass = maxHealth >= scenario.minHealthToAvoidStagger
+        ? 'health-safe' : 'health-warning';
+    }
+
+    return {
+      minHealthBlockBypassText,
+      minHealthBlockBypassCssClass,
+      minHealthStaggerText,
+      minHealthStaggerCssClass,
+    };
+  }
 }
 

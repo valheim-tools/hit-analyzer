@@ -1,0 +1,93 @@
+<div class="f-step">
+  <div class="f-step-label">3 — Block Reduced Damage</div>
+  @if (data().isSkipped) {
+    <div class="f-skipped">No shield — step skipped</div>
+  } @else {
+    <div class="f-step-group">
+      <div class="f-branch-check">
+        {{ data().effectiveBlockArmor | formatNumber }} &lt; {{ data().inputDamage | formatNumber }} ÷ 2 (= {{ data().halfInputDamage | formatNumber }})?
+        <span class="tip-wrap f-hover-wrap" tabindex="0">
+          <span class="f-hover-decision">{{ data().isLinear ? 'YES' : 'NO' }} → {{ data().isLinear ? 'linear' : 'quadratic' }}</span>
+          <span class="tip-text">
+            If effectiveBlockArmor &lt; @if (hasRiskFactor()) {scaledEffectiveDamage} @else {effectiveDamage} ÷ 2, use the linear reduction.<br>
+            Otherwise, use the quadratic reduction.<br>
+            @if (data().isLinear) {Chosen branch: reducedDamage = damage − armor} @else {Chosen branch: reducedDamage = damage² ÷ (armor × 4)}
+            @if (data().isExactTie) {<br>Because the check is strict (&lt;), an exact tie still uses the quadratic branch.}
+          </span>
+        </span>
+      </div>
+      <div class="f-eq">
+        @if (data().isLinear) {
+          {{ data().inputDamage | formatNumber }} − {{ data().effectiveBlockArmor | formatNumber }} =
+        } @else {
+          {{ data().inputDamage | formatNumber }}² ÷ ({{ data().effectiveBlockArmor | formatNumber }} × 4) =
+        }
+        <span class="tip-wrap f-hover-wrap" tabindex="0">
+          <strong class="f-hover-result" [class.f-main-result]="!data().staggeredOnBlock">{{ data().afterBlockDamage | formatNumber }}</strong>
+          <span class="tip-text">
+            @if (data().isLinear) {
+              blockReducedDamage = @if (hasRiskFactor()) {scaledEffectiveDamage} @else {effectiveDamage} − effectiveBlockArmor<br>
+              {{ data().inputDamage | formatNumber }} − {{ data().effectiveBlockArmor | formatNumber }} = {{ data().afterBlockDamage | formatNumber }}
+            } @else {
+              blockReducedDamage = @if (hasRiskFactor()) {scaledEffectiveDamage} @else {effectiveDamage}² ÷ (effectiveBlockArmor × 4)<br>
+              {{ data().inputDamage | formatNumber }}² ÷ ({{ data().effectiveBlockArmor | formatNumber }} × 4) = {{ data().afterBlockDamage | formatNumber }}
+            }
+          </span>
+        </span>
+      </div>
+      @for (breakdown of data().typeBreakdowns; track breakdown.typeName) {
+        <div class="f-eq">
+          {{ breakdown.icon }} {{ breakdown.beforeValue | formatNumber }} →
+          <span class="tip-wrap f-hover-wrap" tabindex="0">
+            <strong class="f-hover-result">{{ breakdown.afterValue | formatNumber }}</strong>
+            <span class="tip-text">
+              {{ breakdown.outputVarPrefix }}{{ breakdown.typeName }}Damage = @if (hasRiskFactor()) {scaledEffective} @else {effective}{{ breakdown.typeName }}Damage × ({{ breakdown.outputVarPrefix }}Damage ÷ @if (hasRiskFactor()) {scaledEffectiveDamage} @else {effectiveDamage})<br>
+              {{ breakdown.beforeValue | formatNumber }} × ({{ breakdown.outputTotal | formatNumber }} ÷ {{ breakdown.inputTotal | formatNumber }}) = {{ breakdown.beforeValue | formatNumber }} × {{ breakdown.ratio | formatNumber }} = {{ breakdown.afterValue | formatNumber }}
+            </span>
+          </span>
+          @if (breakdown.isStaggerType) { <span class="tip-wrap" tabindex="0"><span class="f-stagger-icon">🌀</span><span class="tip-text">Stagger damage</span></span> }
+        </div>
+      }
+    </div>
+
+    <div class="f-step-divider" aria-hidden="true"></div>
+
+    <div class="f-step-group f-step-group-stagger">
+      <div class="f-eq">
+        Stagger buildup:
+        <span class="tip-wrap f-hover-wrap" tabindex="0">
+          <strong class="f-hover-result">{{ data().blockStaggerDamage | formatNumber }} ({{ staggerBuildupPercentage() | number:'1.0-1' }}%)</strong>
+          <span class="tip-text">
+            blockStaggerDamage =
+            @if (data().blockStaggerTerms.length > 0) {
+              @for (staggerTerm of data().blockStaggerTerms; track staggerTerm.variableName; let isLast = $last) {
+                {{ staggerTerm.variableName }}@if (!isLast) { + }
+              }
+              <br>
+              @for (staggerTerm of data().blockStaggerTerms; track staggerTerm.variableName; let isLast = $last) {
+                {{ staggerTerm.value | formatNumber }}@if (!isLast) { + }
+              } = {{ data().blockStaggerDamage | formatNumber }}
+            } @else {
+              0<br>
+              0 = {{ data().blockStaggerDamage | formatNumber }}
+            }
+          </span>
+        </span>
+      </div>
+      <div class="f-branch-check">
+        {{ data().blockStaggerDamage | formatNumber }} &ge; {{ data().staggerThreshold | formatNumber }} (= 40% of {{ data().maxHealth | formatNumber }} max health)?
+        @if (data().staggeredOnBlock) {
+          <br>
+          <span class="tip-wrap f-hover-wrap" tabindex="0">
+            <span class="f-hover-stagger">YES → 🌀 Staggered → ⚠️ Block bypassed → <strong class="f-main-result">{{ data().inputDamage | formatNumber }}</strong></span>
+            <span class="tip-text">
+              Block bypassed, damage is not reduced → {{ data().inputDamage | formatNumber }}
+            </span>
+          </span>
+        } @else {
+          <br>NO → Not Staggered
+        }
+      </div>
+    </div>
+  }
+</div>

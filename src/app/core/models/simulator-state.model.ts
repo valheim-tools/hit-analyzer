@@ -1,4 +1,3 @@
-import { ScenarioResult } from './calculation.model';
 import { SimScenarioKey } from './form-state.model';
 
 export interface HitLogEntry {
@@ -8,6 +7,7 @@ export interface HitLogEntry {
   remainingHealth: number;
   exactRemainingHealth: number;
   isStaggered: boolean;
+  isStaggeredOnBlock: boolean;
   rngFactor: number | null;
   isDead: boolean;
 }
@@ -34,7 +34,5 @@ export interface SimulatorState {
   arenaScenarioKey: SimScenarioKey | null;
   arenaIsStaggered: boolean;
   arenaIsDead: boolean;
-  arenaShieldImageSrc: string;
   arenaIsAnimating: boolean;
 }
-

@@ -1,5 +1,17 @@
 @use '../../../styles/variables' as *;
 
+.mob-preset-influence-group {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $color-gold-faint;
+}
+
+.preset-row {
+  margin-bottom: 0.8rem;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 // ── Damage type inputs ──────────────────────────────────────────────────────
 
 .damage-type-inputs {
@@ -45,20 +57,21 @@
 }
 
 .add-damage-type-btn {
-  background: transparent;
-  border: 1px dashed $color-gold-darker;
-  color: $color-text-muted;
+  background: rgba(84, 72, 40, 0.25);
+  border: 1px dashed #8a7040;
+  color: #b8a060;
   cursor: pointer;
   font-family: inherit;
   font-size: 0.75rem;
   padding: 0.35rem 0.7rem;
   border-radius: $radius-md;
   margin-top: 0.3rem;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
 
   &:hover {
     color: $color-gold;
     border-color: $color-gold;
+    background: rgba(84, 72, 40, 0.4);
   }
 }
 

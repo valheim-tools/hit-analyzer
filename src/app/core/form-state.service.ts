@@ -20,7 +20,8 @@ const DEFAULTS: FormState = {
   shieldPreset: 'ShieldBronzeBuckler',
   shieldQuality: 3,
   riskFactor: 0,
-  dotSpeed: 3,
+  dotSpeed: 1,
+  animationSpeed: 1,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -39,6 +40,13 @@ export class FormStateService {
   reset(): void {
     this.stateSignal.set({ ...DEFAULTS });
     localStorage.removeItem(LS_KEY);
+    this.resetVersionSignal.update(version => version + 1);
+  }
+
+  /** Replace the entire form state and trigger a UI rebuild. */
+  load(state: Partial<FormState>): void {
+    this.stateSignal.set({ ...DEFAULTS, ...state });
+    this.saveToStorage();
     this.resetVersionSignal.update(version => version + 1);
   }
 
@@ -86,4 +94,3 @@ export class FormStateService {
     return merged;
   }
 }
-

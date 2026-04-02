@@ -1,0 +1,30 @@
+<div class="f-step">
+  <div class="f-step-label">1 — @if (data().hasRiskFactor) {Scaled Effective Damage} @else {Effective Damage}</div>
+  <div class="f-eq">
+    {{ data().baseDamage | formatNumber }} × (1 + {{ data().difficultyBonus }} + {{ data().starLevelBonus }} + ({{ data().extraDamagePercent | formatNumber }} ÷ 100))
+    = {{ data().baseDamage | formatNumber }} × {{ data().totalMultiplier | formatNumber }} =
+    <span class="tip-wrap f-hover-wrap" tabindex="0">
+      <strong class="f-hover-result" [class.f-main-result]="!data().hasRiskFactor">{{ data().effectiveDamage | formatNumber }}</strong>
+      <span class="tip-text">
+        effectiveDamage = baseDamage × (1 + difficultyBonus + starLevel × 0.5 + extraDamagePercent ÷ 100)<br>
+        {{ data().baseDamage | formatNumber }} × (1 + {{ data().difficultyBonus }} + {{ data().starLevelBonus }} + ({{ data().extraDamagePercent | formatNumber }} ÷ 100)) = {{ data().baseDamage | formatNumber }} × {{ data().totalMultiplier | formatNumber }} = {{ data().effectiveDamage | formatNumber }}
+      </span>
+    </span>
+  </div>
+  @if (data().hasRiskFactor) {
+    <div class="f-eq">
+      {{ data().effectiveDamage | formatNumber }} × √{{ data().rngValue | formatNumber }}
+      = {{ data().effectiveDamage | formatNumber }} × {{ data().rngFactor | formatNumber }} =
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result f-main-result">{{ data().scaledEffectiveDamage | formatNumber }}</strong>
+        <span class="tip-text">
+          {{ data().riskFactorValue }}% risk: scaledEffectiveDamage = effectiveDamage × √rng<br>
+          rng = 0.75 + 0.25 × {{ data().rngBasePercentile }} = {{ data().rngValue | formatNumber }}<br>
+          {{ data().effectiveDamage | formatNumber }} × √{{ data().rngValue | formatNumber }} = {{ data().effectiveDamage | formatNumber }} × {{ data().rngFactor | formatNumber }} = {{ data().scaledEffectiveDamage | formatNumber }}
+        </span>
+      </span>
+      <span class="risk-factor-badge">{{ data().riskFactorValue }}% risk</span>
+    </div>
+  }
+</div>
+

@@ -1,0 +1,1591 @@
+{
+  "helmets": [
+    {
+      "name": "Midsummer Crown",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        null,
+        null,
+        null
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 0,
+      "max_armor": 1,
+      "max_quality": 1,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/0/01/Midsummer_crown.png/revision/latest?cb=20220620163219",
+      "image_file": "armor_icons/Midsummer_Crown.png"
+    },
+    {
+      "name": "Yule hat",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        null,
+        null,
+        null
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 0,
+      "max_armor": 1,
+      "max_quality": 1,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/3/34/Yule_hat.png/revision/latest?cb=20210210033644",
+      "image_file": "armor_icons/Yule_hat.png"
+    },
+    {
+      "name": "Celebratory cap",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 2,
+      "max_armor": 7,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/6/63/Celebratory_cap.png/revision/latest?cb=20260203195036",
+      "image_file": "armor_icons/Celebratory_cap.png"
+    },
+    {
+      "name": "Dverger circlet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        2,
+        null,
+        null,
+        null
+      ],
+      "min_armor": 2,
+      "armor_per_upgrade": 0,
+      "max_armor": 2,
+      "max_quality": 1,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": "Cone shaped light source",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/8/88/Dverger_circlet.png/revision/latest?cb=20210210033343",
+      "image_file": "armor_icons/Dverger_circlet.png"
+    },
+    {
+      "name": "Hood of Odin",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/d/d2/Hood_of_Odin.png/revision/latest?cb=20210215131651",
+      "image_file": "armor_icons/Hood_of_Odin.png"
+    },
+    {
+      "name": "Leather helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "min_armor": 2,
+      "armor_per_upgrade": 2,
+      "max_armor": 8,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Leather Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/e/e3/Leather_helmet.png/revision/latest?cb=20210209040310",
+      "image_file": "armor_icons/Leather_helmet.png"
+    },
+    {
+      "name": "Troll leather helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "min_armor": 6,
+      "armor_per_upgrade": 2,
+      "max_armor": 12,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": "Troll Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/b/b9/Troll_leather_helmet.png/revision/latest?cb=20210209145602",
+      "image_file": "armor_icons/Troll_leather_helmet.png"
+    },
+    {
+      "name": "Headdress of the Bear",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        7,
+        9,
+        11,
+        13
+      ],
+      "min_armor": 7,
+      "armor_per_upgrade": 2,
+      "max_armor": 13,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "piece_effects": null,
+      "set_name": "Bear Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/f/f9/Headdress_of_the_Bear.png/revision/latest?cb=20250821174006",
+      "image_file": "armor_icons/Headdress_of_the_Bear.png"
+    },
+    {
+      "name": "Bronze helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "min_armor": 8,
+      "armor_per_upgrade": 2,
+      "max_armor": 14,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Bronze Armor",
+      "set_biome": "Black Forest",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/a/a9/Bronze_helmet.png/revision/latest?cb=20210210032807",
+      "image_file": "armor_icons/Bronze_helmet.png"
+    },
+    {
+      "name": "Root mask",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "min_armor": 8,
+      "armor_per_upgrade": 2,
+      "max_armor": 14,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "piece_effects": "Resistant(0.5x) VS Poison; Weak(1.5x) VS Fire",
+      "set_name": "Root Set",
+      "set_biome": "Swamp",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/a/a2/Root_mask.png/revision/latest?cb=20211208154547",
+      "image_file": "armor_icons/Root_mask.png"
+    },
+    {
+      "name": "Iron helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        14,
+        16,
+        18,
+        20
+      ],
+      "min_armor": 14,
+      "armor_per_upgrade": 2,
+      "max_armor": 20,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Iron Armor",
+      "set_biome": "Swamp",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/f/f7/Iron_Helmet.png/revision/latest?cb=20210209005556",
+      "image_file": "armor_icons/Iron_helmet.png"
+    },
+    {
+      "name": "Fenris hood",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        10,
+        12,
+        14,
+        16
+      ],
+      "min_armor": 10,
+      "armor_per_upgrade": 2,
+      "max_armor": 16,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Fire",
+      "set_name": "Fenris Set",
+      "set_biome": "Mountain",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/1/15/Fenris_hood.png/revision/latest?cb=20220219144141",
+      "image_file": "armor_icons/Fenris_hood.png"
+    },
+    {
+      "name": "Drake helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        20,
+        22,
+        24,
+        26
+      ],
+      "min_armor": 20,
+      "armor_per_upgrade": 2,
+      "max_armor": 26,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Wolf Armor",
+      "set_biome": "Mountain",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/cb/Drake_helmet.png/revision/latest?cb=20210210033148",
+      "image_file": "armor_icons/Drake_helmet.png"
+    },
+    {
+      "name": "Padded helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "min_armor": 26,
+      "armor_per_upgrade": 2,
+      "max_armor": 32,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Padded Armor",
+      "set_biome": "Plains",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/0/0e/Padded_helmet.png/revision/latest?cb=20210210033604",
+      "image_file": "armor_icons/Padded_helmet.png"
+    },
+    {
+      "name": "Vilebone Visage",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        12,
+        14,
+        16,
+        18
+      ],
+      "min_armor": 12,
+      "armor_per_upgrade": 2,
+      "max_armor": 18,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "piece_effects": null,
+      "set_name": "Vilebone Set",
+      "set_biome": "Plains",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/5/54/Vilebone_visage.png/revision/latest?cb=20250821175416",
+      "image_file": "armor_icons/Vilebone_Visage.png"
+    },
+    {
+      "name": "Eitr-weave hood",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "min_armor": 16,
+      "armor_per_upgrade": 2,
+      "max_armor": 22,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": "+20% Eitr regen",
+      "set_name": "Eitr-weave Set",
+      "set_biome": "Mistlands",
+      "set_type": "Mage",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/c9/Eitr-weave_hood.png/revision/latest?cb=20221129135726",
+      "image_file": "armor_icons/Eitr-weave_hood.png"
+    },
+    {
+      "name": "Carapace helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        32,
+        34,
+        36,
+        38
+      ],
+      "min_armor": 32,
+      "armor_per_upgrade": 2,
+      "max_armor": 38,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Carapace Armor",
+      "set_biome": "Mistlands",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/2/27/Carapace_helmet.png/revision/latest?cb=20221126191255",
+      "image_file": "armor_icons/Carapace_helmet.png"
+    },
+    {
+      "name": "Hood of Embla",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        19,
+        21,
+        23,
+        25
+      ],
+      "min_armor": 19,
+      "armor_per_upgrade": 2,
+      "max_armor": 25,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": null,
+      "piece_effects": "+30% Eitr regen",
+      "set_name": "Embla Set",
+      "set_biome": "Ashlands",
+      "set_type": "Mage",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/d/d7/Hood_of_Embla.png/revision/latest?cb=20240423150142",
+      "image_file": "armor_icons/Hood_of_Embla.png"
+    },
+    {
+      "name": "Hood of Ask",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        28,
+        30,
+        32,
+        34
+      ],
+      "min_armor": 28,
+      "armor_per_upgrade": 2,
+      "max_armor": 34,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Ask's Endurance (full set)",
+      "piece_effects": null,
+      "set_name": "Ask Set",
+      "set_biome": "Ashlands",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/6/6a/Hood_of_Ask.png/revision/latest?cb=20240423150022",
+      "image_file": "armor_icons/Hood_of_Ask.png"
+    },
+    {
+      "name": "Flametal helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        38,
+        40,
+        42,
+        44
+      ],
+      "min_armor": 38,
+      "armor_per_upgrade": 2,
+      "max_armor": 44,
+      "max_quality": 4,
+      "weight": 3.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Flametal Armor",
+      "set_biome": "Ashlands",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/b/bc/Flametal_Helmet.png/revision/latest?cb=20240423150103",
+      "image_file": "armor_icons/Flametal_helmet.png"
+    }
+  ],
+  "chest_armor": [
+    {
+      "name": "Rag tunic",
+      "slot": "Chest",
+      "armor_by_quality": [
+        1,
+        2,
+        null,
+        null
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 2,
+      "max_quality": 2,
+      "weight": 2.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Rag Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/5/52/Rag_tunic.png/revision/latest?cb=20210209001200",
+      "image_file": "armor_icons/Rag_tunic.png"
+    },
+    {
+      "name": "Leather tunic",
+      "slot": "Chest",
+      "armor_by_quality": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "min_armor": 2,
+      "armor_per_upgrade": 2,
+      "max_armor": 8,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Leather Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/cb/Leather_tunic.png/revision/latest?cb=20210209042720",
+      "image_file": "armor_icons/Leather_tunic.png"
+    },
+    {
+      "name": "Troll leather tunic",
+      "slot": "Chest",
+      "armor_by_quality": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "min_armor": 6,
+      "armor_per_upgrade": 2,
+      "max_armor": 12,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": "Troll Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/b/b4/Troll_leather_tunic.png/revision/latest?cb=20210209144905",
+      "image_file": "armor_icons/Troll_leather_tunic.png"
+    },
+    {
+      "name": "Patterns of the Bear",
+      "slot": "Chest",
+      "armor_by_quality": [
+        7,
+        9,
+        11,
+        13
+      ],
+      "min_armor": 7,
+      "armor_per_upgrade": 2,
+      "max_armor": 13,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "piece_effects": null,
+      "set_name": "Bear Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/0/06/Patterns_of_the_Bear.png/revision/latest?cb=20250821173634",
+      "image_file": "armor_icons/Patterns_of_the_Bear.png"
+    },
+    {
+      "name": "Bronze plate cuirass",
+      "slot": "Chest",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "min_armor": 8,
+      "armor_per_upgrade": 2,
+      "max_armor": 14,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Bronze Armor",
+      "set_biome": "Black Forest",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/3/30/Bronze_plate_cuirass.png/revision/latest?cb=20210210033801",
+      "image_file": "armor_icons/Bronze_plate_cuirass.png"
+    },
+    {
+      "name": "Root harnesk",
+      "slot": "Chest",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "min_armor": 8,
+      "armor_per_upgrade": 2,
+      "max_armor": 14,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "piece_effects": "-2% Movement speed; Resistant(0.5x) VS Pierce; Weak(1.5x) VS Fire",
+      "set_name": "Root Set",
+      "set_biome": "Swamp",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/3/30/Root_harnesk.png/revision/latest?cb=20211208154501",
+      "image_file": "armor_icons/Root_harnesk.png"
+    },
+    {
+      "name": "Iron scale mail",
+      "slot": "Chest",
+      "armor_by_quality": [
+        14,
+        16,
+        18,
+        20
+      ],
+      "min_armor": 14,
+      "armor_per_upgrade": 2,
+      "max_armor": 20,
+      "max_quality": 4,
+      "weight": 15.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Iron Armor",
+      "set_biome": "Swamp",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/d/d3/Iron_scale_mail.png/revision/latest?cb=20210215131223",
+      "image_file": "armor_icons/Iron_scale_mail.png"
+    },
+    {
+      "name": "Fenris coat",
+      "slot": "Chest",
+      "armor_by_quality": [
+        10,
+        12,
+        14,
+        16
+      ],
+      "min_armor": 10,
+      "armor_per_upgrade": 2,
+      "max_armor": 16,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Frost",
+      "set_name": "Fenris Set",
+      "set_biome": "Mountain",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/8/89/Fenris_coat.png/revision/latest?cb=20220219144142",
+      "image_file": "armor_icons/Fenris_coat.png"
+    },
+    {
+      "name": "Wolf armor chest",
+      "slot": "Chest",
+      "armor_by_quality": [
+        20,
+        22,
+        24,
+        26
+      ],
+      "min_armor": 20,
+      "armor_per_upgrade": 2,
+      "max_armor": 26,
+      "max_quality": 4,
+      "weight": 15.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed; Resistant(0.5x) VS Frost",
+      "set_name": "Wolf Armor",
+      "set_biome": "Mountain",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/5/55/Wolf_hide_chestpiece.png/revision/latest?cb=20210215131244",
+      "image_file": "armor_icons/Wolf_armor_chest.png"
+    },
+    {
+      "name": "Padded cuirass",
+      "slot": "Chest",
+      "armor_by_quality": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "min_armor": 26,
+      "armor_per_upgrade": 2,
+      "max_armor": 32,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Padded Armor",
+      "set_biome": "Plains",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/5/53/Padded_cuirass.png/revision/latest?cb=20210215131239",
+      "image_file": "armor_icons/Padded_cuirass.png"
+    },
+    {
+      "name": "Vilebone Cage",
+      "slot": "Chest",
+      "armor_by_quality": [
+        18,
+        20,
+        22,
+        24
+      ],
+      "min_armor": 18,
+      "armor_per_upgrade": 2,
+      "max_armor": 24,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "piece_effects": null,
+      "set_name": "Vilebone Set",
+      "set_biome": "Plains",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/1/16/Vilebone_cage.png/revision/latest?cb=20250821175425",
+      "image_file": "armor_icons/Vilebone_Cage.png"
+    },
+    {
+      "name": "Eitr-weave robe",
+      "slot": "Chest",
+      "armor_by_quality": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "min_armor": 16,
+      "armor_per_upgrade": 2,
+      "max_armor": 22,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": null,
+      "piece_effects": "+40% Eitr regen; -2% Movement speed",
+      "set_name": "Eitr-weave Set",
+      "set_biome": "Mistlands",
+      "set_type": "Mage",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/c6/Eitr-weave_robe.png/revision/latest?cb=20221129135829",
+      "image_file": "armor_icons/Eitr-weave_robe.png"
+    },
+    {
+      "name": "Carapace breastplate",
+      "slot": "Chest",
+      "armor_by_quality": [
+        32,
+        34,
+        36,
+        38
+      ],
+      "min_armor": 32,
+      "armor_per_upgrade": 2,
+      "max_armor": 38,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Carapace Armor",
+      "set_biome": "Mistlands",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/2/21/Carapace_breastplate.png/revision/latest?cb=20221126191122",
+      "image_file": "armor_icons/Carapace_breastplate.png"
+    },
+    {
+      "name": "Robes of Embla",
+      "slot": "Chest",
+      "armor_by_quality": [
+        19,
+        21,
+        23,
+        25
+      ],
+      "min_armor": 19,
+      "armor_per_upgrade": 2,
+      "max_armor": 25,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": null,
+      "piece_effects": "+50% Eitr regen; -2% Movement speed",
+      "set_name": "Embla Set",
+      "set_biome": "Ashlands",
+      "set_type": "Mage",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/0/06/Robes_of_Embla.png/revision/latest?cb=20240423145011",
+      "image_file": "armor_icons/Robes_of_Embla.png"
+    },
+    {
+      "name": "Breastplate of Ask",
+      "slot": "Chest",
+      "armor_by_quality": [
+        28,
+        30,
+        32,
+        34
+      ],
+      "min_armor": 28,
+      "armor_per_upgrade": 2,
+      "max_armor": 34,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Ask's Endurance (full set)",
+      "piece_effects": null,
+      "set_name": "Ask Set",
+      "set_biome": "Ashlands",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/0/0d/Breastplate_of_Ask.png/revision/latest?cb=20240423144505",
+      "image_file": "armor_icons/Breastplate_of_Ask.png"
+    },
+    {
+      "name": "Flametal breastplate",
+      "slot": "Chest",
+      "armor_by_quality": [
+        38,
+        40,
+        42,
+        44
+      ],
+      "min_armor": 38,
+      "armor_per_upgrade": 2,
+      "max_armor": 44,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "+20% Heat Resistance; -5% Movement speed",
+      "set_name": "Flametal Armor",
+      "set_biome": "Ashlands",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/7/74/Flametal_Breastplate.png/revision/latest?cb=20240423144655",
+      "image_file": "armor_icons/Flametal_breastplate.png"
+    }
+  ],
+  "leg_armor": [
+    {
+      "name": "Rag pants",
+      "slot": "Legs",
+      "armor_by_quality": [
+        1,
+        2,
+        null,
+        null
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 2,
+      "max_quality": 2,
+      "weight": 2.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Rag Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/b/b9/Rag_pants.png/revision/latest?cb=20210209001457",
+      "image_file": "armor_icons/Rag_pants.png"
+    },
+    {
+      "name": "Leather pants",
+      "slot": "Legs",
+      "armor_by_quality": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "min_armor": 2,
+      "armor_per_upgrade": 2,
+      "max_armor": 8,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Leather Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/8/82/Leather_pants.png/revision/latest?cb=20210209042343",
+      "image_file": "armor_icons/Leather_pants.png"
+    },
+    {
+      "name": "Troll leather pants",
+      "slot": "Legs",
+      "armor_by_quality": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "min_armor": 6,
+      "armor_per_upgrade": 2,
+      "max_armor": 12,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": "Troll Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/3/3d/Troll_leather_pants.png/revision/latest?cb=20210209144501",
+      "image_file": "armor_icons/Troll_leather_pants.png"
+    },
+    {
+      "name": "Loincloth of the Bear",
+      "slot": "Legs",
+      "armor_by_quality": [
+        7,
+        9,
+        11,
+        13
+      ],
+      "min_armor": 7,
+      "armor_per_upgrade": 2,
+      "max_armor": 13,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "piece_effects": null,
+      "set_name": "Bear Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/a/ab/Loincloth_of_the_Bear.png/revision/latest?cb=20250821173949",
+      "image_file": "armor_icons/Loincloth_of_the_Bear.png"
+    },
+    {
+      "name": "Bronze plate leggings",
+      "slot": "Legs",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "min_armor": 8,
+      "armor_per_upgrade": 2,
+      "max_armor": 14,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Bronze Armor",
+      "set_biome": "Black Forest",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/4/42/Bronze_plate_leggings.png/revision/latest?cb=20210210033859",
+      "image_file": "armor_icons/Bronze_plate_leggings.png"
+    },
+    {
+      "name": "Root leggings",
+      "slot": "Legs",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "min_armor": 8,
+      "armor_per_upgrade": 2,
+      "max_armor": 14,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "piece_effects": "-2% Movement speed; Weak(1.5x) VS Fire",
+      "set_name": "Root Set",
+      "set_biome": "Swamp",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/8/88/Root_leggings.png/revision/latest?cb=20211208154805",
+      "image_file": "armor_icons/Root_leggings.png"
+    },
+    {
+      "name": "Iron greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        14,
+        16,
+        18,
+        20
+      ],
+      "min_armor": 14,
+      "armor_per_upgrade": 2,
+      "max_armor": 20,
+      "max_quality": 4,
+      "weight": 15.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Iron Armor",
+      "set_biome": "Swamp",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/2/2e/Iron_greaves.png/revision/latest?cb=20210215131230",
+      "image_file": "armor_icons/Iron_greaves.png"
+    },
+    {
+      "name": "Fenris leggings",
+      "slot": "Legs",
+      "armor_by_quality": [
+        10,
+        12,
+        14,
+        16
+      ],
+      "min_armor": 10,
+      "armor_per_upgrade": 2,
+      "max_armor": 16,
+      "max_quality": 4,
+      "weight": 1.0,
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Fire",
+      "set_name": "Fenris Set",
+      "set_biome": "Mountain",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/e/eb/Fenris_leggings.png/revision/latest?cb=20220219144142",
+      "image_file": "armor_icons/Fenris_leggings.png"
+    },
+    {
+      "name": "Wolf armor legs",
+      "slot": "Legs",
+      "armor_by_quality": [
+        20,
+        22,
+        24,
+        26
+      ],
+      "min_armor": 20,
+      "armor_per_upgrade": 2,
+      "max_armor": 26,
+      "max_quality": 4,
+      "weight": 15.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Wolf Armor",
+      "set_biome": "Mountain",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/8/83/Wolf_hide_trousers.png/revision/latest?cb=20210215131246",
+      "image_file": "armor_icons/Wolf_armor_legs.png"
+    },
+    {
+      "name": "Padded greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "min_armor": 26,
+      "armor_per_upgrade": 2,
+      "max_armor": 32,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Padded Armor",
+      "set_biome": "Plains",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/c8/Padded_greaves.png/revision/latest?cb=20210215131240",
+      "image_file": "armor_icons/Padded_greaves.png"
+    },
+    {
+      "name": "Vilebone Drapes",
+      "slot": "Legs",
+      "armor_by_quality": [
+        18,
+        20,
+        22,
+        24
+      ],
+      "min_armor": 18,
+      "armor_per_upgrade": 2,
+      "max_armor": 24,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "piece_effects": null,
+      "set_name": "Vilebone Set",
+      "set_biome": "Plains",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/c5/Vilebone_drapes.png/revision/latest?cb=20250821175437",
+      "image_file": "armor_icons/Vilebone_Drapes.png"
+    },
+    {
+      "name": "Eitr-weave trousers",
+      "slot": "Legs",
+      "armor_by_quality": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "min_armor": 16,
+      "armor_per_upgrade": 2,
+      "max_armor": 22,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": null,
+      "piece_effects": "+40% Eitr regen; -2% Movement speed",
+      "set_name": "Eitr-weave Set",
+      "set_biome": "Mistlands",
+      "set_type": "Mage",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/2/25/Eitr-weave_trousers.png/revision/latest?cb=20221129135838",
+      "image_file": "armor_icons/Eitr-weave_trousers.png"
+    },
+    {
+      "name": "Carapace greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        32,
+        34,
+        36,
+        38
+      ],
+      "min_armor": 32,
+      "armor_per_upgrade": 2,
+      "max_armor": 38,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Carapace Armor",
+      "set_biome": "Mistlands",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/b/b1/Carapace_greaves.png/revision/latest?cb=20221126191214",
+      "image_file": "armor_icons/Carapace_greaves.png"
+    },
+    {
+      "name": "Trousers of Embla",
+      "slot": "Legs",
+      "armor_by_quality": [
+        19,
+        21,
+        23,
+        25
+      ],
+      "min_armor": 19,
+      "armor_per_upgrade": 2,
+      "max_armor": 25,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": null,
+      "piece_effects": "+50% Eitr regen; -2% Movement speed",
+      "set_name": "Embla Set",
+      "set_biome": "Ashlands",
+      "set_type": "Mage",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/b/b2/Trousers_of_Embla.png/revision/latest?cb=20240423145048",
+      "image_file": "armor_icons/Trousers_of_Embla.png"
+    },
+    {
+      "name": "Trousers of Ask",
+      "slot": "Legs",
+      "armor_by_quality": [
+        28,
+        30,
+        32,
+        34
+      ],
+      "min_armor": 28,
+      "armor_per_upgrade": 2,
+      "max_armor": 34,
+      "max_quality": 4,
+      "weight": 5.0,
+      "set_bonus": "Ask's Endurance (full set)",
+      "piece_effects": null,
+      "set_name": "Ask Set",
+      "set_biome": "Ashlands",
+      "set_type": "Light",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/a/a6/Trousers_of_Ask.png/revision/latest?cb=20240423144554",
+      "image_file": "armor_icons/Trousers_of_Ask.png"
+    },
+    {
+      "name": "Flametal Greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        38,
+        40,
+        42,
+        44
+      ],
+      "min_armor": 38,
+      "armor_per_upgrade": 2,
+      "max_armor": 44,
+      "max_quality": 4,
+      "weight": 10.0,
+      "set_bonus": null,
+      "piece_effects": "+20% Heat Resistance; -5% Movement speed",
+      "set_name": "Flametal Armor",
+      "set_biome": "Ashlands",
+      "set_type": "Heavy",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/9/92/Flametal_Greaves.png/revision/latest?cb=20240423144735",
+      "image_file": "armor_icons/Flametal_Greaves.png"
+    }
+  ],
+  "capes": [
+    {
+      "name": "Cape of Odin",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/2/23/Cape_of_Odin.png/revision/latest?cb=20210215131437",
+      "image_file": "armor_icons/Cape_of_Odin.png",
+      "associated_set": null
+    },
+    {
+      "name": "Deer hide cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/3/38/Deer_hide_cape.png/revision/latest?cb=20210209041809",
+      "image_file": "armor_icons/Deer_hide_cape.png",
+      "associated_set": "Leather Armor"
+    },
+    {
+      "name": "Troll hide cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/9/90/Troll_hide_cape.png/revision/latest?cb=20210209145246",
+      "image_file": "armor_icons/Troll_hide_cape.png",
+      "associated_set": "Troll Set"
+    },
+    {
+      "name": "Wolf fur cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/7/72/Wolf_fur_cape.png/revision/latest?cb=20210215131439",
+      "image_file": "armor_icons/Wolf_fur_cape.png",
+      "associated_set": "Wolf Armor"
+    },
+    {
+      "name": "Lox cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/c/ce/Lox_cape.png/revision/latest?cb=20210215131436",
+      "image_file": "armor_icons/Lox_cape.png",
+      "associated_set": "Vilebone Set"
+    },
+    {
+      "name": "Linen cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": null,
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/e/e3/Linen_cape.png/revision/latest?cb=20210215131429",
+      "image_file": "armor_icons/Linen_cape.png",
+      "associated_set": "Padded Armor"
+    },
+    {
+      "name": "Feather cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost; Very Weak (2x) vs. Fire; Fall damage: -100%; Limit fall speed: 5m/s; -20% jump stamina",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/0/0e/Feather_cape.png/revision/latest?cb=20221127200910",
+      "image_file": "armor_icons/Feather_cape.png",
+      "associated_set": "Eitr-weave Set"
+    },
+    {
+      "name": "Asksvin cloak",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "min_armor": 1,
+      "armor_per_upgrade": 1,
+      "max_armor": 4,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost; Wind Run; Dodge stamina usage: -15%",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/6/61/Asksvincape.png/revision/latest?cb=20240511110834",
+      "image_file": "armor_icons/Asksvin_cloak.png",
+      "associated_set": "Ask Set"
+    },
+    {
+      "name": "Ashen cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        12,
+        14,
+        16,
+        18
+      ],
+      "min_armor": 12,
+      "armor_per_upgrade": 2,
+      "max_armor": 18,
+      "max_quality": 4,
+      "weight": 4.0,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost; Attack Stamina Usage: -10%; Block Stamina Usage: -20%",
+      "image_url": "https://static.wikia.nocookie.net/valheim/images/5/59/Ashen_cape.png/revision/latest?cb=20240423145845",
+      "image_file": "armor_icons/Ashen_cape.png",
+      "associated_set": "Flametal Armor"
+    }
+  ],
+  "sets": {
+    "Leather Armor": {
+      "biome": "Meadows",
+      "type": "Light",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Leather helmet",
+        "chest": "Leather tunic",
+        "legs": "Leather pants"
+      },
+      "total_armor_by_quality": [
+        6,
+        12,
+        18,
+        24
+      ]
+    },
+    "Troll Set": {
+      "biome": "Black Forest",
+      "type": "Light",
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "pieces": {
+        "helmet": "Troll leather helmet",
+        "chest": "Troll leather tunic",
+        "legs": "Troll leather pants"
+      },
+      "total_armor_by_quality": [
+        18,
+        24,
+        30,
+        36
+      ]
+    },
+    "Bear Set": {
+      "biome": "Black Forest",
+      "type": "Light",
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "pieces": {
+        "helmet": "Headdress of the Bear",
+        "chest": "Patterns of the Bear",
+        "legs": "Loincloth of the Bear"
+      },
+      "total_armor_by_quality": [
+        21,
+        27,
+        33,
+        39
+      ]
+    },
+    "Bronze Armor": {
+      "biome": "Black Forest",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Bronze helmet",
+        "chest": "Bronze plate cuirass",
+        "legs": "Bronze plate leggings"
+      },
+      "total_armor_by_quality": [
+        24,
+        30,
+        36,
+        42
+      ]
+    },
+    "Root Set": {
+      "biome": "Swamp",
+      "type": "Light",
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "pieces": {
+        "helmet": "Root mask",
+        "chest": "Root harnesk",
+        "legs": "Root leggings"
+      },
+      "total_armor_by_quality": [
+        24,
+        30,
+        36,
+        42
+      ]
+    },
+    "Iron Armor": {
+      "biome": "Swamp",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Iron helmet",
+        "chest": "Iron scale mail",
+        "legs": "Iron greaves"
+      },
+      "total_armor_by_quality": [
+        42,
+        48,
+        54,
+        60
+      ]
+    },
+    "Fenris Set": {
+      "biome": "Mountain",
+      "type": "Light",
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "pieces": {
+        "helmet": "Fenris hood",
+        "chest": "Fenris coat",
+        "legs": "Fenris leggings"
+      },
+      "total_armor_by_quality": [
+        30,
+        36,
+        42,
+        48
+      ]
+    },
+    "Wolf Armor": {
+      "biome": "Mountain",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Drake helmet",
+        "chest": "Wolf armor chest",
+        "legs": "Wolf armor legs"
+      },
+      "total_armor_by_quality": [
+        60,
+        66,
+        72,
+        78
+      ]
+    },
+    "Padded Armor": {
+      "biome": "Plains",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Padded helmet",
+        "chest": "Padded cuirass",
+        "legs": "Padded greaves"
+      },
+      "total_armor_by_quality": [
+        78,
+        84,
+        90,
+        96
+      ]
+    },
+    "Vilebone Set": {
+      "biome": "Plains",
+      "type": "Light",
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "pieces": {
+        "helmet": "Vilebone Visage",
+        "chest": "Vilebone Cage",
+        "legs": "Vilebone Drapes"
+      },
+      "total_armor_by_quality": [
+        48,
+        54,
+        60,
+        66
+      ]
+    },
+    "Eitr-weave Set": {
+      "biome": "Mistlands",
+      "type": "Mage",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Eitr-weave hood",
+        "chest": "Eitr-weave robe",
+        "legs": "Eitr-weave trousers"
+      },
+      "total_armor_by_quality": [
+        48,
+        54,
+        60,
+        66
+      ]
+    },
+    "Carapace Armor": {
+      "biome": "Mistlands",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Carapace helmet",
+        "chest": "Carapace breastplate",
+        "legs": "Carapace greaves"
+      },
+      "total_armor_by_quality": [
+        96,
+        102,
+        108,
+        114
+      ]
+    },
+    "Embla Set": {
+      "biome": "Ashlands",
+      "type": "Mage",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Hood of Embla",
+        "chest": "Robes of Embla",
+        "legs": "Trousers of Embla"
+      },
+      "total_armor_by_quality": [
+        57,
+        63,
+        69,
+        75
+      ]
+    },
+    "Ask Set": {
+      "biome": "Ashlands",
+      "type": "Light",
+      "set_bonus": "Ask's Endurance (full set)",
+      "pieces": {
+        "helmet": "Hood of Ask",
+        "chest": "Breastplate of Ask",
+        "legs": "Trousers of Ask"
+      },
+      "total_armor_by_quality": [
+        84,
+        90,
+        96,
+        102
+      ]
+    },
+    "Flametal Armor": {
+      "biome": "Ashlands",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Flametal helmet",
+        "chest": "Flametal breastplate",
+        "legs": "Flametal Greaves"
+      },
+      "total_armor_by_quality": [
+        114,
+        120,
+        126,
+        132
+      ]
+    },
+    "Rag Armor": {
+      "biome": "Meadows",
+      "type": "Light",
+      "set_bonus": null,
+      "pieces": {
+        "chest": "Rag tunic",
+        "legs": "Rag pants"
+      },
+      "total_armor_by_quality": [
+        2,
+        4,
+        null,
+        null
+      ]
+    }
+  }
+}

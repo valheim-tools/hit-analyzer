@@ -1,0 +1,34 @@
+<div class="f-step">
+  <div class="f-step-label">2 — Effective Block Armor</div>
+  @if (data().isSkipped) {
+    <div class="f-skipped">No shield — step skipped</div>
+  } @else {
+    <div class="f-eq">
+      @if (data().isParry) {
+        {{ data().blockArmor | formatNumber }} × (1 + 0.005 × {{ data().blockingSkill }}) × {{ data().parryMultiplier }}
+      } @else {
+        {{ data().blockArmor | formatNumber }} × (1 + 0.005 × {{ data().blockingSkill }})
+      }
+    </div>
+    <div class="f-eq">
+      @if (data().isParry) {
+        {{ data().blockArmor | formatNumber }} × {{ data().skillFactor | formatNumber }} × {{ data().parryMultiplier }} =
+      } @else {
+        {{ data().blockArmor | formatNumber }} × {{ data().skillFactor | formatNumber }} =
+      }
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result f-main-result">{{ data().effectiveBlockArmor | formatNumber }}</strong>
+        <span class="tip-text">
+          @if (data().isParry) {
+            effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill) × parryMultiplier<br>
+            {{ data().blockArmor | formatNumber }} × (1 + 0.005 × {{ data().blockingSkill }}) × {{ data().parryMultiplier }} = {{ data().blockArmor | formatNumber }} × {{ data().skillFactor | formatNumber }} × {{ data().parryMultiplier }} = {{ data().effectiveBlockArmor | formatNumber }}
+          } @else {
+            effectiveBlockArmor = blockArmor × (1 + 0.005 × blockingSkill)<br>
+            {{ data().blockArmor | formatNumber }} × (1 + 0.005 × {{ data().blockingSkill }}) = {{ data().blockArmor | formatNumber }} × {{ data().skillFactor | formatNumber }} = {{ data().effectiveBlockArmor | formatNumber }}
+          }
+        </span>
+      </span>
+    </div>
+  }
+</div>
+

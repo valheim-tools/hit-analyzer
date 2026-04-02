@@ -1,16 +1,8 @@
-import { DamageTypeName } from './damage-map.model';
+import { DamageMap } from '../../core/constants';
 
-export interface MobAttack {
+export interface MobAttack extends Partial<DamageMap> {
   attack_name: string;
   attack_type: string;
-  Blunt?: number;
-  Slash?: number;
-  Pierce?: number;
-  Fire?: number;
-  Frost?: number;
-  Lightning?: number;
-  Poison?: number;
-  Spirit?: number;
   _mobPrefab?: string;
   _mobIconFile?: string;
 }
@@ -32,4 +24,3 @@ export interface FlatMobPreset extends MobAttack {
   _mobPrefab: string;
   _mobIconFile: string;
 }
-

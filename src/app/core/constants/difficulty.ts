@@ -1,9 +1,10 @@
-import { DifficultyKey } from '../models';
-
 /** Canonical ordering of difficulty keys. */
-export const DIFFICULTY_KEYS: readonly DifficultyKey[] = [
+export const DIFFICULTY_KEYS = [
   'VERY_EASY', 'EASY', 'NORMAL', 'HARD', 'VERY_HARD',
-];
+] as const;
+
+/** Union of all difficulty key strings, derived from DIFFICULTY_KEYS. */
+export type DifficultyKey = typeof DIFFICULTY_KEYS[number];
 
 /** Short human-readable label for each difficulty. */
 export const DIFFICULTY_LABELS: Record<DifficultyKey, string> = {
@@ -26,12 +27,5 @@ export const DIFFICULTY_DAMAGE_BONUS_PERCENT: Record<DifficultyKey, number> = {
   VERY_HARD: 100,
 };
 
-/** Long-form description shown in the mob-attack form label. */
-export const DIFFICULTY_EFFECT_DESCRIPTIONS: Record<DifficultyKey, string> = {
-  VERY_EASY: '50% less damage (flat)',
-  EASY:      '25% less damage (flat)',
-  NORMAL:    '0% additional damage bonus',
-  HARD:      '50% additional damage bonus',
-  VERY_HARD: '100% additional damage bonus',
-};
+
 

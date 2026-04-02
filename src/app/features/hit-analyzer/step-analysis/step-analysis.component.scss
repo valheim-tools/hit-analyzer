@@ -39,6 +39,9 @@
 .f-shared { margin-bottom: 1rem; padding-bottom: 0.9rem; border-bottom: 1px solid $color-gold-faint; }
 .f-shared-label { font-size: 0.7rem; color: $color-gold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.35rem; }
 
+.f-eq { font-size: 0.79rem; color: #d0c090; font-family: 'Courier New', monospace; line-height: 1.5; strong { color: #e8d8a0; } }
+.f-type-badges { margin-bottom: 0.3rem; }
+
 .f-cols { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; }
 
 .f-col {
@@ -57,25 +60,6 @@
   padding: 0.42rem 0.8rem;
   border-bottom: 1px solid $color-gold-darker;
 }
-
-.f-step { padding: 0.55rem 0.8rem; border-bottom: 1px solid #2a2820; &:last-child { border-bottom: none; } }
-
-.f-step-label { font-size: 0.68rem; color: $color-gold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.3rem; }
-
-.f-hover-wrap { cursor: help; }
-.f-hover-result, .f-hover-decision { text-decoration: underline; text-decoration-style: dotted; text-decoration-color: rgba(232, 216, 160, 0.4); text-underline-offset: 2px; }
-.f-hover-decision { color: #e8d8a0; }
-
-.f-eq { font-size: 0.79rem; color: #d0c090; font-family: 'Courier New', monospace; line-height: 1.5; strong { color: #e8d8a0; } }
-
-.f-branch-check { font-size: 0.73rem; color: $color-text-muted; font-family: 'Courier New', monospace; line-height: 1.5; margin-bottom: 0.15rem; }
-
-.f-skipped { font-size: 0.75rem; color: #8a7858; font-style: italic; }
-
-.f-stagger-warn { font-size: 0.73rem; color: #c87840; font-family: 'Courier New', monospace; line-height: 1.5; margin: 0.1rem 0; strong { color: #e8d8a0; } }
-
-.f-dead { color: #e06060; }
-.f-type-badges { margin-bottom: 0.3rem; }
 
 // ── Responsive ───────────────────────────────────────────────────────────────
 

@@ -1392,6 +1392,16 @@ AddStaggerDamage(stagger_dmg, hit.m_dir, hit)
 
 > **Key implication:** If a block fails due to stagger, the player gets staggered during the block AND then takes full damage through the regular pipeline. The stagger from the unblocked hit could also contribute again in ApplyDamage (the bar is already at max so it doesn't re-trigger, but it's worth understanding the flow).
 
+In this project, the reported stagger-health metrics map to that flow as follows:
+- `minHealthForNoBlockStagger`: minimum health to avoid block bypass (1st check in `BlockAttack`)
+- `minHealthToAvoidStagger`: minimum health to avoid overall stagger outcome
+
+Naming note: `minHealthToAvoidStagger` is the current field name and replaces the
+older `minHealthForNoArmorStagger` label used in earlier revisions.
+
+When guard break happens on the 1st check, these values are equal, because avoiding
+block bypass is a prerequisite for avoiding stagger in that case.
+
 ---
 
 ## Notes

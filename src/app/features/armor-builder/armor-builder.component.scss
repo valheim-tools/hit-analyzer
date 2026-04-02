@@ -1,0 +1,753 @@
+@use '../../../styles/variables' as *;
+
+$slot-size: 80px;
+
+.armor-builder {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+// ── Header ──────────────────────────────────────────────────────────────────
+
+.armor-builder-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid $color-gold-darker;
+
+  h2 {
+    flex: 1;
+    font-size: 1.1rem;
+    color: $color-gold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+    margin: 0;
+  }
+}
+
+.back-button {
+  color: $color-text-muted;
+  text-decoration: none;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-md;
+  background: $color-bg-section;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: $color-gold;
+    border-color: $color-gold;
+  }
+}
+
+.apply-button {
+  color: #b0d070;
+  font-size: 0.85rem;
+  font-family: inherit;
+  padding: 0.4rem 1rem;
+  border: 1px solid #607020;
+  border-radius: $radius-md;
+  background: #2a3018;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #3a4020;
+    border-color: #80a030;
+  }
+
+  &--armor {
+    color: #d0c080;
+    border-color: #706020;
+    background: #2a2818;
+
+    &:hover {
+      background: #3a3820;
+      border-color: #a09030;
+    }
+  }
+
+  &--effects {
+    color: #90b0d0;
+    border-color: #405060;
+    background: #1e2830;
+
+    &:hover {
+      background: #283848;
+      border-color: #5080a0;
+    }
+  }
+
+  &--all {
+    color: #b0d070;
+    border-color: #607020;
+    background: #2a3018;
+
+    &:hover {
+      background: #3a4020;
+      border-color: #80a030;
+    }
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.reset-button {
+  color: #c06060;
+  font-size: 0.8rem;
+  font-family: inherit;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #804040;
+  border-radius: $radius-md;
+  background: #2a2018;
+  cursor: pointer;
+  white-space: nowrap;
+  margin-left: 1rem;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: #362222;
+    color: #e06060;
+  }
+}
+
+// ── Set Presets ─────────────────────────────────────────────────────────────
+
+.set-presets {
+  margin-bottom: 1.2rem;
+}
+
+.set-presets-label {
+  font-size: 0.68rem;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.4rem;
+}
+
+.set-presets-list {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+
+  // Hide scrollbar but keep scrollability
+  scrollbar-width: thin;
+  scrollbar-color: $color-gold-darker transparent;
+}
+
+.set-preset-button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-md;
+  background: $color-bg-input;
+  color: $color-text-primary;
+  font-family: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $color-gold-dark;
+    background: $color-bg-section;
+  }
+
+  &.is-active {
+    border-color: $color-gold;
+    background: $color-bg-btn;
+  }
+}
+
+.set-preset-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.set-preset-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.set-preset-name {
+  font-size: 0.72rem;
+  color: $color-text-primary;
+  white-space: nowrap;
+}
+
+.set-preset-meta {
+  font-size: 0.58rem;
+  color: $color-text-muted;
+  white-space: nowrap;
+}
+
+// ── Inventory Grid ──────────────────────────────────────────────────────────
+
+.inventory {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.4rem;
+}
+
+.inventory-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inventory-row {
+  display: flex;
+  gap: 6px;
+}
+
+.inventory-cell {
+  width: $slot-size;
+  height: $slot-size;
+}
+
+.inventory-cell-empty {
+  // keep the grid aligned — invisible spacer
+  visibility: hidden;
+}
+
+.slot-box {
+  position: relative;
+  width: $slot-size;
+  height: $slot-size;
+  border: 2px solid $color-gold-darker;
+  border-radius: $radius-md;
+  background: $color-bg-input;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+
+  &:hover {
+    border-color: $color-gold;
+    box-shadow: 0 0 8px rgba(204, 175, 94, 0.25);
+  }
+
+  &.is-filled {
+    border-color: $color-gold-dark;
+    background: #1e1c14;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+  }
+}
+
+.slot-label {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.55rem;
+  color: $color-gold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+
+  .is-filled & {
+    color: rgba($color-gold, 0.7);
+  }
+}
+
+.slot-armor-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 3px;
+  font-size: 0.62rem;
+  font-weight: bold;
+  color: $color-gold;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 0 3px;
+  border-radius: 2px;
+  pointer-events: none;
+  line-height: 1.3;
+}
+
+// ── Total below grid ────────────────────────────────────────────────────────
+
+.inventory-total {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+  padding: 0.5rem 1rem;
+  background: $color-bg-section;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-md;
+}
+
+.inventory-total-label {
+  font-size: 0.75rem;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.inventory-total-value {
+  font-size: 1.3rem;
+  color: $color-gold;
+  font-weight: bold;
+}
+
+// ── Equipped section header (All Quality) ───────────────────────────────────
+
+.equipped-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid $color-gold-faint;
+}
+
+.equipped-section-label {
+  font-size: 0.72rem;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.global-quality-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.global-quality-label {
+  font-size: 0.62rem;
+  color: $color-text-muted;
+  white-space: nowrap;
+}
+
+.global-quality-buttons {
+  display: flex;
+  gap: 0.2rem;
+}
+
+// ── Equipped piece detail cards ─────────────────────────────────────────────
+
+.equipped-detail {
+  background: $color-bg-section;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-lg;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.equipped-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.equipped-detail-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: $radius-sm;
+  border: 1px solid $color-gold-darker;
+  background: $color-bg-input;
+  flex-shrink: 0;
+}
+
+.equipped-detail-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.equipped-detail-name {
+  font-size: 0.78rem;
+  color: $color-text-primary;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equipped-detail-armor {
+  font-size: 0.68rem;
+  color: $color-gold-dark;
+}
+
+.equipped-remove-button {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #603030;
+  border-radius: $radius-sm;
+  background: #2a1818;
+  color: #c06060;
+  font-size: 0.7rem;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: #3a2020;
+    color: #e06060;
+  }
+}
+
+.equipped-quality-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.equipped-quality-label {
+  font-size: 0.68rem;
+  color: $color-text-muted;
+  margin-bottom: 0;
+}
+
+.equipped-quality-buttons {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.quality-button {
+  font-family: inherit;
+  font-size: 0.68rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-sm;
+  background: $color-bg-input;
+  color: $color-text-muted;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: $color-text-primary;
+    border-color: $color-gold-dark;
+  }
+
+  &.active {
+    background: $color-bg-btn;
+    color: $color-gold;
+    border-color: $color-gold;
+  }
+}
+
+.equipped-effects {
+  font-size: 0.68rem;
+  color: $color-text-muted;
+  line-height: 1.4;
+  margin-top: 0.3rem;
+  padding: 0.25rem 0.5rem;
+  background: #1e1c14;
+  border-radius: $radius-sm;
+  border-left: 2px solid $color-gold-darker;
+}
+
+.equipped-set-tag {
+  font-size: 0.62rem;
+  color: $color-gold-dark;
+  margin-top: 0.2rem;
+  letter-spacing: 0.5px;
+}
+
+// ── Set bonus & Resistance (below equipped details) ─────────────────────────
+
+.set-bonus-banner {
+  background: #1e2a1e;
+  border: 1px solid #405030;
+  border-radius: $radius-lg;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.set-bonus-name {
+  font-size: 0.78rem;
+  color: #a0d0a0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.set-bonus-detail {
+  font-size: 0.72rem;
+  color: $color-text-muted;
+  line-height: 1.4;
+}
+
+.resistance-summary {
+  background: $color-bg-section;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-lg;
+  padding: 0.7rem 0.9rem;
+  margin-bottom: 0.8rem;
+}
+
+.resistance-summary-label {
+  font-size: 0.68rem;
+  color: $color-text-muted;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.resistance-summary-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.resistance-tag {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: $radius-sm;
+  background: #2a3028;
+  color: #a0d0a0;
+  border: 1px solid #405030;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &.is-weakness {
+    background: #302820;
+    color: #d0a060;
+    border-color: #604820;
+  }
+
+  &.is-resistance {
+    background: #202830;
+    color: #70a0d0;
+    border-color: #305060;
+  }
+}
+
+.resistance-tag-icon {
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+// ── Picker Overlay ──────────────────────────────────────────────────────────
+
+.picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.picker-panel {
+  width: 100%;
+  max-width: 380px;
+  max-height: 80vh;
+  background: $color-bg-body;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-lg;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid $color-gold-faint;
+}
+
+.picker-title {
+  font-size: 0.82rem;
+  color: $color-gold;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.picker-close {
+  width: 28px;
+  height: 28px;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-sm;
+  background: $color-bg-section;
+  color: $color-text-muted;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: $color-text-primary;
+    border-color: $color-gold;
+  }
+}
+
+.picker-search {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid $color-gold-faint;
+  border-radius: 0;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.82rem;
+  font-family: inherit;
+  background: #1a1712;
+  color: $color-text-primary;
+
+  &:focus {
+    outline: none;
+    border-color: $color-gold-darker;
+  }
+}
+
+.picker-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 4px 0;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.35rem 0.9rem;
+  border: none;
+  background: transparent;
+  color: $color-text-primary;
+  font-family: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.1s;
+
+  &:hover {
+    background: $color-bg-btn;
+  }
+
+  &.is-selected {
+    background: #2a2416;
+    border-left: 3px solid $color-gold;
+    padding-left: calc(0.9rem - 3px);
+  }
+}
+
+.picker-item-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: $radius-sm;
+  border: 1px solid $color-gold-darker;
+  background: $color-bg-input;
+  flex-shrink: 0;
+}
+
+.picker-item-icon-empty {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-sm;
+  border: 1px dashed $color-gold-darker;
+  background: $color-bg-input;
+  color: $color-text-muted;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.picker-item-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.picker-item-biome {
+  font-size: 0.62rem;
+  color: $color-text-muted;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+// ── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: $bp-mobile) {
+  .armor-builder-header {
+    gap: 0.5rem;
+
+    h2 {
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+  }
+
+  .back-button,
+  .apply-button {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+  }
+
+  .picker-panel {
+    max-width: 100%;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,80 @@
+<div class="f-step">
+  <div class="f-step-label">7 — Remaining Health</div>
+
+  @if (data().adjustedInstantDamage > 0) {
+    <div class="f-eq">
+      Instant:
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result">{{ data().adjustedInstantDamage | formatNumber }}</strong>
+        <span class="tip-text">
+          adjustedInstantDamage =
+          @if (data().adjustedInstantDamageTerms.length > 0) {
+            @for (termEntry of data().adjustedInstantDamageTerms; track termEntry.variableName; let isLast = $last) {
+              {{ termEntry.variableName }}@if (!isLast) { + }
+            }
+            <br>
+            @for (termEntry of data().adjustedInstantDamageTerms; track termEntry.variableName; let isLast = $last) {
+              {{ termEntry.value | formatNumber }}@if (!isLast) { + }
+            }
+            = {{ data().adjustedInstantDamage | formatNumber }}
+          } @else {
+            0<br>
+            0 = {{ data().adjustedInstantDamage | formatNumber }}
+          }
+        </span>
+      </span>
+    </div>
+  }
+
+  @if (data().adjustedDotDamage > 0) {
+    <div class="f-eq">
+      DoT:
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result">{{ data().adjustedDotDamage | formatNumber }}</strong>
+        <span class="tip-text">
+          adjustedDotDamage =
+          @if (data().adjustedDotDamageTerms.length > 0) {
+            @for (termEntry of data().adjustedDotDamageTerms; track termEntry.variableName; let isLast = $last) {
+              {{ termEntry.variableName }}@if (!isLast) { + }
+            }
+            <br>
+            @for (termEntry of data().adjustedDotDamageTerms; track termEntry.variableName; let isLast = $last) {
+              {{ termEntry.value | formatNumber }}@if (!isLast) { + }
+            }
+            = {{ data().adjustedDotDamage | formatNumber }}
+          } @else {
+            0<br>
+            0 = {{ data().adjustedDotDamage | formatNumber }}
+          }
+        </span>
+      </span>
+    </div>
+  }
+
+  @if (data().adjustedInstantDamage > 0 && data().adjustedDotDamage > 0) {
+    <div class="f-eq">
+      ∑ Total =
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result">{{ data().adjustedTotal | formatNumber }}</strong>
+        <span class="tip-text">
+          adjustedTotalDamage = adjustedInstantDamage + adjustedDotDamage<br>
+          {{ data().adjustedInstantDamage | formatNumber }} + {{ data().adjustedDotDamage | formatNumber }} = {{ data().adjustedTotal | formatNumber }}
+        </span>
+      </span>
+    </div>
+  }
+
+  <div class="f-eq">
+    {{ data().maxHealth | formatNumber }} − {{ data().adjustedTotal | formatNumber }} =
+    <span class="tip-wrap f-hover-wrap" tabindex="0">
+      <strong [class]="data().isDead ? 'f-hover-result f-main-result f-dead' : 'f-hover-result f-main-result'">
+        @if (data().isDead) { 💀 }{{ data().remainingHealth | formatNumber }}
+      </strong>
+      <span class="tip-text">
+        remainingHealth = maxHealth − adjustedTotalDamage<br>
+        {{ data().maxHealth | formatNumber }} − {{ data().adjustedTotal | formatNumber }} = {{ data().remainingHealth | formatNumber }}
+      </span>
+    </span>
+  </div>
+</div>
+

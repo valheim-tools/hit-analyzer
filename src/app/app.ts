@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, effect } from '@angular/core';
 
 import { FormStateService } from './core/form-state.service';
 import { DamageCalculatorService } from './core/damage-calculator.service';
@@ -11,6 +11,7 @@ import { PlayerDefenseFormComponent } from './features/player-defense-form/playe
 import { CombatArenaComponent } from './features/hit-simulator/combat-arena/combat-arena.component';
 import { ResultsTableComponent } from './features/hit-analyzer/results-table/results-table.component';
 import { StepAnalysisComponent } from './features/hit-analyzer/step-analysis/step-analysis.component';
+import { DevTestCaseLoaderComponent } from './features/dev-test-case-loader/dev-test-case-loader.component';
 
 type ActiveTab = 'simulator' | 'hit-analyzer';
 
@@ -22,6 +23,7 @@ type ActiveTab = 'simulator' | 'hit-analyzer';
     CombatArenaComponent,
     ResultsTableComponent,
     StepAnalysisComponent,
+    DevTestCaseLoaderComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -35,7 +37,19 @@ export class App implements OnInit {
   readonly calculationResult = signal<CalculationResult | null>(null);
   readonly calculationFormState = signal<FormState | null>(null);
   readonly calculationError = signal<string | null>(null);
-  readonly riskFactor = signal<number>(0);
+  readonly riskFactor = signal<number>(this.formStateService.state().riskFactor);
+  private previousDifficulty = this.formStateService.state().difficulty;
+
+  constructor() {
+    effect(() => {
+      const currentState = this.formStateService.state();
+      const currentDifficulty = currentState.difficulty;
+      if (currentDifficulty === this.previousDifficulty) return;
+
+      this.previousDifficulty = currentDifficulty;
+      this.hitSimulatorService.reset(currentState.maxHealth);
+    });
+  }
 
   ngOnInit(): void {
     this.hitSimulatorService.init(this.formStateService.state().maxHealth);
@@ -95,12 +109,12 @@ export class App implements OnInit {
     this.calculationError.set(null);
     this.calculationFormState.set(null);
     this.riskFactor.set(0);
-    const state = this.formStateService.state();
-    this.hitSimulatorService.reset(state.maxHealth);
   }
 
   onRiskFactorChange(event: Event): void {
     const value = parseFloat((event.target as HTMLInputElement).value);
-    this.riskFactor.set(Number.isFinite(value) && value >= 0 && value <= 100 ? value : 0);
+    const riskFactorValue = Number.isFinite(value) && value >= 0 && value <= 100 ? value : 0;
+    this.riskFactor.set(riskFactorValue);
+    this.formStateService.patch({ riskFactor: riskFactorValue });
   }
 }

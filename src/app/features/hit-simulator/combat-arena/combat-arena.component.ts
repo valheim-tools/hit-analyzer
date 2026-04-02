@@ -1,5 +1,5 @@
 import {
-  Component, OnInit, OnDestroy, inject, signal, viewChild, ElementRef, afterRenderEffect,
+  Component, OnInit, OnDestroy, inject, signal, computed, viewChild, ElementRef, afterRenderEffect, effect,
 } from '@angular/core';
 import { HitSimulatorService } from '../../../core/hit-simulator.service';
 import { DamageCalculatorService } from '../../../core/damage-calculator.service';
@@ -8,9 +8,11 @@ import {
   SimLogEntry, HitLogEntry, DotTickLogEntry, DotBreakdown, ScenarioResult,
   SimScenarioKey,
 } from '../../../core/models';
-import { DAMAGE_TYPE_ICONS, SIM_SCENARIO_KEYS, SIM_SCENARIO_LABELS } from '../../../core/constants';
-import { DOT_TYPE_CONFIGS } from '../../../core/damage-calculator';
+import { DAMAGE_TYPE_ICONS, SIM_SCENARIO_KEYS, SIM_SCENARIO_LABELS, DOT_TYPE_CONFIGS } from '../../../core/constants';
 import { FormatNumberPipe } from '../../../shared/pipes/format-number.pipe';
+
+const DOT_SPEED_OPTIONS: readonly number[] = [0.5, 1, 2, 3, 4, 5];
+const ANIMATION_SPEED_OPTIONS: readonly number[] = [0.5, 1, 2, 3, 4, 5];
 
 @Component({
   selector: 'app-combat-arena',
@@ -25,27 +27,41 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
 
   readonly simulatorState = this.hitSimulatorService.state;
   readonly scenarioKeys: readonly SimScenarioKey[] = SIM_SCENARIO_KEYS;
+  readonly dotSpeedOptions: readonly number[] = DOT_SPEED_OPTIONS;
 
-  readonly arenaMobIconSrc = 'assets/images/animations/greydwarf.png';
+  readonly arenaMobIconSrc = 'images/animations/greydwarf.png';
 
   readonly selectedScenario = signal<SimScenarioKey>('noShield');
-  readonly dotSpeed = signal<number>(3);
+  readonly dotSpeed = signal<number>(this.formStateService.state().dotSpeed);
+  readonly animationSpeed = signal<number>(this.formStateService.state().animationSpeed);
   readonly errorMessage = signal<string | null>(null);
   readonly lastDotBreakdown = signal<DotBreakdown | null>(null);
 
+  // Task 3: Base animation slowdown factor — all durations multiplied by 1.35 for a more cinematic feel
+  readonly animationDurationFactor = computed<number>(() => 1.35 / this.animationSpeed());
+
   // Arena animation state
   readonly arenaAnimationClass = signal<string>('');
-  readonly arenaShieldSrc = signal<string>('assets/images/animations/blue-shield.png');
   readonly arenaIsStaggered = signal<boolean>(false);
   readonly arenaIsDead = signal<boolean>(false);
   readonly arenaIsAttacking = signal<boolean>(false);
   private arenaCleanupTimer: ReturnType<typeof setTimeout> | null = null;
+  private arenaReactionTimer: ReturnType<typeof setTimeout> | null = null;
+  private arenaAttackTimer: ReturnType<typeof setTimeout> | null = null;
   private vikingSkalTimer: ReturnType<typeof setTimeout> | null = null;
   readonly arenaIsVikingSkal = signal<boolean>(false);
 
   private readonly simLogListElement = viewChild<ElementRef<HTMLUListElement>>('simLog');
 
   constructor() {
+    // Sync slider signals when the form is reset
+    effect(() => {
+      this.formStateService.resetVersion(); // track reset
+      const formState = this.formStateService.state();
+      this.dotSpeed.set(formState.dotSpeed);
+      this.animationSpeed.set(formState.animationSpeed);
+    });
+
     // Scroll the log list to the bottom whenever a new entry is appended.
     // earlyRead reads scrollHeight before Angular writes to the DOM (avoids reflow in write phase).
     // write phase sets scrollTop — no DOM reads allowed here.
@@ -67,9 +83,10 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
   }
 
 
+  // Task 1: Disable hit buttons during arena animation, DoT animation, or death
   get isHitButtonsDisabled(): boolean {
     const state = this.simulatorState();
-    return state.isDead || state.isDotAnimating;
+    return state.isDead || state.isDotAnimating || this.arenaIsAttacking();
   }
 
   get healthBarClass(): string {
@@ -89,7 +106,7 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.clearArenaCleanupTimer();
+    this.clearAllArenaTimers();
   }
 
   onSelectScenario(scenarioKey: SimScenarioKey): void {
@@ -107,17 +124,41 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
 
   onResetHealth(): void {
     const state = this.formStateService.state();
+    this.clearAllArenaTimers();
     this.hitSimulatorService.reset(state.maxHealth);
     this.errorMessage.set(null);
     this.arenaIsDead.set(false);
     this.arenaIsStaggered.set(false);
+    this.arenaIsAttacking.set(false);
+    this.arenaIsVikingSkal.set(false);
     this.arenaAnimationClass.set('');
-    this.clearArenaCleanupTimer();
+    this.lastDotBreakdown.set(null);
   }
 
   onDotSpeedChange(event: Event): void {
-    const value = parseFloat((event.target as HTMLInputElement).value);
-    this.dotSpeed.set(value);
+    const sliderIndex = parseInt((event.target as HTMLInputElement).value, 10);
+    const selectedDotSpeed = this.dotSpeedOptions[sliderIndex] ?? this.dotSpeedOptions[0];
+    this.dotSpeed.set(selectedDotSpeed);
+    this.formStateService.patch({ dotSpeed: selectedDotSpeed });
+  }
+
+  dotSpeedSliderIndex(): number {
+    const selectedDotSpeed = this.dotSpeed();
+    const matchedIndex = this.dotSpeedOptions.findIndex(speedOption => speedOption === selectedDotSpeed);
+    return matchedIndex >= 0 ? matchedIndex : 0;
+  }
+
+  onAnimationSpeedChange(event: Event): void {
+    const sliderIndex = parseInt((event.target as HTMLInputElement).value, 10);
+    const selectedAnimationSpeed = ANIMATION_SPEED_OPTIONS[sliderIndex] ?? ANIMATION_SPEED_OPTIONS[1];
+    this.animationSpeed.set(selectedAnimationSpeed);
+    this.formStateService.patch({ animationSpeed: selectedAnimationSpeed });
+  }
+
+  animationSpeedSliderIndex(): number {
+    const selectedAnimationSpeed = this.animationSpeed();
+    const matchedIndex = ANIMATION_SPEED_OPTIONS.findIndex(speedOption => speedOption === selectedAnimationSpeed);
+    return matchedIndex >= 0 ? matchedIndex : 1;
   }
 
   onVikingClick(): void {
@@ -169,12 +210,14 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
     const scenarioResult: ScenarioResult = calculationResult[scenarioKey];
     const instantDamage = scenarioResult.instantDamage;
     const isStaggered = scenarioResult.stagger === 'YES';
+    const isStaggeredOnBlock = scenarioResult.staggeredOnBlock;
     const isDead = (this.simulatorState().currentHealth - instantDamage) <= 0;
 
-    this.hitSimulatorService.applyInstantDamage(instantDamage, scenarioKey, isStaggered, rng);
+    // Task 2: Pass isStaggeredOnBlock to the service for the hit log
+    this.hitSimulatorService.applyInstantDamage(instantDamage, scenarioKey, isStaggered, isStaggeredOnBlock, rng);
 
     // Trigger arena animation
-    this.triggerCombatAnimation(scenarioKey, isStaggered, isDead);
+    this.triggerCombatAnimation(scenarioKey, isStaggered, isStaggeredOnBlock, isDead);
 
     // Play DoT if any
     const dotBreakdown = scenarioResult.dotBreakdown;
@@ -188,43 +231,45 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
   private triggerCombatAnimation(
     scenarioKey: SimScenarioKey,
     isStaggered: boolean,
+    isStaggeredOnBlock: boolean,
     isDead: boolean,
   ): void {
-    this.clearArenaCleanupTimer();
+    this.clearAllArenaTimers();
     this.arenaIsDead.set(false);
     this.arenaIsStaggered.set(false);
     this.arenaAnimationClass.set('');
     this.arenaIsAttacking.set(false);
 
     const isShieldScenario = scenarioKey === 'block' || scenarioKey === 'parry';
-    if (isShieldScenario) {
-      this.arenaShieldSrc.set(
-        scenarioKey === 'parry'
-          ? 'assets/images/animations/yellow-shield.png'
-          : 'assets/images/animations/blue-shield.png'
-      );
-    }
+
+    const durationFactor = this.animationDurationFactor();
 
     // Mob lunges and projectile flies immediately (next render frame after reset)
-    setTimeout(() => {
+    this.arenaAttackTimer = setTimeout(() => {
       this.arenaIsAttacking.set(true);
+      this.arenaAttackTimer = null;
     }, 0);
 
-    // Player reacts after reaction delay
-    const reactionDelay = 267;
-    setTimeout(() => {
+    // Player reacts just before the projectile arrives (~65% of its 0.8s flight = 520ms).
+    // Shield animations ramp to full opacity 67–120ms after the class is applied,
+    // so a 400ms delay makes the shield visually appear at ~467–520ms — right as the stone hits.
+    const reactionDelay = 400 * durationFactor;
+    this.arenaReactionTimer = setTimeout(() => {
       if (isDead) {
         this.arenaAnimationClass.set('arena-death');
         this.arenaIsDead.set(true);
       } else if (isStaggered) {
-        this.arenaAnimationClass.set(`arena-hit-${this.getScenarioClass(scenarioKey)} arena-stagger${isShieldScenario ? ' arena-shield-break' : ''}`);
+        const isShieldBroken = isShieldScenario && isStaggeredOnBlock;
+        this.arenaAnimationClass.set(`arena-hit-${this.getScenarioClass(scenarioKey)} arena-stagger${isShieldBroken ? ' arena-shield-break' : ''}`);
         this.arenaIsStaggered.set(true);
       } else {
         this.arenaAnimationClass.set(`arena-hit-${this.getScenarioClass(scenarioKey)}`);
       }
+      this.arenaReactionTimer = null;
     }, reactionDelay);
 
-    const totalDuration = isDead ? 1600 : isStaggered ? 1733 : 1200;
+    const baseTotalDuration = isDead ? 1730 : isStaggered ? 1870 : 1330;
+    const totalDuration = baseTotalDuration * durationFactor;
     this.arenaCleanupTimer = setTimeout(() => {
       this.arenaAnimationClass.set('');
       this.arenaIsStaggered.set(false);
@@ -262,10 +307,22 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  private clearArenaCleanupTimer(): void {
+  private clearAllArenaTimers(): void {
     if (this.arenaCleanupTimer) {
       clearTimeout(this.arenaCleanupTimer);
       this.arenaCleanupTimer = null;
+    }
+    if (this.arenaReactionTimer) {
+      clearTimeout(this.arenaReactionTimer);
+      this.arenaReactionTimer = null;
+    }
+    if (this.arenaAttackTimer) {
+      clearTimeout(this.arenaAttackTimer);
+      this.arenaAttackTimer = null;
+    }
+    if (this.vikingSkalTimer) {
+      clearTimeout(this.vikingSkalTimer);
+      this.vikingSkalTimer = null;
     }
   }
 
@@ -286,5 +343,4 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
     return (DAMAGE_TYPE_ICONS as Record<string, string>)[dotTypeName] ?? '⏱';
   }
 }
-
 

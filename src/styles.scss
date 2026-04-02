@@ -14,3 +14,46 @@
 @use 'styles/toggle-group';
 // ── Layout ───────────────────────────────────────────────────────────────────
 @use 'styles/layout';
+
+// ── View Transitions (swipe left/right) ──────────────────────────────────────
+
+@keyframes slide-out-left {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-30%); opacity: 0; }
+}
+
+@keyframes slide-in-from-right {
+  from { transform: translateX(30%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-out-right {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(30%); opacity: 0; }
+}
+
+@keyframes slide-in-from-left {
+  from { transform: translateX(-30%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+// Navigate forward → current page slides left, new page slides in from right
+html.navigating-forward {
+  &::view-transition-old(root) {
+    animation: 250ms ease-in both slide-out-left;
+  }
+  &::view-transition-new(root) {
+    animation: 250ms ease-out 100ms both slide-in-from-right;
+  }
+}
+
+// Navigate back → current page slides right, old page slides in from left
+html.navigating-back {
+  &::view-transition-old(root) {
+    animation: 250ms ease-in both slide-out-right;
+  }
+  &::view-transition-new(root) {
+    animation: 250ms ease-out 100ms both slide-in-from-left;
+  }
+}
+

@@ -1,5 +1,43 @@
 @use '../styles/variables' as *;
 
+// ── Page header ──────────────────────────────────────────────────────────────
+
+.page-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+
+  h1 { margin-bottom: 0; }
+}
+
+.gear-button {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  font-size: 1.4rem;
+  color: $color-text-muted;
+  text-decoration: none;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-md;
+  background: $color-bg-section;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+  &:hover {
+    color: $color-gold;
+    border-color: $color-gold;
+    background: $color-bg-btn;
+  }
+}
+
 // ── Form grid ────────────────────────────────────────────────────────────────
 
 .form-grid {

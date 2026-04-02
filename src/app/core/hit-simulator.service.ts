@@ -1,13 +1,9 @@
 import { Injectable, signal, inject, NgZone } from '@angular/core';
 import {
-  SimulatorState, SimLogEntry, HitLogEntry, DotTickLogEntry,
+  SimulatorState, SimLogEntry,
   SimScenarioKey, DotBreakdown,
 } from './models';
-import { DOT_TYPE_CONFIGS } from './damage-calculator';
-
-const SHIELD_IMAGE_BLOCK  = 'assets/images/animations/blue-shield.png';
-const SHIELD_IMAGE_PARRY  = 'assets/images/animations/yellow-shield.png';
-const SHIELD_IMAGE_BROKEN = 'assets/images/animations/red-shield.png';
+import { DOT_TYPE_CONFIGS } from './constants';
 
 function makeInitialState(maxHealth: number): SimulatorState {
   return {
@@ -21,7 +17,6 @@ function makeInitialState(maxHealth: number): SimulatorState {
     arenaScenarioKey: null,
     arenaIsStaggered: false,
     arenaIsDead: false,
-    arenaShieldImageSrc: SHIELD_IMAGE_BLOCK,
     arenaIsAnimating: false,
   };
 }
@@ -56,6 +51,7 @@ export class HitSimulatorService {
     instantDamage: number,
     scenarioKey: SimScenarioKey,
     isStaggered: boolean,
+    isStaggeredOnBlock: boolean,
     rngFactor: number | null,
   ): void {
     this.stateSignal.update(current => {
@@ -76,14 +72,11 @@ export class HitSimulatorService {
           remainingHealth: currentHealth,
           exactRemainingHealth,
           isStaggered,
+          isStaggeredOnBlock,
           rngFactor,
           isDead,
         },
       };
-
-      const shieldImageSrc = scenarioKey === 'parry'
-        ? SHIELD_IMAGE_PARRY
-        : SHIELD_IMAGE_BLOCK;
 
       return {
         ...current,
@@ -95,14 +88,9 @@ export class HitSimulatorService {
         arenaScenarioKey: scenarioKey,
         arenaIsStaggered: isStaggered,
         arenaIsDead: isDead,
-        arenaShieldImageSrc: shieldImageSrc,
         arenaIsAnimating: true,
       };
     });
-  }
-
-  clearArenaAnimation(): void {
-    this.stateSignal.update(current => ({ ...current, arenaIsAnimating: false }));
   }
 
   playDotAnimation(dotBreakdown: DotBreakdown, dotSpeed: number): void {
@@ -205,4 +193,3 @@ export class HitSimulatorService {
     this.stateSignal.set(makeInitialState(maxHealth));
   }
 }
-

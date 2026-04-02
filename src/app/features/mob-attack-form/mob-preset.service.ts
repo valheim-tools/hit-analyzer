@@ -1,16 +1,11 @@
 import { Injectable, computed } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { MobAttackData, MobEntry, FlatMobPreset } from './models';
-import { DAMAGE_TYPE_NAMES } from './constants';
-
-const BIOME_ORDER = [
-  'Meadows', 'Black Forest', 'Ocean', 'Swamp', 'Mountain',
-  'Plains', 'Mistlands', 'Ashlands', 'Boss', 'Miniboss', 'Passive',
-];
+import { MobAttackData, MobEntry, FlatMobPreset } from './mob-preset.model';
+import { DAMAGE_TYPE_NAMES, BIOME_ORDER } from '../../core/constants';
 
 @Injectable({ providedIn: 'root' })
 export class MobPresetService {
-  private readonly mobAttackResource = httpResource<MobAttackData>(() => 'assets/data/mob-attacks.json');
+  private readonly mobAttackResource = httpResource<MobAttackData>(() => 'data/mob-attacks.json');
 
   readonly rawData = computed<MobAttackData>(() => this.mobAttackResource.value() ?? ({} as MobAttackData));
   readonly flatPresets = computed<FlatMobPreset[]>(() => this.flattenPresets(this.rawData()));
@@ -19,16 +14,11 @@ export class MobPresetService {
     return this.flatPresets().find(preset => preset._id === id);
   }
 
-
   getGroupedData(): { biome: string; mobs: MobEntry[] }[] {
     const data = this.rawData();
     return BIOME_ORDER
       .filter(biome => data[biome])
       .map(biome => ({ biome, mobs: data[biome] }));
-  }
-
-  private normalizeAssetPath(path: string): string {
-    return path.startsWith('src/') ? path.slice(4) : path;
   }
 
   private flattenPresets(data: MobAttackData): FlatMobPreset[] {
@@ -37,11 +27,10 @@ export class MobPresetService {
       const mobs = data[biome];
       if (!mobs) continue;
       for (const mob of mobs) {
-        const normalizedIconFile = this.normalizeAssetPath(mob.icon_file);
         for (const attack of mob.attacks) {
           const typeEntries = DAMAGE_TYPE_NAMES
-            .filter(typeName => (attack as any)[typeName] > 0)
-            .map(typeName => `${(attack as any)[typeName]} ${typeName}`);
+            .filter(typeName => (attack[typeName] ?? 0) > 0)
+            .map(typeName => `${attack[typeName]} ${typeName}`);
           const typeSummary = typeEntries.join(' + ');
           const label = `${mob.mob_name} — ${attack.attack_name} (${typeSummary})`;
           result.push({
@@ -49,7 +38,7 @@ export class MobPresetService {
             _id: attack.attack_type,
             _label: label,
             _mobPrefab: mob.prefab,
-            _mobIconFile: normalizedIconFile,
+            _mobIconFile: mob.icon_file,
           });
         }
       }
@@ -57,4 +46,3 @@ export class MobPresetService {
     return result;
   }
 }
-

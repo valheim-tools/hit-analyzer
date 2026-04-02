@@ -1,34 +1,22 @@
 @if (result()) {
 
   <!-- ── Damage Summary ────────────────────────────────────────────────── -->
-  @if (damageSummaryData(); as summary) {
+  @if (damageSummary(); as summary) {
     <p class="damage-summary">
-      @if (summary.hasParts) {
-        Damage modifier:
-        <span>{{ summary.parts.join(' | ') }} ({{ summary.totalBonus >= 0 ? '+' : '' }}{{ summary.totalBonus }}% total)</span>
-      } @else {
-        No damage modifier
+      {{ summary.label }}
+      @if (summary.highlight) {
+        <span>{{ summary.highlight }}</span>
       }
     </p>
   }
 
   <!-- ── Modifier Line ─────────────────────────────────────────────────── -->
-  @if (modifierLineData(); as modifier) {
+  @if (modifierLine(); as modifier) {
     <p class="modifier-line">
-      @if (modifier.hasRiskFactor) {
-        Scaled Effective Damage = {{ modifier.baseDamage | formatNumber }}
-        @if (modifier.hasEffectiveDamageStep) {
-          → {{ modifier.effectiveDamage | formatNumber }}
-        }
-        → <span>{{ modifier.scaledEffectiveDamage | formatNumber }}</span>
+      {{ modifier.label }}<span>{{ modifier.highlight }}</span>
+      @if (modifier.badgeText) {
         <br>
-        <span class="risk-factor-badge">{{ modifier.riskFactorValue }}% risk (×{{ modifier.rngFactor | formatNumber }})</span>
-      } @else {
-        @if (modifier.hasEffectiveDamageStep) {
-          Effective Damage = {{ modifier.baseDamage | formatNumber }} → <span>{{ modifier.effectiveDamage | formatNumber }}</span>
-        } @else {
-          Effective Damage = <span>{{ modifier.baseDamage | formatNumber }}</span>
-        }
+        <span class="risk-factor-badge">{{ modifier.badgeText }}</span>
       }
     </p>
   }
@@ -45,79 +33,118 @@
         </tr>
       </thead>
       <tbody>
-        @for (row of tableRows(); track $index) {
-          <tr [class]="row.rowClass">
 
-            <!-- Label column -->
-            <td>
-              {{ row.labelText }}
-              @if (row.labelTooltip) {
-                <span class="tip-wrap">
-                  <i class="tip-icon">?</i>
-                  <span class="tip-text">{{ row.labelTooltip }}</span>
-                </span>
-              }
-            </td>
-
-            <!-- Data columns -->
-            @for (cell of row.cells; track $index) {
+        <!-- Instant damage (conditional) -->
+        @if (hasInstantDamage()) {
+          <tr>
+            <td>Instant damage</td>
+            @for (scenario of scenarioDisplayValues(); track $index) {
               <td>
-                @switch (cell.kind) {
-
-                  @case ('number') {
-                    {{ cell.numericValue | formatNumber }}
-                  }
-
-                  @case ('skull') {
-                    <span class="skull-wrap tip-wrap">
-                      <span class="skull-icon">💀</span>
-                      <span class="tip-text">{{ cell.numericValue | formatNumber }}</span>
-                    </span>
-                  }
-
-                  @case ('stagger') {
-                    @if (cell.staggerValue === 'yes') {
-                      <span class="stagger-yes">yes</span>
-                    } @else if (cell.staggerValue === 'no') {
-                      <span class="stagger-no">no</span>
-                    } @else {
-                      <span class="stagger-no">N/A</span>
-                    }
-                  }
-
-                  @case ('health-check') {
-                    @if (cell.healthStatus === 'na') {
-                      <span class="stagger-no">N/A</span>
-                    } @else if (cell.healthStatus === 'zero') {
-                      <span class="stagger-no">0</span>
-                    } @else {
-                      <span [class]="cell.healthStatus === 'safe' ? 'health-safe' : 'health-warning'">{{ cell.healthValue }}</span>
-                    }
-                  }
-
-                  @case ('damage-lines') {
-                    @for (line of cell.lines ?? []; track $index) {
-                      <div class="dot-line">
-                        @if (line.displayText !== undefined) {
-                          {{ line.icon }} {{ line.displayText }}
-                        } @else if (line.displayValue !== null) {
-                          {{ line.icon }} {{ line.displayValue | formatNumber }}
-                        } @else {
-                          <span class="stagger-no">—</span>
-                        }
-                      </div>
-                    }
-                    @if (cell.linesSum !== undefined) {
-                      <div class="dot-line dot-line-sum">∑ {{ cell.linesSum | formatNumber }}</div>
-                    }
-                  }
-
+                @for (line of scenario.instantDamageLines; track $index) {
+                  <div [class]="line.cssClass">{{ line.text }}</div>
+                }
+                @if (scenario.instantDamageSumText) {
+                  <div class="dot-line dot-line-sum">{{ scenario.instantDamageSumText }}</div>
                 }
               </td>
             }
-
           </tr>
         }
+
+        <!-- DoT damage (conditional) -->
+        @if (hasDoT()) {
+          <tr>
+            <td>DoT damage</td>
+            @for (scenario of scenarioDisplayValues(); track $index) {
+              <td>
+                @for (line of scenario.dotDamageLines; track $index) {
+                  <div [class]="line.cssClass">{{ line.text }}</div>
+                }
+                @if (scenario.dotDamageSumText) {
+                  <div class="dot-line dot-line-sum">{{ scenario.dotDamageSumText }}</div>
+                }
+              </td>
+            }
+          </tr>
+
+          <tr>
+            <td>DoT ticks</td>
+            @for (scenario of scenarioDisplayValues(); track $index) {
+              <td>
+                @for (line of scenario.dotTickLines; track $index) {
+                  <div [class]="line.cssClass">{{ line.text }}</div>
+                }
+              </td>
+            }
+          </tr>
+
+          <!-- Remaining health before DoT -->
+          <tr class="row-key-result">
+            <td>Remaining health before DoT</td>
+            @for (scenario of scenarioDisplayValues(); track $index) {
+              <td>
+                @if (scenario.isRemainingHealthBeforeDoTLethal) {
+                  <span class="skull-wrap tip-wrap">
+                    <span class="skull-icon">💀</span>
+                    <span class="tip-text">{{ scenario.remainingHealthBeforeDoTText }}</span>
+                  </span>
+                } @else {
+                  {{ scenario.remainingHealthBeforeDoTText }}
+                }
+              </td>
+            }
+          </tr>
+        }
+
+        <!-- Remaining health -->
+        <tr class="row-key-result">
+          <td>Remaining health</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td>
+              @if (scenario.isRemainingHealthLethal) {
+                <span class="skull-wrap tip-wrap">
+                  <span class="skull-icon">💀</span>
+                  <span class="tip-text">{{ scenario.remainingHealthText }}</span>
+                </span>
+              } @else {
+                {{ scenario.remainingHealthText }}
+              }
+            </td>
+          }
+        </tr>
+
+        <!-- Staggered -->
+        <tr class="row-secondary">
+          <td>Staggered</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td><span [class]="scenario.staggeredCssClass">{{ scenario.staggeredText }}</span></td>
+          }
+        </tr>
+
+        <!-- Block bypassed -->
+        <tr class="row-secondary">
+          <td>Block bypassed</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td><span [class]="scenario.blockBypassedCssClass">{{ scenario.blockBypassedText }}</span></td>
+          }
+        </tr>
+
+        <!-- Min health to avoid block bypass -->
+        <tr class="row-secondary">
+          <td>Min health to avoid block bypass</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td><span [class]="scenario.minHealthBlockBypassCssClass">{{ scenario.minHealthBlockBypassText }}</span></td>
+          }
+        </tr>
+
+        <!-- Min health to avoid stagger -->
+        <tr class="row-secondary">
+          <td>Min health to avoid stagger</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td><span [class]="scenario.minHealthStaggerCssClass">{{ scenario.minHealthStaggerText }}</span></td>
+          }
+        </tr>
+
       </tbody>
     </table>
   </div>

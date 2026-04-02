@@ -1,37 +1,23 @@
-import { DamageMap, DamageTypeName } from './damage-map.model';
+import { DamageMap } from '../constants';
+import { DifficultyKey } from '../constants';
+import { SimScenarioKey } from '../constants/scenarios';
 
-export type DifficultyKey = 'VERY_EASY' | 'EASY' | 'NORMAL' | 'HARD' | 'VERY_HARD';
-export type ParryBonusKey = 'X1' | 'X1_5' | 'X2' | 'X2_5' | 'X4' | 'X6';
-export type ResistancePresetKey =
-  | 'VERY_WEAK'
-  | 'WEAK'
-  | 'SLIGHTLY_WEAK'
-  | 'NEUTRAL'
-  | 'SLIGHTLY_RESISTANT'
-  | 'RESISTANT'
-  | 'VERY_RESISTANT'
-  | 'IMMUNE';
+export type { DifficultyKey };
 
 export interface ResistanceModifiers {
   [key: string]: number;
 }
 
 export interface CalculationInputs {
-  damageTypes?: Partial<DamageMap>;
-  /** @deprecated use damageTypes instead */
-  baseDamage?: number;
+  damageTypes: Partial<DamageMap>;
   starLevel: number;
   extraDamagePercent?: number;
-  /** @deprecated use extraDamagePercent instead */
-  extraDamage?: number;
   difficulty: DifficultyKey;
   maxHealth: number;
   blockingSkill: number;
   blockArmor: number;
   armor: number;
-  parryMultiplier?: number;
-  /** @deprecated use parryMultiplier instead */
-  parryBonus?: ParryBonusKey;
+  parryMultiplier: number;
   resistanceModifiers?: ResistanceModifiers;
 }
 
@@ -62,7 +48,7 @@ export interface DamageBreakdownSnapshot {
 }
 
 export interface ScenarioResult {
-  scenarioName: string;
+  scenario: SimScenarioKey;
   blockReducedDamage: number;
   resistanceMultipliedDamage: number;
   armorReducedDamage: number;
@@ -74,7 +60,7 @@ export interface ScenarioResult {
   armorStaggerDamage: number;
   totalStaggerAccumulation: number;
   minHealthForNoBlockStagger: number;
-  minHealthForNoArmorStagger: number;
+  minHealthToAvoidStagger: number;
   instantDamage: number;
   instantMap: DamageMap;
   dotBreakdown: DotBreakdown;
@@ -93,9 +79,4 @@ export interface CalculationResult {
   parry: ScenarioResult;
 }
 
-export interface ResistancePresetEntry {
-  multiplier: number;
-  label: string;
-  percent: number;
-}
 

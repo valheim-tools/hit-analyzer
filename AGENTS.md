@@ -25,15 +25,17 @@ Angular single-page application — all calculation logic runs client-side in Ty
 │   │   │   ├── damage-calculator.service.ts    # Injectable wrapper around damage-calculator.ts
 │   │   │   ├── form-state.service.ts           # Centralized form state management
 │   │   │   ├── hit-simulator.service.ts        # Hit simulator state & DoT animation
-│   │   │   ├── mob-preset.service.ts           # Mob attack preset data loading
-│   │   │   ├── shield-preset.service.ts        # Shield preset data loading
 │   │   │   ├── constants/                      # Shared constants (damage types, scenarios, etc.)
-│   │   │   └── models/                         # TypeScript interfaces & types
+│   │   │   └── models/                         # Shared TypeScript interfaces & types
 │   │   ├── features/
 │   │   │   ├── hit-analyzer/                   # Hit Analyzer tab (results table, step analysis)
 │   │   │   ├── hit-simulator/                  # Hit Simulator tab (combat arena)
 │   │   │   ├── mob-attack-form/                # Mob attack stats form
+│   │   │   │   ├── mob-preset.model.ts         # Mob attack preset interfaces
+│   │   │   │   └── mob-preset.service.ts       # Mob attack preset data loading
 │   │   │   └── player-defense-form/            # Player defense stats form
+│   │   │       ├── shield-preset.model.ts      # Shield preset interface
+│   │   │       └── shield-preset.service.ts    # Shield preset data loading
 │   │   └── shared/
 │   │       ├── components/                     # Shared UI components (badges, dropdowns, toggles)
 │   │       ├── directives/                     # Shared directives (tooltip)

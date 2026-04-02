@@ -6,12 +6,21 @@
  * Pipeline: difficulty scaling → block/parry → resistance modifiers → body armor → DoT extraction
  */
 
-import { SIM_SCENARIO_LABELS } from './constants/scenarios';
+import {
+  DAMAGE_TYPE_NAMES,
+  INSTANT_DAMAGE_TYPE_NAMES,
+  DOT_DAMAGE_TYPE_NAMES,
+  STAGGER_DAMAGE_TYPE_NAMES,
+  DIFFICULTY_DAMAGE_BONUS_PERCENT,
+  FIRE_DOT,
+  SPIRIT_DOT,
+  POISON_DOT,
+} from './constants';
 import {
   DamageMap,
   DamageTypeName,
   DifficultyKey,
-  ParryBonusKey,
+  SimScenarioKey,
   CalculationInputs,
   CalculationOptions,
   CalculationResult,
@@ -21,103 +30,6 @@ import {
   ResistanceModifiers,
 } from './models';
 
-/* ── Constants ── */
-
-const DAMAGE_TYPE_NAMES: readonly DamageTypeName[] = Object.freeze([
-  'Blunt', 'Slash', 'Pierce',
-  'Fire', 'Frost', 'Lightning',
-  'Poison', 'Spirit',
-]);
-
-const BLOCKABLE_TYPES: readonly DamageTypeName[] = Object.freeze([
-  'Blunt', 'Slash', 'Pierce',
-  'Fire', 'Frost', 'Lightning',
-  'Poison', 'Spirit',
-]);
-
-export const STAGGER_TYPES: readonly DamageTypeName[] = Object.freeze([
-  'Blunt', 'Slash', 'Pierce', 'Lightning',
-]);
-
-const DOT_TYPES: readonly DamageTypeName[] = Object.freeze(['Fire', 'Poison', 'Spirit']);
-
-const INSTANT_TYPES: readonly DamageTypeName[] = Object.freeze([
-  'Blunt', 'Slash', 'Pierce', 'Frost', 'Lightning',
-]);
-
-/* ── Difficulty ── */
-
-interface DifficultyEntry {
-  damageBonus: number;
-}
-
-const DIFFICULTY: Readonly<Record<DifficultyKey, DifficultyEntry>> = Object.freeze({
-  VERY_EASY: { damageBonus: -0.50 },
-  EASY:      { damageBonus: -0.25 },
-  NORMAL:    { damageBonus:  0.0  },
-  HARD:      { damageBonus:  0.5  },
-  VERY_HARD: { damageBonus:  1.0  },
-});
-
-/* ── ParryBonus (legacy enum lookup) ── */
-
-const PARRY_BONUS: Readonly<Record<ParryBonusKey, number>> = Object.freeze({
-  X1:   1.0,
-  X1_5: 1.5,
-  X2:   2.0,
-  X2_5: 2.5,
-  X4:   4.0,
-  X6:   6.0,
-});
-
-/* ── DoT prefab constants ── */
-
-const FIRE_DOT = Object.freeze({ totalDuration: 5.0, tickInterval: 1.0, minimumPerTick: 0.2 });
-const SPIRIT_DOT = Object.freeze({ totalDuration: 3.0, tickInterval: 0.5, minimumPerTick: 0.2 });
-const POISON_DOT = Object.freeze({
-  baseDuration: 1.0,
-  durationPerDamagePlayer: 5.0,
-  durationPower: 0.5,
-  tickInterval: 1.0,
-});
-
-/** Per-type metadata derived from DoT game constants. Shared by analysis and simulator. */
-export interface DotTypeConfig {
-  /** Key used in `DotBreakdown` (lowercase). */
-  readonly key: keyof DotBreakdown;
-  /** Corresponding `DamageTypeName` (capitalized, for icon / CSS lookups). */
-  readonly damageTypeName: DamageTypeName;
-  /** Total DoT duration in seconds. `null` for Poison (variable). */
-  readonly totalDuration: number | null;
-  /** Per-tick minimum — ticks below this value are disregarded. `null` for Poison (no minimum). */
-  readonly minimumPerTick: number | null;
-  /** Fixed tick count. `null` for Poison (variable). */
-  readonly tickCount: number | null;
-}
-
-export const DOT_TYPE_CONFIGS: readonly DotTypeConfig[] = Object.freeze([
-  {
-    key: 'fire'   as const,
-    damageTypeName: 'Fire',
-    totalDuration:  FIRE_DOT.totalDuration,
-    minimumPerTick: FIRE_DOT.minimumPerTick,
-    tickCount: Math.floor(FIRE_DOT.totalDuration / FIRE_DOT.tickInterval),
-  },
-  {
-    key: 'spirit' as const,
-    damageTypeName: 'Spirit',
-    totalDuration:  SPIRIT_DOT.totalDuration,
-    minimumPerTick: SPIRIT_DOT.minimumPerTick,
-    tickCount: Math.floor(SPIRIT_DOT.totalDuration / SPIRIT_DOT.tickInterval),
-  },
-  {
-    key: 'poison' as const,
-    damageTypeName: 'Poison',
-    totalDuration:  null,
-    minimumPerTick: null,
-    tickCount:      null,
-  },
-]);
 
 /* ── RNG damage variance ── */
 
@@ -195,11 +107,11 @@ function applyEffectiveScaling(
   damageMap: DamageMap,
   starLevel: number,
   extraDamagePercent: number,
-  difficulty: DifficultyEntry,
+  difficultyBonusPercent: number,
 ): DamageMap {
   const starBonus = starLevel * 0.50;
   const extraBonus = extraDamagePercent / 100.0;
-  const multiplier = 1.0 + difficulty.damageBonus + starBonus + extraBonus;
+  const multiplier = 1.0 + difficultyBonusPercent / 100.0 + starBonus + extraBonus;
   const scaled = cloneDamageMap(damageMap);
   for (const typeName of DAMAGE_TYPE_NAMES) {
     scaled[typeName] *= multiplier;
@@ -250,11 +162,11 @@ function applyArmorToDamageMap(damageMap: DamageMap, armor: number): DamageMap {
 /* ── Block helpers ── */
 
 function getTotalBlockable(damageMap: DamageMap): number {
-  return sumTypes(damageMap, BLOCKABLE_TYPES);
+  return sumTypes(damageMap, DAMAGE_TYPE_NAMES);
 }
 
 function getTotalStagger(damageMap: DamageMap): number {
-  return sumTypes(damageMap, STAGGER_TYPES);
+  return sumTypes(damageMap, STAGGER_DAMAGE_TYPE_NAMES);
 }
 
 function applyBlockDamage(damageMap: DamageMap, actualBlocked: number): DamageMap {
@@ -263,7 +175,7 @@ function applyBlockDamage(damageMap: DamageMap, actualBlocked: number): DamageMa
   const remaining = Math.max(0, totalBlockable - actualBlocked);
   const ratio = remaining / totalBlockable;
   const result = cloneDamageMap(damageMap);
-  for (const typeName of BLOCKABLE_TYPES) {
+  for (const typeName of DAMAGE_TYPE_NAMES) {
     result[typeName] *= ratio;
   }
   return result;
@@ -367,7 +279,7 @@ function buildDotBreakdown(damageMap: DamageMap): DotBreakdown {
 function extractDotDamage(damageMap: DamageMap): { instant: DamageMap; dotValues: DamageMap } {
   const instant = cloneDamageMap(damageMap);
   const dotValues = createEmptyDamageMap();
-  for (const typeName of DOT_TYPES) {
+  for (const typeName of DOT_DAMAGE_TYPE_NAMES) {
     dotValues[typeName] = instant[typeName] || 0;
     instant[typeName] = 0;
   }
@@ -475,31 +387,31 @@ function calculateScenario(
   // Min health to avoid stagger:
   //   no shield → avoid armor-phase stagger
   //   shield + successful block → avoid combined (block + armor) stagger
-  //   shield + guard break → 0 (guard break is primary stagger; captured by minHealthForNoBlockStagger)
-  let minHealthForNoArmorStagger: number;
+  //   shield + guard break → avoid block-phase stagger threshold (same value as minHealthForNoBlockStagger)
+  let minHealthToAvoidStagger: number;
   if (!useShield) {
-    minHealthForNoArmorStagger = armorStaggerDamage > 0 ? Math.floor(armorStaggerDamage / 0.4) + 1 : 0;
+    minHealthToAvoidStagger = armorStaggerDamage > 0 ? Math.floor(armorStaggerDamage / 0.4) + 1 : 0;
   } else if (staggeredOnBlock) {
-    minHealthForNoArmorStagger = 0;
+    minHealthToAvoidStagger = minHealthForNoBlockStagger;
   } else {
-    minHealthForNoArmorStagger = totalStaggerAccumulation > 0 ? Math.floor(totalStaggerAccumulation / 0.4) + 1 : 0;
+    minHealthToAvoidStagger = totalStaggerAccumulation > 0 ? Math.floor(totalStaggerAccumulation / 0.4) + 1 : 0;
   }
 
   // --- DoT extraction ---
   const { instant: instantMap, dotValues } = extractDotDamage(afterArmorMap);
-  const instantDamage = sumTypes(instantMap, INSTANT_TYPES);
+  const instantDamage = sumTypes(instantMap, INSTANT_DAMAGE_TYPE_NAMES);
   const dotBreakdown = buildDotBreakdown(dotValues);
 
   const totalDamage = afterArmorTotal;
   const remainingHealthBeforeDoT = player.maxHealth - instantDamage;
   const remainingHealth = player.maxHealth - totalDamage;
-  let scenarioName: string;
-  if (!useShield) scenarioName = SIM_SCENARIO_LABELS.noShield;
-  else if (isParry) scenarioName = SIM_SCENARIO_LABELS.parry;
-  else scenarioName = SIM_SCENARIO_LABELS.block;
+  let scenario: SimScenarioKey;
+  if (!useShield) scenario = 'noShield';
+  else if (isParry) scenario = 'parry';
+  else scenario = 'block';
 
   return {
-    scenarioName,
+    scenario,
     blockReducedDamage: blockReducedTotal,
     resistanceMultipliedDamage: resistanceMultipliedTotal,
     armorReducedDamage: totalDamage,
@@ -511,7 +423,7 @@ function calculateScenario(
     armorStaggerDamage,
     totalStaggerAccumulation,
     minHealthForNoBlockStagger,
-    minHealthForNoArmorStagger,
+    minHealthToAvoidStagger,
     instantDamage,
     instantMap,
     dotBreakdown,
@@ -525,26 +437,9 @@ function calculateScenario(
 
 /* ── Input resolution ── */
 
-function resolveParryMultiplier(inputs: CalculationInputs): number {
-  if (inputs.parryMultiplier != null && inputs.parryMultiplier !== (undefined as any)) {
-    const multiplier = Number(inputs.parryMultiplier);
-    validateParryMultiplier(multiplier);
-    return multiplier;
-  }
-  if (inputs.parryBonus != null && String(inputs.parryBonus).trim() !== '') {
-    const key = String(inputs.parryBonus) as ParryBonusKey;
-    if (!(key in PARRY_BONUS)) {
-      throw new Error(`Unknown parryBonus: ${key}`);
-    }
-    return PARRY_BONUS[key];
-  }
-  throw new Error('parryMultiplier is required.');
-}
-
 function resolveExtraDamagePercent(inputs: CalculationInputs): number {
-  const inputValue = inputs.extraDamagePercent != null ? inputs.extraDamagePercent : inputs.extraDamage;
-  if (inputValue == null) return 0.0;
-  const value = Number(inputValue);
+  if (inputs.extraDamagePercent == null) return 0.0;
+  const value = Number(inputs.extraDamagePercent);
   if (!Number.isFinite(value) || value < 0) {
     throw new Error('extraDamagePercent must be a non-negative number.');
   }
@@ -552,19 +447,7 @@ function resolveExtraDamagePercent(inputs: CalculationInputs): number {
 }
 
 function resolveDamageTypes(inputs: CalculationInputs): DamageMap {
-  if (inputs.damageTypes != null && typeof inputs.damageTypes === 'object') {
-    return normalizeDamageTypes(inputs.damageTypes as Partial<DamageMap>);
-  }
-  if (inputs.baseDamage != null) {
-    const baseDamage = Number(inputs.baseDamage);
-    if (!Number.isFinite(baseDamage)) {
-      throw new Error('baseDamage must be a finite number.');
-    }
-    const damageMap = createEmptyDamageMap();
-    damageMap.Blunt = baseDamage;
-    return damageMap;
-  }
-  throw new Error('Either damageTypes or baseDamage is required.');
+  return normalizeDamageTypes(inputs.damageTypes as Partial<DamageMap>);
 }
 
 function resolveResistanceModifiers(inputs: CalculationInputs): ResistanceModifiers {
@@ -593,10 +476,10 @@ export function calculate(
   { rng = null }: CalculationOptions = {},
 ): CalculationResult {
   const difficultyKey = String(inputs.difficulty) as DifficultyKey;
-  if (!(difficultyKey in DIFFICULTY)) {
+  if (!(difficultyKey in DIFFICULTY_DAMAGE_BONUS_PERCENT)) {
     throw new Error(`Unknown difficulty: ${difficultyKey}`);
   }
-  const difficulty = DIFFICULTY[difficultyKey];
+  const difficultyBonusPercent = DIFFICULTY_DAMAGE_BONUS_PERCENT[difficultyKey];
 
   const baseDamageMap = resolveDamageTypes(inputs);
   const baseDamageTotal = sumAllTypes(baseDamageMap);
@@ -607,7 +490,7 @@ export function calculate(
   validateExtraDamagePercent(extraDamagePercent);
 
   const effectiveDamageMap = applyEffectiveScaling(
-    baseDamageMap, starLevel, extraDamagePercent, difficulty,
+    baseDamageMap, starLevel, extraDamagePercent, difficultyBonusPercent,
   );
   const effectiveDamageTotal = sumAllTypes(effectiveDamageMap);
 
@@ -625,7 +508,8 @@ export function calculate(
     scaledEffectiveDamageTotal = effectiveDamageTotal;
   }
 
-  const parryMultiplier = resolveParryMultiplier(inputs);
+  const parryMultiplier = Number(inputs.parryMultiplier);
+  validateParryMultiplier(parryMultiplier);
   const resistanceModifiers = resolveResistanceModifiers(inputs);
   const player: PlayerState = {
     maxHealth:          Number(inputs.maxHealth),

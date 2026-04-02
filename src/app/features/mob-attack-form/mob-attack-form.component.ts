@@ -8,11 +8,12 @@ import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormStateService } from '../../core/form-state.service';
-import { MobPresetService } from '../../core/mob-preset.service';
+import { MobPresetService } from './mob-preset.service';
 import { DamageTypeName, FormState, DamageTypeEntry, DifficultyKey } from '../../core/models';
 import {
   DAMAGE_TYPE_NAMES, DAMAGE_TYPE_ICONS, INSTANT_DAMAGE_TYPE_NAMES, DOT_DAMAGE_TYPE_NAMES,
-  DIFFICULTY_KEYS, DIFFICULTY_LABELS, DIFFICULTY_EFFECT_DESCRIPTIONS,
+  DIFFICULTY_KEYS, DIFFICULTY_LABELS, DIFFICULTY_DAMAGE_BONUS_PERCENT,
+  STAR_LEVELS, STAR_LEVEL_LABELS, STAR_LEVEL_DAMAGE_BONUS_PERCENT, StarLevel,
 } from '../../core/constants';
 import { ToggleGroupComponent, ToggleOption } from '../../shared/components/toggle-group/toggle-group.component';
 import { PresetDropdownComponent, PresetGroup, PresetSubGroup } from '../../shared/components/preset-dropdown/preset-dropdown.component';
@@ -49,20 +50,27 @@ export class MobAttackFormComponent {
   readonly INSTANT_DAMAGE_TYPE_NAMES = INSTANT_DAMAGE_TYPE_NAMES;
   readonly DOT_DAMAGE_TYPE_NAMES = DOT_DAMAGE_TYPE_NAMES;
 
-  readonly starLevelOptions: ToggleOption[] = [
-    { value: 0, label: '0★' },
-    { value: 1, label: '1★' },
-    { value: 2, label: '2★' },
-  ];
+  readonly starLevelOptions: ToggleOption[] = STAR_LEVELS.map(level => ({
+    value: level,
+    label: STAR_LEVEL_LABELS[level],
+  }));
 
   readonly difficultyOptions: ToggleOption[] = DIFFICULTY_KEYS.map(key => ({
     value: key,
     label: DIFFICULTY_LABELS[key],
   }));
 
-  readonly difficultyBonusLabels: Record<DifficultyKey, string> = DIFFICULTY_EFFECT_DESCRIPTIONS;
+  readonly difficultyBonusLabels: Record<DifficultyKey, string> = Object.fromEntries(
+    DIFFICULTY_KEYS.map(key => {
+      const percent = DIFFICULTY_DAMAGE_BONUS_PERCENT[key];
+      const label = percent < 0
+        ? `${Math.abs(percent)}% less damage (flat)`
+        : `${percent}% additional damage bonus`;
+      return [key, label];
+    })
+  ) as Record<DifficultyKey, string>;
 
-  readonly starLevelBonusLabels: Record<number, string> = { 0: '0', 1: '50', 2: '100' };
+  readonly starLevelBonusLabels = STAR_LEVEL_DAMAGE_BONUS_PERCENT;
 
   readonly hasExtraDamage = signal(false);
 
@@ -98,8 +106,8 @@ export class MobAttackFormComponent {
     return this.form.controls.damageTypes;
   }
 
-  get currentStarLevel(): number {
-    return Number(this.form.controls.starLevel.value ?? 0);
+  get currentStarLevel(): StarLevel {
+    return Number(this.form.controls.starLevel.value ?? 0) as StarLevel;
   }
 
   get currentDifficulty(): DifficultyKey {

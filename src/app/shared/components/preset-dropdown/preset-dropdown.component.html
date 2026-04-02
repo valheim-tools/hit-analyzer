@@ -37,7 +37,7 @@
             <span class="preset-dropdown-option-text">Custom</span>
           </div>
         }
-        @for (group of filteredGroups(); track group.groupLabel; let groupIndex = $index) {
+        @for (group of filteredGroups(); track group.groupLabel;) {
           <div class="preset-dropdown-group-header">{{ group.groupLabel }}</div>
           @if (group.subGroups) {
             @for (subGroup of group.subGroups; track subGroup.subGroupLabel) {
@@ -46,7 +46,7 @@
                   <img class="preset-dropdown-subgroup-icon"
                        [src]="subGroup.iconSrc"
                        [alt]="subGroup.subGroupLabel"
-                       [attr.loading]="getSubgroupImageLoading(groupIndex)">
+                       [attr.loading]="'eager'">
                 }
                 {{ subGroup.subGroupLabel }}
               </div>
@@ -61,7 +61,7 @@
               }
             }
           } @else {
-            @for (item of (group.items ?? []); track item.id; let itemIndex = $index) {
+            @for (item of (group.items ?? []); track item.id;) {
               <div
                 class="preset-dropdown-option"
                 [class.selected]="item.id === selectedId()"
@@ -71,7 +71,7 @@
                   <img class="preset-dropdown-option-icon"
                        [src]="item.iconSrc"
                        [alt]="item.label"
-                       [attr.loading]="getOptionImageLoading(groupIndex, itemIndex)">
+                       [attr.loading]="'eager'">
                 }
                 <span class="preset-dropdown-option-text">{{ item.label }}</span>
               </div>

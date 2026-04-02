@@ -50,7 +50,8 @@
 
   <!-- ── Combat Animation Arena ── -->
   <div class="sim-arena"
-       [class.arena-parry-flash]="simulatorState().arenaScenarioKey === 'parry' && arenaIsAttacking()">
+       [class.arena-parry-flash]="simulatorState().arenaScenarioKey === 'parry' && arenaIsAttacking()"
+       [style.--arena-duration-factor]="animationDurationFactor()">
     <div class="arena-ground"></div>
 
     <div class="arena-mob" [class.arena-animating]="arenaIsAttacking()">
@@ -65,7 +66,7 @@
     <img
       class="arena-projectile"
       [class.arena-animating]="arenaIsAttacking()"
-      src="assets/images/animations/projectile.png"
+      src="images/animations/projectile.png"
       alt="Projectile"
     >
 
@@ -78,24 +79,33 @@
     >
       <img
         class="arena-player-icon"
-        src="assets/images/animations/viking.png"
+        src="images/animations/viking.png"
         alt="Viking"
       >
       <img
-        class="arena-player-shield"
-        [src]="arenaShieldSrc()"
-        alt="Shield"
+        class="arena-player-shield arena-player-shield-block"
+        src="images/animations/blue-shield.png"
+        alt="Block Shield"
+      >
+      <img
+        class="arena-player-shield arena-player-shield-parry"
+        src="images/animations/yellow-shield.png"
+        alt="Parry Shield"
       >
       <img
         class="arena-player-shield-broken"
-        src="assets/images/animations/red-shield.png"
+        src="images/animations/red-shield.png"
         alt="Broken Shield"
       >
-      <span class="arena-stagger-badge">⚠ Staggered</span>
+      <span class="arena-dizzy-stars">
+        <span class="arena-dizzy-star">✦</span>
+        <span class="arena-dizzy-star">✦</span>
+        <span class="arena-dizzy-star">✦</span>
+      </span>
       <span class="arena-death-overlay">💀</span>
       <span class="arena-viking-skal">
         Skål!
-        <img class="arena-viking-skal-icon" src="assets/images/animations/skal.png" alt="">
+        <img class="arena-viking-skal-icon" src="images/animations/skal.png" alt="">
       </span>
     </div>
   </div>
@@ -115,18 +125,33 @@
     >🎲 Random Hit</button>
   </div>
 
-  <div class="sim-dot-speed-row">
-    <label class="dot-speed-label" for="dotSpeedSlider">DoT Speed</label>
-    <input
-      type="range"
-      id="dotSpeedSlider"
-      min="1" max="10"
-      [value]="dotSpeed()"
-      step="0.5"
-      class="dot-speed-slider"
-      (input)="onDotSpeedChange($event)"
-    >
-    <span class="dot-speed-value">{{ dotSpeed() }}×</span>
+  <div class="sim-speed-sliders-row">
+    <div class="sim-speed-slider-group">
+      <label class="speed-slider-label" for="dotSpeedSlider">DoT Speed</label>
+      <input
+        type="range"
+        id="dotSpeedSlider"
+        min="0" max="5"
+        [value]="dotSpeedSliderIndex()"
+        step="1"
+        class="speed-slider"
+        (input)="onDotSpeedChange($event)"
+      >
+      <span class="speed-slider-value">{{ dotSpeed() }}×</span>
+    </div>
+    <div class="sim-speed-slider-group">
+      <label class="speed-slider-label" for="animationSpeedSlider">Anim Speed</label>
+      <input
+        type="range"
+        id="animationSpeedSlider"
+        min="0" max="5"
+        [value]="animationSpeedSliderIndex()"
+        step="1"
+        class="speed-slider"
+        (input)="onAnimationSpeedChange($event)"
+      >
+      <span class="speed-slider-value">{{ animationSpeed() }}×</span>
+    </div>
   </div>
 
   <button type="button" class="sim-reset-mobile" (click)="onResetHealth()">Reset HP</button>
@@ -152,7 +177,10 @@
             <span class="sim-log-hp">{{ entry.data.remainingHealth | formatNumber }} HP</span>
           }
           @if (entry.data.isStaggered) {
-            <span class="sim-log-stagger">⚠<span class="sim-log-stagger-text"> Staggered</span></span>
+            <span class="sim-log-stagger">🌀<span class="sim-log-stagger-text"> Staggered</span></span>
+            @if (entry.data.isStaggeredOnBlock) {
+              <span class="sim-log-stagger sim-log-block-bypass">⚠️<span class="sim-log-stagger-text"> Block bypassed</span></span>
+            }
           }
         </li>
       } @else if (isDotLogEntry(entry)) {

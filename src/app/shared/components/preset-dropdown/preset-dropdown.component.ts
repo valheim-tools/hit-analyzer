@@ -45,10 +45,6 @@ export class PresetDropdownComponent {
   readonly searchQuery = signal('');
 
   constructor() {
-
-    // Auto-focus the search input when the dropdown opens — matches vanilla JS behaviour.
-    // afterRenderEffect write phase runs after Angular has finished updating the DOM,
-    // so the @if-rendered input is guaranteed to exist before focus() is called.
     afterRenderEffect({
       write: () => {
         const searchElement = this.searchInputElement();
@@ -87,8 +83,8 @@ export class PresetDropdownComponent {
           .map(subGroup => {
             const subGroupNameMatches = subGroup.subGroupLabel.toLowerCase().includes(query);
             const matchingItems = subGroup.items.filter(item => item.label.toLowerCase().includes(query));
-            // If the mob name itself matches, show ALL its attacks — not just the (zero) items whose
-            // label also contains the mob name (attack labels never embed the mob name).
+            // If the mob name itself matches, show ALL its attacks — not just the items whose
+            // label also contains the mob name.
             return {
               ...subGroup,
               items: subGroupNameMatches ? subGroup.items : matchingItems,
@@ -135,22 +131,5 @@ export class PresetDropdownComponent {
 
   onSearchInput(event: Event): void {
     this.searchQuery.set((event.target as HTMLInputElement).value);
-  }
-
-  /**
-   * Always eagerly load subgroup (mob header) icons so all images are
-   * pre-fetched as soon as the component mounts — no flash-of-missing-image
-   * when the dropdown opens.
-   */
-  getSubgroupImageLoading(_groupIndex: number): 'eager' | 'lazy' {
-    return 'eager';
-  }
-
-  /**
-   * Always eagerly load flat option icons (e.g. shield preset options) so
-   * all images are pre-fetched on mount.
-   */
-  getOptionImageLoading(_groupIndex: number, _itemIndex: number): 'eager' | 'lazy' {
-    return 'eager';
   }
 }

@@ -1,0 +1,36 @@
+<div class="f-step">
+  <div class="f-step-label">6 — Adjusted Total Damage</div>
+  @if (!data().hasDisregardedDot) {
+    <div class="f-skipped">
+      {{ data().hasAnyDot ? 'No DoT damage below threshold' : 'No DoT damage — step skipped' }}
+    </div>
+  } @else {
+    @for (dot of data().dotDisregardEntries; track dot.icon) {
+      <div class="f-eq">
+        {{ dot.icon }} {{ dot.total | formatNumber }} →
+        <span class="tip-wrap f-hover-wrap" tabindex="0">
+          <strong class="f-hover-result">0</strong>
+          <span class="tip-text">
+            @if (dot.hasThreshold) {
+              per-tick {{ (dot.perTick ?? 0) | formatNumber }} &lt; {{ dot.threshold }} minimum threshold → damage disregarded<br>
+              (threshold only applies to Fire &amp; Spirit, not Poison)
+            } @else {
+              DoT damage disregarded
+            }
+          </span>
+        </span>
+      </div>
+    }
+    <div class="f-eq">
+      {{ data().armorReducedDamage | formatNumber }} − {{ data().disregardedTotal | formatNumber }} =
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result f-main-result">{{ data().adjustedTotal | formatNumber }}</strong>
+        <span class="tip-text">
+          adjustedTotalDamage = armorReducedDamage − disregardedDotDamage<br>
+          {{ data().armorReducedDamage | formatNumber }} − {{ data().disregardedTotal | formatNumber }} = {{ data().adjustedTotal | formatNumber }}
+        </span>
+      </span>
+    </div>
+  }
+</div>
+

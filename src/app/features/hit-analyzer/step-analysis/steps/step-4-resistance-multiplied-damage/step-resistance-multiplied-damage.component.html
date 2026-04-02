@@ -1,0 +1,41 @@
+<div class="f-step">
+  <div class="f-step-label">4 — Resistance-Multiplied Damage</div>
+  @if (data().isSkipped) {
+    @if (data().isNotAffecting) {
+      <div class="f-skipped">No resistance modifier affecting any of the damage types — step skipped</div>
+    } @else {
+      <div class="f-skipped">No resistance modifiers — step skipped</div>
+    }
+  } @else {
+    @for (resistance of data().typeResistances; track resistance.typeName) {
+      <div class="f-eq">
+        {{ resistance.icon }} {{ resistance.beforeValue | formatNumber }} →
+        <span class="tip-wrap f-hover-wrap" tabindex="0">
+          <strong class="f-hover-result">{{ resistance.afterValue | formatNumber }}</strong>
+          <span class="tip-text">
+            resistanceMultiplied{{ resistance.typeName }}Damage = @if (isShielded()) {blockReduced} @else {@if (hasRiskFactor()) {scaledEffective} @else {effective}}{{ resistance.typeName }}Damage × {{ resistance.lowerTypeName }}ResistanceMultiplier<br>
+            {{ resistance.beforeValue | formatNumber }} × {{ resistance.multiplier | formatNumber }} = {{ resistance.afterValue | formatNumber }}
+          </span>
+        </span>
+      </div>
+    }
+    <div class="f-eq">
+      @for (sum of data().activeSums; track sum.typeName; let isLast = $last) {
+        {{ sum.value | formatNumber }}@if (!isLast) { + }
+      } =
+      <span class="tip-wrap f-hover-wrap" tabindex="0">
+        <strong class="f-hover-result f-main-result">{{ data().afterResistanceDamage | formatNumber }}</strong>
+        <span class="tip-text">
+          resistanceMultipliedDamage =
+          @for (sum of data().activeSums; track sum.typeName; let isLast = $last) {
+            resistanceMultiplied{{ sum.typeName }}Damage@if (!isLast) { +}
+          }<br>
+          @for (sum of data().activeSums; track sum.typeName; let isLast = $last) {
+            {{ sum.value | formatNumber }}@if (!isLast) { + }
+          } = {{ data().afterResistanceDamage | formatNumber }}
+        </span>
+      </span>
+    </div>
+  }
+</div>
+

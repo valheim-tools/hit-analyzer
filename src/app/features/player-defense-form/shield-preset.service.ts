@@ -1,11 +1,11 @@
 import { Injectable, computed } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { Shield } from './models';
-import { calculateShieldBlockArmor } from './damage-calculator';
+import { Shield } from './shield-preset.model';
+import { calculateShieldBlockArmor } from '../../core/damage-calculator';
 
 @Injectable({ providedIn: 'root' })
 export class ShieldPresetService {
-  private readonly shieldResource = httpResource<Shield[]>(() => 'assets/data/shields.json');
+  private readonly shieldResource = httpResource<Shield[]>(() => 'data/shields.json');
 
   readonly shields = computed<Shield[]>(() => this.shieldResource.value() ?? ([] as Shield[]));
 

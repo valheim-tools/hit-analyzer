@@ -1,0 +1,296 @@
+<div class="armor-builder">
+  <header class="armor-builder-header">
+    <a routerLink="/" class="back-button" aria-label="Go back">← Back</a>
+    <h2>Armor Builder</h2>
+    <div class="header-actions">
+      <button class="apply-button apply-button--all" (click)="applyAllAndNavigateBack()">
+        Apply All
+      </button>
+      <button class="apply-button apply-button--armor" (click)="applyArmorAndNavigateBack()">
+        Apply Armor
+      </button>
+      <button class="apply-button apply-button--effects" (click)="applyEffectsAndNavigateBack()">
+        Apply Effects
+      </button>
+      <button type="button" class="reset-button" (click)="resetEquipment()">Reset</button>
+    </div>
+  </header>
+
+  <!-- ── Set Presets ── -->
+  <div class="set-presets">
+    <div class="set-presets-label">Armor Sets</div>
+    <div class="set-presets-list" (wheel)="onPresetsWheel($event)">
+      @for (setPreset of armorPieceService.armorSetPresets(); track setPreset.setName) {
+        <button
+          type="button"
+          class="set-preset-button"
+          [class.is-active]="selectedSetPresetName() === setPreset.setName"
+          [title]="setPreset.setName + ' — ' + setPreset.biome + ' (' + setPreset.type + ')'"
+          (click)="equipSet(setPreset.setName)"
+        >
+          @if (setPreset.iconFile) {
+            <img class="set-preset-icon" [src]="setPreset.iconFile" [alt]="setPreset.setName">
+          }
+          <div class="set-preset-info">
+            <span class="set-preset-name">{{ setPreset.setName }}</span>
+            <span class="set-preset-meta">{{ setPreset.biome }} · {{ setPreset.type }}</span>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- ── Equipment Grid (visual inventory) ── -->
+  <div class="inventory">
+    <div class="inventory-grid">
+      <!-- Row 1: Head + Legs -->
+      <div class="inventory-row">
+        <div class="inventory-cell">
+          <button
+            type="button"
+            class="slot-box"
+            [class.is-filled]="equippedSlots()['helmet'].piece"
+            (click)="openPicker('helmet')"
+            title="Head"
+          >
+            @if (equippedSlots()['helmet'].piece?.image_file) {
+              <img [src]="equippedSlots()['helmet'].piece!.image_file!" [alt]="equippedSlots()['helmet'].piece!.name">
+            }
+            <span class="slot-label">Head</span>
+            @if (getSlotArmor('helmet') > 0) {
+              <span class="slot-armor-badge">{{ getSlotArmor('helmet') }}</span>
+            }
+          </button>
+        </div>
+        <div class="inventory-cell">
+          <button
+            type="button"
+            class="slot-box"
+            [class.is-filled]="equippedSlots()['legs'].piece"
+            (click)="openPicker('legs')"
+            title="Legs"
+          >
+            @if (equippedSlots()['legs'].piece?.image_file) {
+              <img [src]="equippedSlots()['legs'].piece!.image_file!" [alt]="equippedSlots()['legs'].piece!.name">
+            }
+            <span class="slot-label">Legs</span>
+            @if (getSlotArmor('legs') > 0) {
+              <span class="slot-armor-badge">{{ getSlotArmor('legs') }}</span>
+            }
+          </button>
+        </div>
+      </div>
+
+      <!-- Row 2: Chest + Cape -->
+      <div class="inventory-row">
+        <div class="inventory-cell">
+          <button
+            type="button"
+            class="slot-box"
+            [class.is-filled]="equippedSlots()['chest'].piece"
+            (click)="openPicker('chest')"
+            title="Chest"
+          >
+            @if (equippedSlots()['chest'].piece?.image_file) {
+              <img [src]="equippedSlots()['chest'].piece!.image_file!" [alt]="equippedSlots()['chest'].piece!.name">
+            }
+            <span class="slot-label">Chest</span>
+            @if (getSlotArmor('chest') > 0) {
+              <span class="slot-armor-badge">{{ getSlotArmor('chest') }}</span>
+            }
+          </button>
+        </div>
+        <div class="inventory-cell">
+          <button
+            type="button"
+            class="slot-box"
+            [class.is-filled]="equippedSlots()['cape'].piece"
+            (click)="openPicker('cape')"
+            title="Cape"
+          >
+            @if (equippedSlots()['cape'].piece?.image_file) {
+              <img [src]="equippedSlots()['cape'].piece!.image_file!" [alt]="equippedSlots()['cape'].piece!.name">
+            }
+            <span class="slot-label">Cape</span>
+            @if (getSlotArmor('cape') > 0) {
+              <span class="slot-armor-badge">{{ getSlotArmor('cape') }}</span>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total armor below the grid -->
+    <div class="inventory-total">
+      <span class="inventory-total-label">Total Armor</span>
+      <span class="inventory-total-value">🛡 {{ totalArmor() }}</span>
+    </div>
+  </div>
+
+  <!-- ── All Quality buttons + Quality selectors for equipped pieces ── -->
+  @if (hasAnyEquippedPiece()) {
+    <div class="equipped-section-header">
+      <span class="equipped-section-label">Equipped Armor</span>
+      <div class="global-quality-controls">
+        <span class="global-quality-label">All Quality</span>
+        <div class="global-quality-buttons">
+          @for (qualityLevel of [1, 2, 3, 4]; track qualityLevel) {
+            <button
+              type="button"
+              class="quality-button"
+              (click)="setAllQuality(qualityLevel)"
+            >⚒ {{ qualityLevel }}</button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+  @for (slotConfig of SLOT_CONFIGS; track slotConfig.key) {
+    @if (equippedSlots()[slotConfig.key].piece) {
+      <div class="equipped-detail">
+        <div class="equipped-detail-header">
+          @if (equippedSlots()[slotConfig.key].piece!.image_file) {
+            <img
+              class="equipped-detail-icon"
+              [src]="equippedSlots()[slotConfig.key].piece!.image_file!"
+              [alt]="equippedSlots()[slotConfig.key].piece!.name"
+            >
+          }
+          <div class="equipped-detail-info">
+            <span class="equipped-detail-name">{{ equippedSlots()[slotConfig.key].piece!.name }}</span>
+            <span class="equipped-detail-armor">🛡 {{ getSlotArmor(slotConfig.key) }}</span>
+          </div>
+          <button type="button" class="equipped-remove-button" (click)="selectPiece(slotConfig.key, null)" title="Remove">✕</button>
+        </div>
+
+        @if (getQualityLevels(slotConfig.key).length > 1) {
+          <div class="equipped-quality-row">
+            <span class="equipped-quality-label">Quality</span>
+            <div class="equipped-quality-buttons">
+              @for (qualityLevel of getQualityLevels(slotConfig.key); track qualityLevel) {
+                <button
+                  type="button"
+                  class="quality-button"
+                  [class.active]="equippedSlots()[slotConfig.key].quality === qualityLevel"
+                  (click)="onQualityChanged(slotConfig.key, qualityLevel)"
+                >⚒ {{ qualityLevel }}</button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (equippedSlots()[slotConfig.key].piece!.piece_effects) {
+          <div class="equipped-effects">
+            {{ equippedSlots()[slotConfig.key].piece!.piece_effects }}
+          </div>
+        }
+
+        @if (equippedSlots()[slotConfig.key].piece!.set_name) {
+          <div class="equipped-set-tag">
+            {{ equippedSlots()[slotConfig.key].piece!.set_name }}
+            @if (equippedSlots()[slotConfig.key].piece!.set_biome) {
+              · {{ equippedSlots()[slotConfig.key].piece!.set_biome }}
+            }
+            @if (equippedSlots()[slotConfig.key].piece!.set_type) {
+              · {{ equippedSlots()[slotConfig.key].piece!.set_type }}
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- ── Set Bonus & Resistances ── -->
+  @if (activeSetName()) {
+    <div class="set-bonus-banner">
+      <span class="set-bonus-name">{{ activeSetName() }} — Set Bonus Active</span>
+      @if (activeSetBonus()) {
+        <span class="set-bonus-detail">{{ activeSetBonus() }}</span>
+      }
+    </div>
+  }
+
+  @if (hasResistanceEffects()) {
+    <div class="resistance-summary">
+      <span class="resistance-summary-label">Resistance Modifiers from Gear</span>
+      <div class="resistance-summary-list">
+        @for (entry of mergedResistanceModifiers(); track entry.type) {
+          <span class="resistance-tag" [class.is-weakness]="entry.percent > 100" [class.is-resistance]="entry.percent < 100">
+            <span class="resistance-tag-icon">{{ DAMAGE_TYPE_ICONS[entry.type] }}</span>
+            {{ entry.type }}: {{ entry.percent }}% ({{ getResistanceLabel(entry.percent / 100) }})
+          </span>
+        }
+      </div>
+    </div>
+  }
+</div>
+
+<!-- ── Item Picker Overlay ── -->
+@if (openPickerSlot()) {
+  <div class="picker-backdrop" (click)="onBackdropClick($event)">
+    <div class="picker-panel">
+      <div class="picker-header">
+        <span class="picker-title">Select {{ getPickerSlotLabel() }}</span>
+        <button type="button" class="picker-close" (click)="closePicker()">✕</button>
+      </div>
+      <input
+        #pickerSearchInput
+        type="text"
+        class="picker-search"
+        placeholder="Search…"
+        autocomplete="off"
+        [value]="pickerSearchQuery()"
+        (input)="onPickerSearchInput($event)"
+        (keydown.escape)="closePicker()"
+      >
+      <div class="picker-list" #pickerList>
+        <button
+          type="button"
+          class="picker-item picker-item-none"
+          [class.is-selected]="!equippedSlots()[openPickerSlot()!].piece"
+          (click)="selectPiece(openPickerSlot()!, null)"
+        >
+          <div class="picker-item-icon-empty">—</div>
+          <span class="picker-item-name">None</span>
+        </button>
+        @for (piece of filteredPickerPieces(); track piece.name) {
+          <button
+            type="button"
+            class="picker-item"
+            [class.is-selected]="isSelectedPiece(openPickerSlot()!, piece)"
+            (click)="selectPiece(openPickerSlot()!, piece)"
+          >
+            @if (piece.image_file) {
+              <img class="picker-item-icon" [src]="piece.image_file" [alt]="piece.name">
+            } @else {
+              <div class="picker-item-icon-empty">?</div>
+            }
+            <span class="picker-item-name">{{ piece.name }}</span>
+            @if (piece.set_biome) {
+              <span class="picker-item-biome">{{ piece.set_biome }}</span>
+            }
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -161,6 +161,7 @@
 .sim-log-hp       { color: #d0c090; flex-shrink: 0; min-width: 5.5rem; }
 .sim-log-hp.sim-log-dead { color: #e06060; }
 .sim-log-stagger  { color: #c87840; font-size: 0.74rem; flex-shrink: 0; }
+.sim-log-block-bypass { color: #6090c0; }
 .sim-log-factor   { color: #7898c8; font-size: 0.74rem; flex-shrink: 0; min-width: 3rem; cursor: help; }
 
 .sim-log-dot-entry { opacity: 0.85; }
@@ -168,23 +169,29 @@
 .sim-log-dot-label { color: #a89872; flex-shrink: 0; min-width: 6rem; font-size: 0.76rem; }
 .sim-log-dot-dmg   { color: #c87840; }
 
-// ── DoT Speed Slider ─────────────────────────────────────────────────────────
+// ── Speed Sliders ────────────────────────────────────────────────────────────
 
-.sim-dot-speed-row {
+.sim-speed-sliders-row {
   display: flex;
-  align-items: center;
   gap: 0.6rem;
   margin-top: 0.8rem;
   margin-bottom: 4px;
+}
+
+.sim-speed-slider-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   padding: 0.5rem 0.8rem;
   background: #26231a;
   border: 1px solid $color-gold-faint;
   border-radius: $radius-md;
 }
 
-.dot-speed-label { font-size: 0.72rem; color: $color-text-muted; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+.speed-slider-label { font-size: 0.72rem; color: $color-text-muted; text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
 
-.dot-speed-slider {
+.speed-slider {
   flex: 1;
   min-width: 0;
   -webkit-appearance: none;
@@ -216,7 +223,7 @@
   }
 }
 
-.dot-speed-value { font-size: 0.8rem; color: $color-gold; font-weight: bold; min-width: 2rem; text-align: right; font-family: 'Courier New', monospace; flex-shrink: 0; }
+.speed-slider-value { font-size: 0.8rem; color: $color-gold; font-weight: bold; min-width: 2rem; text-align: right; font-family: 'Courier New', monospace; flex-shrink: 0; }
 
 // ── Combat Arena ─────────────────────────────────────────────────────────────
 
@@ -335,23 +342,47 @@
   opacity: 0; z-index: 3; pointer-events: none;
 }
 
-.arena-stagger-badge {
-  position: absolute;
-  bottom: -2px;
-  font-size: 0.6rem;
-  color: #c87840;
-  background: rgba(30, 28, 19, 0.9);
-  border: 1px solid #c87840;
-  border-radius: $radius-sm;
-  padding: 1px 5px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-}
-
 .arena-death-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.2rem; opacity: 0; pointer-events: none; filter: drop-shadow(0 0 8px rgba(200, 40, 40, 0.8)); }
 
+.arena-dizzy-stars {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3rem;
+  height: 1.2rem;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
 // ─── Arena Keyframes ─────────────────────────────────────────────────────────
+
+@keyframes arenaDizzyOrbit {
+  0%   { transform: rotate(0deg) translateX(1.1rem) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(1.1rem) rotate(-360deg); }
+}
+
+@keyframes arenaDizzyFadeInOut {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.arena-dizzy-star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 0.7rem;
+  color: #f0c060;
+  filter: drop-shadow(0 0 3px rgba(240, 192, 96, 0.8));
+  animation: arenaDizzyOrbit calc(0.8s * var(--arena-duration-factor, 1)) linear infinite;
+
+  &:nth-child(1) { animation-delay: 0s; }
+  &:nth-child(2) { animation-delay: -0.267s; }
+  &:nth-child(3) { animation-delay: -0.533s; }
+}
 
 @keyframes arenaMobIdle {
   0%, 100% { filter: drop-shadow(0 0 6px rgba(200, 60, 60, 0.3)); }
@@ -376,9 +407,9 @@
 @keyframes arenaProjectileFly {
   0%   { left: 18%; opacity: 0; transform: translate(0, -50%) scale(0.6); }
   10%  { opacity: 1; transform: translate(0, -50%) scale(1); }
-  70%  { opacity: 1; left: 72%; transform: translate(0, -50%) scale(1.2); }
-  85%  { opacity: 0.6; left: 78%; transform: translate(0, -50%) scale(1.4); }
-  100% { opacity: 0; left: 80%; transform: translate(0, -50%) scale(0.5); }
+  65%  { opacity: 1; left: 78%; transform: translate(0, -50%) scale(1.2); }
+  82%  { opacity: 0.6; left: 84%; transform: translate(0, -50%) scale(1.3); }
+  100% { opacity: 0; left: 87%; transform: translate(0, -50%) scale(0.5); }
 }
 
 @keyframes arenaPlayerHit {
@@ -435,13 +466,6 @@
   100% { transform: translateX(0) rotate(0deg); }
 }
 
-@keyframes arenaStaggerBadgeFade {
-  0%   { opacity: 0; transform: translateY(4px); }
-  15%  { opacity: 1; transform: translateY(0); }
-  75%  { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-2px); }
-}
-
 @keyframes arenaPlayerDeath {
   0%   { transform: translateX(0) rotate(0deg); opacity: 1; }
   30%  { transform: translateX(10px) rotate(-10deg); opacity: 0.8; }
@@ -480,21 +504,23 @@
 
 // ─── Arena animation classes ─────────────────────────────────────────────────
 
-.arena-mob.arena-animating { animation: arenaAttackLunge 0.93s ease-out forwards; .arena-mob-icon { animation: none; } .arena-mob-weapon { animation: arenaWeaponSlash 0.93s ease-out forwards; } }
-.arena-projectile.arena-animating { animation: arenaProjectileFly 0.8s ease-out forwards; }
-.arena-mob.arena-mob-stagger { animation: arenaMobStagger 1s ease-out forwards; }
+$adf: var(--arena-duration-factor, 1);
+
+.arena-mob.arena-animating { animation: arenaAttackLunge calc(0.93s * #{$adf}) ease-out forwards; .arena-mob-icon { animation: none; } .arena-mob-weapon { animation: arenaWeaponSlash calc(0.93s * #{$adf}) ease-out forwards; } }
+.arena-projectile.arena-animating { animation: arenaProjectileFly calc(0.8s * #{$adf}) ease-out forwards; }
+.arena-mob.arena-mob-stagger { animation: arenaMobStagger calc(1s * #{$adf}) ease-out forwards; }
 
 .arena-player {
-  &.arena-hit-no-shield { animation: arenaPlayerHit 0.8s ease-out forwards; .arena-player-icon { animation: arenaPlayerDamageFlash 0.8s ease-out forwards; } }
-  &.arena-hit-block { animation: arenaPlayerBlock 0.67s ease-out forwards; .arena-player-shield { animation: arenaShieldBlock 0.8s ease-out forwards; } }
-  &.arena-hit-parry { animation: arenaPlayerParry 0.53s ease-out forwards; .arena-player-shield { animation: arenaShieldParry 0.67s ease-out forwards; } }
-  &.arena-stagger { animation: arenaPlayerStagger 1.2s ease-out forwards; .arena-stagger-badge { animation: arenaStaggerBadgeFade 1.33s ease-out forwards; } }
-  &.arena-shield-break { .arena-player-shield { animation: none !important; opacity: 0 !important; } .arena-player-shield-broken { animation: arenaShieldBreak 1.2s ease-out forwards; } }
-  &.arena-death { .arena-player-icon { animation: arenaPlayerDeath 1.07s ease-out forwards; } .arena-death-overlay { animation: arenaDeathSkull 1.07s 0.27s ease-out forwards; } }
+  &.arena-hit-no-shield { animation: arenaPlayerHit calc(0.8s * #{$adf}) ease-out forwards; .arena-player-icon { animation: arenaPlayerDamageFlash calc(0.8s * #{$adf}) ease-out forwards; } }
+  &.arena-hit-block { animation: arenaPlayerBlock calc(0.67s * #{$adf}) ease-out forwards; .arena-player-shield-block { animation: arenaShieldBlock calc(0.8s * #{$adf}) ease-out forwards; } }
+  &.arena-hit-parry { animation: arenaPlayerParry calc(0.53s * #{$adf}) ease-out forwards; .arena-player-shield-parry { animation: arenaShieldParry calc(0.67s * #{$adf}) ease-out forwards; } }
+  &.arena-stagger { animation: arenaPlayerStagger calc(1.2s * #{$adf}) ease-out forwards; .arena-dizzy-stars { animation: arenaDizzyFadeInOut calc(1.33s * #{$adf}) ease-out forwards; } }
+  &.arena-shield-break { .arena-player-shield-block, .arena-player-shield-parry { animation: none !important; opacity: 0 !important; } .arena-player-shield-broken { animation: arenaShieldBreak calc(1.2s * #{$adf}) ease-out forwards; } }
+  &.arena-death { .arena-player-icon { animation: arenaPlayerDeath calc(1.07s * #{$adf}) ease-out forwards; } .arena-death-overlay { animation: arenaDeathSkull calc(1.07s * #{$adf}) calc(0.27s * #{$adf}) ease-out forwards; } }
   &.arena-dead { .arena-player-icon { opacity: 0.15; transform: rotate(25deg); } .arena-death-overlay { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 }
 
-.sim-arena.arena-parry-flash { animation: arenaParryFlash 0.67s ease-out forwards; }
+.sim-arena.arena-parry-flash { animation: arenaParryFlash calc(0.67s * #{$adf}) ease-out forwards; }
 
 // ── Responsive ───────────────────────────────────────────────────────────────
 
@@ -533,7 +559,8 @@
 
   .arena-mob-weapon { font-size: 0.85rem; top: -2px; right: -8px; }
 
-  .arena-stagger-badge { font-size: 0.5rem; padding: 0 3px; }
+  .arena-dizzy-stars { top: -4px; width: 2.4rem; height: 1rem; }
+  .arena-dizzy-star { font-size: 0.55rem; }
 
   .arena-death-overlay { font-size: 1.6rem; }
 
@@ -557,6 +584,8 @@
   }
 
   .sim-hit-row { flex-direction: column; gap: 0.5rem; }
+
+  .sim-speed-sliders-row { flex-direction: column; gap: 0.4rem; }
 
   .sim-take-hit-btn {
     padding: 0.7rem 0.4rem;

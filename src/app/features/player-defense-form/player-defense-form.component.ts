@@ -4,14 +4,16 @@ import {
 import {
   ReactiveFormsModule, FormGroup, FormArray, FormControl, Validators,
 } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormStateService } from '../../core/form-state.service';
-import { ShieldPresetService } from '../../core/shield-preset.service';
+import { ShieldPresetService } from './shield-preset.service';
 import { DamageTypeName, FormState, ResistanceModifierEntry, ParryMultiplierMode } from '../../core/models';
 import {
   DAMAGE_TYPE_NAMES, DAMAGE_TYPE_ICONS, INSTANT_DAMAGE_TYPE_NAMES, DOT_DAMAGE_TYPE_NAMES,
+  SHIELD_QUALITY_LEVELS, RESISTANCE_PRESETS,
 } from '../../core/constants';
 import { ToggleGroupComponent, ToggleOption } from '../../shared/components/toggle-group/toggle-group.component';
 import { PresetDropdownComponent, PresetGroup } from '../../shared/components/preset-dropdown/preset-dropdown.component';
@@ -24,6 +26,7 @@ const PARRY_MULTIPLIER_PRESETS = [1, 1.5, 2, 2.5, 4, 6];
 
 interface ResistanceRowControls {
   type: FormControl<DamageTypeName | null>;
+  preset: FormControl<string | null>;
   percent: FormControl<number | null>;
 }
 
@@ -41,7 +44,7 @@ interface PlayerDefenseFormControls {
 
 @Component({
   selector: 'app-player-defense-form',
-  imports: [ReactiveFormsModule, ToggleGroupComponent, PresetDropdownComponent, TooltipDirective],
+  imports: [ReactiveFormsModule, RouterLink, ToggleGroupComponent, PresetDropdownComponent, TooltipDirective],
   templateUrl: './player-defense-form.component.html',
   styleUrls: ['./player-defense-form.component.scss'],
 })
@@ -53,15 +56,15 @@ export class PlayerDefenseFormComponent {
   private formSubscriptions = new Subscription();
 
   readonly DAMAGE_TYPE_ICONS = DAMAGE_TYPE_ICONS;
-  readonly INSTANT_DAMAGE_TYPE_NAMES = INSTANT_DAMAGE_TYPE_NAMES;
-  readonly DOT_DAMAGE_TYPE_NAMES = DOT_DAMAGE_TYPE_NAMES;
+  readonly INSTANT_DAMAGE_TYPE_NAMES: readonly DamageTypeName[] = INSTANT_DAMAGE_TYPE_NAMES;
+  readonly DOT_DAMAGE_TYPE_NAMES: readonly DamageTypeName[] = DOT_DAMAGE_TYPE_NAMES;
   readonly PARRY_MULTIPLIER_PRESETS = PARRY_MULTIPLIER_PRESETS;
+  readonly RESISTANCE_PRESETS = RESISTANCE_PRESETS;
 
-  readonly shieldQualityOptions: ToggleOption[] = [
-    { value: 1, label: '⚒ 1' },
-    { value: 2, label: '⚒ 2' },
-    { value: 3, label: '⚒ 3' },
-  ];
+  readonly shieldQualityOptions: ToggleOption[] = SHIELD_QUALITY_LEVELS.map(level => ({
+    value: level,
+    label: `⚒ ${level}`,
+  }));
 
   form!: FormGroup<PlayerDefenseFormControls>;
 
@@ -75,7 +78,7 @@ export class PlayerDefenseFormComponent {
       items: shields.map(shield => ({
         id: shield.prefab,
         label: shield.item_name,
-        iconSrc: `assets/images/presets/shields/${shield.prefab}.png`,
+        iconSrc: shield.icon_file,
       })),
     }];
   });
@@ -176,8 +179,14 @@ export class PlayerDefenseFormComponent {
   }
 
   private buildResistanceRow(type: DamageTypeName, percent: number): FormGroup<ResistanceRowControls> {
+    const matchingPreset = RESISTANCE_PRESETS.find(
+      resistancePreset => resistancePreset.percent === percent
+    );
+    const presetValue = matchingPreset ? String(matchingPreset.percent) : 'custom';
+
     return new FormGroup<ResistanceRowControls>({
       type: new FormControl<DamageTypeName | null>(type),
+      preset: new FormControl<string | null>(presetValue),
       percent: new FormControl(percent, [Validators.min(0), Validators.max(200)]),
     });
   }
@@ -253,6 +262,21 @@ export class PlayerDefenseFormComponent {
   }
 
   onResistanceTypeChange(): void {
+    this.syncToService();
+  }
+
+  isResistanceCustom(rowIndex: number): boolean {
+    return this.resistanceModifiersArray.at(rowIndex)?.controls.preset.value === 'custom';
+  }
+
+  onResistancePresetChange(rowIndex: number): void {
+    const row = this.resistanceModifiersArray.at(rowIndex);
+    if (!row) return;
+
+    const presetValue = row.controls.preset.value;
+    if (presetValue !== 'custom') {
+      row.controls.percent.setValue(Number(presetValue), { emitEvent: true });
+    }
     this.syncToService();
   }
 

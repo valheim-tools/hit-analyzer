@@ -1,161 +1,50 @@
 import { Component, input, computed } from '@angular/core';
 import {
-  CalculationResult, FormState, DamageTypeName, ScenarioResult, SimScenarioKey,
+  CalculationResult, FormState, ScenarioResult, SimScenarioKey,
 } from '../../../core/models';
 import {
-  STAGGER_TYPES, getPercentileRng, DOT_TYPE_CONFIGS,
+  getPercentileRng,
   calculateArmorReduction, calculateBlockPower, calculateBlockingSkillFactor, calculateStaggerThreshold,
 } from '../../../core/damage-calculator';
 import {
   DAMAGE_TYPE_NAMES, DAMAGE_TYPE_ICONS, DAMAGE_TYPE_CSS_CLASSES, DIFFICULTY_DAMAGE_BONUS_PERCENT,
-  DAMAGE_DISPLAY_THRESHOLD,
+  STAGGER_DAMAGE_TYPE_NAMES, DOT_TYPE_CONFIGS, INSTANT_DAMAGE_TYPE_NAMES, DOT_DAMAGE_TYPE_NAMES,
+  DAMAGE_DISPLAY_THRESHOLD, SIM_SCENARIO_LABELS,
 } from '../../../core/constants';
 import { FormatNumberPipe } from '../../../shared/pipes/format-number.pipe';
 
+import {
+  AnalysisSharedData, ScenarioAnalysis,
+  EffectiveDamageStepAnalysis, EffectiveBlockArmorStepAnalysis,
+  BlockReducedDamageStepAnalysis, ResistanceMultipliedDamageStepAnalysis,
+  ArmorReducedDamageStepAnalysis, AdjustedTotalDamageStepAnalysis,
+  RemainingHealthStepAnalysis, TypeBreakdownEntry, TypeResistanceEntry,
+  TypeActiveSum, DotDisregardEntry, StaggerTermEntry, FormulaTermEntry,
+} from './step-analysis.models';
 
-// ── Data interfaces ───────────────────────────────────────────────────────────
+import { StepEffectiveDamageComponent } from './steps/step-1-effective-damage/step-effective-damage.component';
+import { StepEffectiveBlockArmorComponent } from './steps/step-2-effective-block-armor/step-effective-block-armor.component';
+import { StepBlockReducedDamageComponent } from './steps/step-3-block-reduced-damage/step-block-reduced-damage.component';
+import { StepResistanceMultipliedDamageComponent } from './steps/step-4-resistance-multiplied-damage/step-resistance-multiplied-damage.component';
+import { StepArmorReducedDamageComponent } from './steps/step-5-armor-reduced-damage/step-armor-reduced-damage.component';
+import { StepAdjustedTotalDamageComponent } from './steps/step-6-adjusted-total-damage/step-adjusted-total-damage.component';
+import { StepRemainingHealthComponent } from './steps/step-7-remaining-health/step-remaining-health.component';
 
-export interface DamageBadge {
-  icon: string;
-  value: number;
-  cssClass: string;
-}
-
-export interface AnalysisSharedData {
-  badges: DamageBadge[];
-  total: number;
-}
-
-export interface TypeBreakdownEntry {
-  typeName: DamageTypeName;
-  icon: string;
-  beforeValue: number;
-  afterValue: number;
-  outputVarPrefix: string;  // e.g. 'blockReduced', 'armorReduced'
-  inputTotal: number;
-  outputTotal: number;
-  ratio: number;
-  isStaggerType: boolean;
-}
-
-export interface TypeResistanceEntry {
-  typeName: DamageTypeName;
-  lowerTypeName: string;
-  icon: string;
-  beforeValue: number;
-  afterValue: number;
-  multiplier: number;
-}
-
-export interface TypeActiveSum {
-  typeName: DamageTypeName;
-  value: number;
-}
-
-export interface DotDisregardEntry {
-  icon: string;
-  total: number;
-  hasThreshold: boolean;
-  perTick: number | null;
-  threshold: number | null;
-}
-
-export interface Step1Analysis {
-  baseDamage: number;
-  difficultyBonus: number;
-  starLevelBonus: number;
-  extraDamagePercent: number;
-  totalMultiplier: number;
-  effectiveDamage: number;
-  hasRiskFactor: boolean;
-  riskFactorValue: number;
-  rngBasePercentile: number;  // (100 − riskFactorValue) / 100
-  rngValue: number;
-  rngFactor: number;
-  scaledEffectiveDamage: number;
-}
-
-export interface Step2Analysis {
-  isSkipped: boolean;
-  blockArmor: number;
-  blockingSkill: number;
-  skillFactor: number;
-  isParry: boolean;
-  parryMultiplier: number;
-  effectiveBlockArmor: number;
-}
-
-export interface Step3Analysis {
-  isSkipped: boolean;
-  effectiveBlockArmor: number;
-  inputDamage: number;
-  halfInputDamage: number;
-  isLinear: boolean;
-  isExactTie: boolean;
-  afterBlockDamage: number;
-  staggeredOnBlock: boolean;
-  blockStaggerDamage: number;
-  staggerThreshold: number;
-  maxHealth: number;
-  typeBreakdowns: TypeBreakdownEntry[];
-}
-
-export interface Step4Analysis {
-  isSkipped: boolean;
-  typeResistances: TypeResistanceEntry[];
-  activeSums: TypeActiveSum[];
-  afterResistanceDamage: number;
-}
-
-export interface Step5Analysis {
-  armorInputDamage: number;
-  armor: number;
-  halfArmorInput: number;
-  isLinear: boolean;
-  isExactArmorThreshold: boolean;
-  armorReducedDamage: number;
-  staggerOccurred: boolean;
-  isNoShieldScenario: boolean;
-  blockStaggerDamage: number;
-  armorStaggerDamage: number;
-  totalStaggerAccumulation: number;
-  staggerThreshold: number;
-  maxHealth: number;
-  typeBreakdowns: TypeBreakdownEntry[];
-}
-
-export interface Step6Analysis {
-  hasDisregardedDot: boolean;
-  hasAnyDot: boolean;
-  dotDisregardEntries: DotDisregardEntry[];
-  disregardedTotal: number;
-  armorReducedDamage: number;
-  adjustedTotal: number;
-}
-
-export interface Step7Analysis {
-  maxHealth: number;
-  adjustedTotal: number;
-  remainingHealth: number;
-  isDead: boolean;
-}
-
-export interface ScenarioAnalysis {
-  title: string;
-  step1: Step1Analysis;
-  step2: Step2Analysis;
-  step3: Step3Analysis;
-  step4: Step4Analysis;
-  step5: Step5Analysis;
-  step6: Step6Analysis;
-  step7: Step7Analysis;
-}
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-step-analysis',
-  imports: [FormatNumberPipe],
+  imports: [
+    FormatNumberPipe,
+    StepEffectiveDamageComponent,
+    StepEffectiveBlockArmorComponent,
+    StepBlockReducedDamageComponent,
+    StepResistanceMultipliedDamageComponent,
+    StepArmorReducedDamageComponent,
+    StepAdjustedTotalDamageComponent,
+    StepRemainingHealthComponent,
+  ],
   templateUrl: './step-analysis.component.html',
   styleUrls: ['./step-analysis.component.scss'],
 })
@@ -225,9 +114,9 @@ export class StepAnalysisComponent {
     const scaledEffectiveDamage = hasRiskFactor ? calculationResult.scaledEffectiveDamage : effectiveDamage;
     const inputDamageMap        = hasRiskFactor ? calculationResult.scaledDamageMap : calculationResult.effectiveDamageMap;
 
-    // ── Step 1 ────────────────────────────────────────────────────────────
+    // ── Effective Damage ────────────────────────────────────────────────────
 
-    const step1: Step1Analysis = {
+    const effectiveDamageStep: EffectiveDamageStepAnalysis = {
       baseDamage,
       difficultyBonus,
       starLevelBonus,
@@ -242,64 +131,72 @@ export class StepAnalysisComponent {
       scaledEffectiveDamage,
     };
 
-    // ── Step 2 ────────────────────────────────────────────────────────────
+    // ── Effective Block Armor ───────────────────────────────────────────────
 
-    const effectiveBlockArmor = isShield
+    const effectiveBlockArmorValue = isShield
       ? calculateBlockPower(formState.blockingSkill, formState.blockArmor, isParry ? parryMultiplier : 1)
       : 0;
 
-    const step2: Step2Analysis = {
+    const effectiveBlockArmorStep: EffectiveBlockArmorStepAnalysis = {
       isSkipped: !isShield,
       blockArmor: formState.blockArmor,
       blockingSkill: formState.blockingSkill,
       skillFactor,
       isParry,
       parryMultiplier,
-      effectiveBlockArmor,
+      effectiveBlockArmor: effectiveBlockArmorValue,
     };
 
-    // ── Step 3 ────────────────────────────────────────────────────────────
+    // ── Block Reduced Damage ────────────────────────────────────────────────
 
-    const { isLinear: isBlockLinear, reducedDamage: afterBlockDamage } = calculateArmorReduction(scaledEffectiveDamage, effectiveBlockArmor);
+    const { isLinear: isBlockLinear, reducedDamage: afterBlockDamage } = calculateArmorReduction(scaledEffectiveDamage, effectiveBlockArmorValue);
     const afterBlockMap = scenarioData.damageBreakdown.afterBlock;
 
-    const step3TypeBreakdowns: TypeBreakdownEntry[] = [];
-    if (isShield && !scenarioData.staggeredOnBlock && afterBlockMap) {
+    const blockTypeBreakdowns: TypeBreakdownEntry[] = [];
+    if (isShield && afterBlockMap) {
       const activeTypes = DAMAGE_TYPE_NAMES.filter(typeName => (inputDamageMap[typeName] || 0) > DAMAGE_DISPLAY_THRESHOLD);
       if (activeTypes.length > 1) {
-        const ratio = scaledEffectiveDamage > 0 ? scenarioData.blockReducedDamage / scaledEffectiveDamage : 0;
+        const blockDamageRatio = scaledEffectiveDamage > 0 ? afterBlockDamage / scaledEffectiveDamage : 0;
         for (const typeName of activeTypes) {
-          step3TypeBreakdowns.push({
+          const beforeValue = inputDamageMap[typeName] || 0;
+          blockTypeBreakdowns.push({
             typeName,
             icon: DAMAGE_TYPE_ICONS[typeName] || '',
-            beforeValue: inputDamageMap[typeName] || 0,
-            afterValue:  afterBlockMap[typeName]  || 0,
+            beforeValue,
+            // Show theoretical post-block values even when guard break bypasses final damage replacement.
+            afterValue: beforeValue * blockDamageRatio,
             outputVarPrefix: 'blockReduced',
             inputTotal: scaledEffectiveDamage,
-            outputTotal: scenarioData.blockReducedDamage,
-            ratio,
-            isStaggerType: false,
+            outputTotal: afterBlockDamage,
+            ratio: blockDamageRatio,
+            isStaggerType: (STAGGER_DAMAGE_TYPE_NAMES as readonly string[]).includes(typeName),
           });
         }
       }
     }
 
-    const step3: Step3Analysis = {
+    const blockReducedDamageStep: BlockReducedDamageStepAnalysis = {
       isSkipped: !isShield,
-      effectiveBlockArmor,
+      effectiveBlockArmor: effectiveBlockArmorValue,
       inputDamage: scaledEffectiveDamage,
       halfInputDamage: scaledEffectiveDamage / 2,
       isLinear: isBlockLinear,
-      isExactTie: Math.abs(effectiveBlockArmor - scaledEffectiveDamage / 2) < 1e-9,
+      isExactTie: Math.abs(effectiveBlockArmorValue - scaledEffectiveDamage / 2) < 1e-9,
       afterBlockDamage,
       staggeredOnBlock: scenarioData.staggeredOnBlock,
       blockStaggerDamage: scenarioData.blockStaggerDamage,
+      blockStaggerTerms: blockTypeBreakdowns
+        .filter(typeBreakdown => typeBreakdown.isStaggerType)
+        .map(typeBreakdown => ({
+          variableName: `block${typeBreakdown.typeName}StaggerDamage`,
+          value: typeBreakdown.afterValue,
+        } as StaggerTermEntry)),
       staggerThreshold,
       maxHealth: formState.maxHealth,
-      typeBreakdowns: step3TypeBreakdowns,
+      typeBreakdowns: blockTypeBreakdowns,
     };
 
-    // ── Step 4 ────────────────────────────────────────────────────────────
+    // ── Resistance-Multiplied Damage ────────────────────────────────────────
 
     const resistanceModifiers: Record<string, number> = {};
     for (const entry of formState.resistanceModifiers) resistanceModifiers[entry.type] = entry.percent / 100;
@@ -328,14 +225,18 @@ export class StepAnalysisComponent {
       .filter(typeName => (afterResMap[typeName] || 0) > 0.001)
       .map(typeName => ({ typeName, value: afterResMap[typeName] || 0 }));
 
-    const step4: Step4Analysis = {
-      isSkipped: formState.resistanceModifiers.length === 0,
+    const hasResistanceModifiers = formState.resistanceModifiers.length > 0;
+    const isResistanceNotAffecting = hasResistanceModifiers && typeResistances.length === 0;
+
+    const resistanceMultipliedDamageStep: ResistanceMultipliedDamageStepAnalysis = {
+      isSkipped: !hasResistanceModifiers || isResistanceNotAffecting,
+      isNotAffecting: isResistanceNotAffecting,
       typeResistances,
       activeSums,
       afterResistanceDamage: scenarioData.resistanceMultipliedDamage,
     };
 
-    // ── Step 5 ────────────────────────────────────────────────────────────
+    // ── Armor Reduced Damage ────────────────────────────────────────────────
 
     const armorInputDamage = scenarioData.resistanceMultipliedDamage;
     const armorInputMap    = scenarioData.damageBreakdown.afterResistance;
@@ -344,12 +245,12 @@ export class StepAnalysisComponent {
 
     const staggerOccurred = scenarioData.stagger === 'YES' && !scenarioData.staggeredOnBlock;
 
-    const step5TypeBreakdowns: TypeBreakdownEntry[] = [];
+    const armorTypeBreakdowns: TypeBreakdownEntry[] = [];
     const activeArmorTypes = DAMAGE_TYPE_NAMES.filter(typeName => (armorInputMap[typeName] || 0) > DAMAGE_DISPLAY_THRESHOLD);
     if (activeArmorTypes.length > 1) {
       const ratio = armorInputDamage > 0 ? scenarioData.armorReducedDamage / armorInputDamage : 0;
       for (const typeName of activeArmorTypes) {
-        step5TypeBreakdowns.push({
+        armorTypeBreakdowns.push({
           typeName,
           icon: DAMAGE_TYPE_ICONS[typeName] || '',
           beforeValue: armorInputMap[typeName] || 0,
@@ -358,12 +259,19 @@ export class StepAnalysisComponent {
           inputTotal: armorInputDamage,
           outputTotal: scenarioData.armorReducedDamage,
           ratio,
-          isStaggerType: staggerOccurred && (STAGGER_TYPES as readonly string[]).includes(typeName),
+          isStaggerType: (STAGGER_DAMAGE_TYPE_NAMES as readonly string[]).includes(typeName),
         });
       }
     }
 
-    const step5: Step5Analysis = {
+    const armorStaggerTerms: StaggerTermEntry[] = armorTypeBreakdowns
+      .filter(typeBreakdown => typeBreakdown.isStaggerType)
+      .map(typeBreakdown => ({
+        variableName: `armor${typeBreakdown.typeName}StaggerDamage`,
+        value: typeBreakdown.afterValue,
+      } as StaggerTermEntry));
+
+    const armorReducedDamageStep: ArmorReducedDamageStepAnalysis = {
       armorInputDamage,
       armor: formState.armor,
       halfArmorInput: armorInputDamage / 2,
@@ -372,15 +280,18 @@ export class StepAnalysisComponent {
       armorReducedDamage: scenarioData.armorReducedDamage,
       staggerOccurred,
       isNoShieldScenario: !isShield,
+      isBlockBypassed: scenarioData.staggeredOnBlock,
       blockStaggerDamage: scenarioData.blockStaggerDamage,
+      staggerBuildupValue: scenarioData.staggeredOnBlock ? scenarioData.armorStaggerDamage : scenarioData.totalStaggerAccumulation,
       armorStaggerDamage: scenarioData.armorStaggerDamage,
+      armorStaggerTerms,
       totalStaggerAccumulation: scenarioData.totalStaggerAccumulation,
       staggerThreshold,
       maxHealth: formState.maxHealth,
-      typeBreakdowns: step5TypeBreakdowns,
+      typeBreakdowns: armorTypeBreakdowns,
     };
 
-    // ── Step 6 ────────────────────────────────────────────────────────────
+    // ── Adjusted Total Damage ───────────────────────────────────────────────
 
     let disregardedTotal = 0;
     const dotDisregardEntries: DotDisregardEntry[] = [];
@@ -401,7 +312,7 @@ export class StepAnalysisComponent {
     const adjustedTotal = scenarioData.armorReducedDamage - disregardedTotal;
     const hasAnyDot = DOT_TYPE_CONFIGS.some(dotConfig => scenarioData.dotBreakdown[dotConfig.key].total > 0.001);
 
-    const step6: Step6Analysis = {
+    const adjustedTotalDamageStep: AdjustedTotalDamageStepAnalysis = {
       hasDisregardedDot: disregardedTotal > 0.001,
       hasAnyDot,
       dotDisregardEntries,
@@ -410,16 +321,59 @@ export class StepAnalysisComponent {
       adjustedTotal,
     };
 
-    // ── Step 7 ────────────────────────────────────────────────────────────
+    // ── Remaining Health ────────────────────────────────────────────────────
 
-    const remainingHealth = formState.maxHealth - adjustedTotal;
-    const step7: Step7Analysis = {
+    const adjustedInstantDamageTerms: FormulaTermEntry[] = INSTANT_DAMAGE_TYPE_NAMES
+      .map(typeName => ({
+        variableName: `adjusted${typeName}Damage`,
+        value: scenarioData.damageBreakdown.afterArmor[typeName] || 0,
+      }))
+      .filter(termEntry => termEntry.value > DAMAGE_DISPLAY_THRESHOLD);
+
+    const adjustedDotDamageTerms: FormulaTermEntry[] = DOT_DAMAGE_TYPE_NAMES
+      .map(typeName => {
+        const matchingDotConfig = DOT_TYPE_CONFIGS.find(dotConfig => dotConfig.damageTypeName === typeName);
+        if (!matchingDotConfig) {
+          return {
+            variableName: `adjusted${typeName}Damage`,
+            value: 0,
+          } as FormulaTermEntry;
+        }
+        const dotData = scenarioData.dotBreakdown[matchingDotConfig.key];
+        return {
+          variableName: `adjusted${typeName}Damage`,
+          value: dotData.ticks.length > 0 ? dotData.total : 0,
+        } as FormulaTermEntry;
+      })
+      .filter(termEntry => termEntry.value > DAMAGE_DISPLAY_THRESHOLD);
+
+    const adjustedInstantDamage = adjustedInstantDamageTerms
+      .reduce((damageSum, termEntry) => damageSum + termEntry.value, 0);
+
+    const adjustedDotDamage = adjustedDotDamageTerms
+      .reduce((damageSum, termEntry) => damageSum + termEntry.value, 0);
+
+    const remainingHealthValue = formState.maxHealth - adjustedTotal;
+    const remainingHealthStep: RemainingHealthStepAnalysis = {
       maxHealth: formState.maxHealth,
       adjustedTotal,
-      remainingHealth,
-      isDead: remainingHealth <= 0,
+      adjustedInstantDamage,
+      adjustedInstantDamageTerms,
+      adjustedDotDamage,
+      adjustedDotDamageTerms,
+      remainingHealth: remainingHealthValue,
+      isDead: remainingHealthValue <= 0,
     };
 
-    return { title: scenarioData.scenarioName, step1, step2, step3, step4, step5, step6, step7 };
+    return {
+      title: SIM_SCENARIO_LABELS[scenarioData.scenario],
+      effectiveDamage: effectiveDamageStep,
+      effectiveBlockArmor: effectiveBlockArmorStep,
+      blockReducedDamage: blockReducedDamageStep,
+      resistanceMultipliedDamage: resistanceMultipliedDamageStep,
+      armorReducedDamage: armorReducedDamageStep,
+      adjustedTotalDamage: adjustedTotalDamageStep,
+      remainingHealth: remainingHealthStep,
+    };
   }
 }

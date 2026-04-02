@@ -1,5 +1,17 @@
 @use '../../../styles/variables' as *;
 
+.shield-preset-influence-group {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid $color-gold-faint;
+}
+
+.preset-row {
+  margin-bottom: 0.8rem;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 // ── Resistance type inputs ──────────────────────────────────────────────────
 
 .resistance-type-inputs {
@@ -16,7 +28,13 @@
 }
 
 .resistance-type-select {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
+  width: 115px;
+  min-width: 0;
+}
+
+.resistance-preset-select {
+  flex: 1 1 0;
   min-width: 0;
 }
 
@@ -80,6 +98,50 @@
   .field { margin-bottom: 0; }
 }
 
+// ── Armor + Resistance group ─────────────────────────────────────────────────
+
+.armor-resistance-group {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid $color-gold-faint;
+}
+
+.armor-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.armor-field {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.armor-builder-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  font-size: 1.1rem;
+  color: $color-text-muted;
+  text-decoration: none;
+  border: 1px solid $color-gold-darker;
+  border-radius: $radius-md;
+  background: $color-bg-input;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+  &:hover {
+    color: $color-gold;
+    border-color: $color-gold;
+    background: $color-bg-btn;
+  }
+}
+
 // ── Shield preset row ───────────────────────────────────────────────────────
 
 .shield-preset-row {
@@ -127,6 +189,7 @@
 @media (max-width: $bp-mobile) {
   .parry-multiplier-row { flex-wrap: wrap; }
   .custom-parry-field { flex: 1 1 100%; }
+  .resistance-type-row { flex-wrap: wrap; }
 }
 
 @media (max-width: $bp-xsmall) {

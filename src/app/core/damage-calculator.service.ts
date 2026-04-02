@@ -4,6 +4,7 @@ import { CalculationInputs, CalculationOptions, CalculationResult } from './mode
 
 @Injectable({ providedIn: 'root' })
 export class DamageCalculatorService {
+
   calculate(inputs: CalculationInputs, options: CalculationOptions = {}): CalculationResult {
     return calculate(inputs, options);
   }

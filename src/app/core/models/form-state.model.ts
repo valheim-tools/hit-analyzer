@@ -1,7 +1,8 @@
-import { DamageTypeName } from './damage-map.model';
+import { DamageTypeName } from '../constants';
 import { DifficultyKey } from './calculation.model';
+import { SimScenarioKey } from '../constants/scenarios';
 
-export type SimScenarioKey = 'noShield' | 'block' | 'parry';
+export type { SimScenarioKey };
 export type ParryMultiplierMode = 'preset' | 'custom';
 
 export interface DamageTypeEntry {
@@ -31,5 +32,6 @@ export interface FormState {
   shieldQuality: number;
   riskFactor: number;
   dotSpeed: number;
+  animationSpeed: number;
 }
 

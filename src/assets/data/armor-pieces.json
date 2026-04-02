@@ -1,0 +1,1313 @@
+{
+  "helmets": [
+    {
+      "name": "Midsummer Crown",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        null,
+        null,
+        null
+      ],
+      "max_quality": 1,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Midsummer_Crown.png"
+    },
+    {
+      "name": "Yule hat",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        null,
+        null,
+        null
+      ],
+      "max_quality": 1,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Yule_hat.png"
+    },
+    {
+      "name": "Celebratory cap",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        3,
+        5,
+        7
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Celebratory_cap.png"
+    },
+    {
+      "name": "Dverger circlet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        2,
+        null,
+        null,
+        null
+      ],
+      "max_quality": 1,
+      "set_bonus": null,
+      "piece_effects": "Cone shaped light source",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Dverger_circlet.png"
+    },
+    {
+      "name": "Hood of Odin",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Hood_of_Odin.png"
+    },
+    {
+      "name": "Leather helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Leather Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Leather_helmet.png"
+    },
+    {
+      "name": "Troll leather helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "max_quality": 4,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": "Troll Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Troll_leather_helmet.png"
+    },
+    {
+      "name": "Headdress of the Bear",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        7,
+        9,
+        11,
+        13
+      ],
+      "max_quality": 4,
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "piece_effects": null,
+      "set_name": "Bear Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Headdress_of_the_Bear.png"
+    },
+    {
+      "name": "Bronze helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Bronze Armor",
+      "set_biome": "Black Forest",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Bronze_helmet.png"
+    },
+    {
+      "name": "Root mask",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "max_quality": 4,
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "piece_effects": "Resistant(0.5x) VS Poison; Weak(1.5x) VS Fire",
+      "set_name": "Root Set",
+      "set_biome": "Swamp",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Root_mask.png"
+    },
+    {
+      "name": "Iron helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        14,
+        16,
+        18,
+        20
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Iron Armor",
+      "set_biome": "Swamp",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Iron_helmet.png"
+    },
+    {
+      "name": "Fenris hood",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        10,
+        12,
+        14,
+        16
+      ],
+      "max_quality": 4,
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Fire",
+      "set_name": "Fenris Set",
+      "set_biome": "Mountain",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Fenris_hood.png"
+    },
+    {
+      "name": "Drake helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        20,
+        22,
+        24,
+        26
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Wolf Armor",
+      "set_biome": "Mountain",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Drake_helmet.png"
+    },
+    {
+      "name": "Padded helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Padded Armor",
+      "set_biome": "Plains",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Padded_helmet.png"
+    },
+    {
+      "name": "Vilebone Visage",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        12,
+        14,
+        16,
+        18
+      ],
+      "max_quality": 4,
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "piece_effects": null,
+      "set_name": "Vilebone Set",
+      "set_biome": "Plains",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Vilebone_Visage.png"
+    },
+    {
+      "name": "Eitr-weave hood",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+20% Eitr regen",
+      "set_name": "Eitr-weave Set",
+      "set_biome": "Mistlands",
+      "set_type": "Mage",
+      "image_file": "images/presets/armor/Eitr-weave_hood.png"
+    },
+    {
+      "name": "Carapace helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        32,
+        34,
+        36,
+        38
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Carapace Armor",
+      "set_biome": "Mistlands",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Carapace_helmet.png"
+    },
+    {
+      "name": "Hood of Embla",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        19,
+        21,
+        23,
+        25
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+30% Eitr regen",
+      "set_name": "Embla Set",
+      "set_biome": "Ashlands",
+      "set_type": "Mage",
+      "image_file": "images/presets/armor/Hood_of_Embla.png"
+    },
+    {
+      "name": "Hood of Ask",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        28,
+        30,
+        32,
+        34
+      ],
+      "max_quality": 4,
+      "set_bonus": "Ask's Endurance (full set)",
+      "piece_effects": null,
+      "set_name": "Ask Set",
+      "set_biome": "Ashlands",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Hood_of_Ask.png"
+    },
+    {
+      "name": "Flametal helmet",
+      "slot": "Helmet",
+      "armor_by_quality": [
+        38,
+        40,
+        42,
+        44
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Flametal Armor",
+      "set_biome": "Ashlands",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Flametal_helmet.png"
+    }
+  ],
+  "chest_armor": [
+    {
+      "name": "Rag tunic",
+      "slot": "Chest",
+      "armor_by_quality": [
+        1,
+        2,
+        null,
+        null
+      ],
+      "max_quality": 2,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Rag Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Rag_tunic.png"
+    },
+    {
+      "name": "Leather tunic",
+      "slot": "Chest",
+      "armor_by_quality": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Leather Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Leather_tunic.png"
+    },
+    {
+      "name": "Troll leather tunic",
+      "slot": "Chest",
+      "armor_by_quality": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "max_quality": 4,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": "Troll Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Troll_leather_tunic.png"
+    },
+    {
+      "name": "Patterns of the Bear",
+      "slot": "Chest",
+      "armor_by_quality": [
+        7,
+        9,
+        11,
+        13
+      ],
+      "max_quality": 4,
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "piece_effects": null,
+      "set_name": "Bear Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Patterns_of_the_Bear.png"
+    },
+    {
+      "name": "Bronze plate cuirass",
+      "slot": "Chest",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Bronze Armor",
+      "set_biome": "Black Forest",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Bronze_plate_cuirass.png"
+    },
+    {
+      "name": "Root harnesk",
+      "slot": "Chest",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "max_quality": 4,
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "piece_effects": "-2% Movement speed; Resistant(0.5x) VS Pierce; Weak(1.5x) VS Fire",
+      "set_name": "Root Set",
+      "set_biome": "Swamp",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Root_harnesk.png"
+    },
+    {
+      "name": "Iron scale mail",
+      "slot": "Chest",
+      "armor_by_quality": [
+        14,
+        16,
+        18,
+        20
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Iron Armor",
+      "set_biome": "Swamp",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Iron_scale_mail.png"
+    },
+    {
+      "name": "Fenris coat",
+      "slot": "Chest",
+      "armor_by_quality": [
+        10,
+        12,
+        14,
+        16
+      ],
+      "max_quality": 4,
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Frost",
+      "set_name": "Fenris Set",
+      "set_biome": "Mountain",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Fenris_coat.png"
+    },
+    {
+      "name": "Wolf armor chest",
+      "slot": "Chest",
+      "armor_by_quality": [
+        20,
+        22,
+        24,
+        26
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed; Resistant(0.5x) VS Frost",
+      "set_name": "Wolf Armor",
+      "set_biome": "Mountain",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Wolf_armor_chest.png"
+    },
+    {
+      "name": "Padded cuirass",
+      "slot": "Chest",
+      "armor_by_quality": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Padded Armor",
+      "set_biome": "Plains",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Padded_cuirass.png"
+    },
+    {
+      "name": "Vilebone Cage",
+      "slot": "Chest",
+      "armor_by_quality": [
+        18,
+        20,
+        22,
+        24
+      ],
+      "max_quality": 4,
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "piece_effects": null,
+      "set_name": "Vilebone Set",
+      "set_biome": "Plains",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Vilebone_Cage.png"
+    },
+    {
+      "name": "Eitr-weave robe",
+      "slot": "Chest",
+      "armor_by_quality": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+40% Eitr regen; -2% Movement speed",
+      "set_name": "Eitr-weave Set",
+      "set_biome": "Mistlands",
+      "set_type": "Mage",
+      "image_file": "images/presets/armor/Eitr-weave_robe.png"
+    },
+    {
+      "name": "Carapace breastplate",
+      "slot": "Chest",
+      "armor_by_quality": [
+        32,
+        34,
+        36,
+        38
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Carapace Armor",
+      "set_biome": "Mistlands",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Carapace_breastplate.png"
+    },
+    {
+      "name": "Robes of Embla",
+      "slot": "Chest",
+      "armor_by_quality": [
+        19,
+        21,
+        23,
+        25
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+50% Eitr regen; -2% Movement speed",
+      "set_name": "Embla Set",
+      "set_biome": "Ashlands",
+      "set_type": "Mage",
+      "image_file": "images/presets/armor/Robes_of_Embla.png"
+    },
+    {
+      "name": "Breastplate of Ask",
+      "slot": "Chest",
+      "armor_by_quality": [
+        28,
+        30,
+        32,
+        34
+      ],
+      "max_quality": 4,
+      "set_bonus": "Ask's Endurance (full set)",
+      "piece_effects": null,
+      "set_name": "Ask Set",
+      "set_biome": "Ashlands",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Breastplate_of_Ask.png"
+    },
+    {
+      "name": "Flametal breastplate",
+      "slot": "Chest",
+      "armor_by_quality": [
+        38,
+        40,
+        42,
+        44
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+20% Heat Resistance; -5% Movement speed",
+      "set_name": "Flametal Armor",
+      "set_biome": "Ashlands",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Flametal_breastplate.png"
+    }
+  ],
+  "leg_armor": [
+    {
+      "name": "Rag pants",
+      "slot": "Legs",
+      "armor_by_quality": [
+        1,
+        2,
+        null,
+        null
+      ],
+      "max_quality": 2,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Rag Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Rag_pants.png"
+    },
+    {
+      "name": "Leather pants",
+      "slot": "Legs",
+      "armor_by_quality": [
+        2,
+        4,
+        6,
+        8
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": "Leather Armor",
+      "set_biome": "Meadows",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Leather_pants.png"
+    },
+    {
+      "name": "Troll leather pants",
+      "slot": "Legs",
+      "armor_by_quality": [
+        6,
+        8,
+        10,
+        12
+      ],
+      "max_quality": 4,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": "Troll Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Troll_leather_pants.png"
+    },
+    {
+      "name": "Loincloth of the Bear",
+      "slot": "Legs",
+      "armor_by_quality": [
+        7,
+        9,
+        11,
+        13
+      ],
+      "max_quality": 4,
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "piece_effects": null,
+      "set_name": "Bear Set",
+      "set_biome": "Black Forest",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Loincloth_of_the_Bear.png"
+    },
+    {
+      "name": "Bronze plate leggings",
+      "slot": "Legs",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Bronze Armor",
+      "set_biome": "Black Forest",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Bronze_plate_leggings.png"
+    },
+    {
+      "name": "Root leggings",
+      "slot": "Legs",
+      "armor_by_quality": [
+        8,
+        10,
+        12,
+        14
+      ],
+      "max_quality": 4,
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "piece_effects": "-2% Movement speed; Weak(1.5x) VS Fire",
+      "set_name": "Root Set",
+      "set_biome": "Swamp",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Root_leggings.png"
+    },
+    {
+      "name": "Iron greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        14,
+        16,
+        18,
+        20
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Iron Armor",
+      "set_biome": "Swamp",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Iron_greaves.png"
+    },
+    {
+      "name": "Fenris leggings",
+      "slot": "Legs",
+      "armor_by_quality": [
+        10,
+        12,
+        14,
+        16
+      ],
+      "max_quality": 4,
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Fire",
+      "set_name": "Fenris Set",
+      "set_biome": "Mountain",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Fenris_leggings.png"
+    },
+    {
+      "name": "Wolf armor legs",
+      "slot": "Legs",
+      "armor_by_quality": [
+        20,
+        22,
+        24,
+        26
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Wolf Armor",
+      "set_biome": "Mountain",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Wolf_armor_legs.png"
+    },
+    {
+      "name": "Padded greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        26,
+        28,
+        30,
+        32
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Padded Armor",
+      "set_biome": "Plains",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Padded_greaves.png"
+    },
+    {
+      "name": "Vilebone Drapes",
+      "slot": "Legs",
+      "armor_by_quality": [
+        18,
+        20,
+        22,
+        24
+      ],
+      "max_quality": 4,
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "piece_effects": null,
+      "set_name": "Vilebone Set",
+      "set_biome": "Plains",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Vilebone_Drapes.png"
+    },
+    {
+      "name": "Eitr-weave trousers",
+      "slot": "Legs",
+      "armor_by_quality": [
+        16,
+        18,
+        20,
+        22
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+40% Eitr regen; -2% Movement speed",
+      "set_name": "Eitr-weave Set",
+      "set_biome": "Mistlands",
+      "set_type": "Mage",
+      "image_file": "images/presets/armor/Eitr-weave_trousers.png"
+    },
+    {
+      "name": "Carapace greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        32,
+        34,
+        36,
+        38
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "-5% Movement speed",
+      "set_name": "Carapace Armor",
+      "set_biome": "Mistlands",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Carapace_greaves.png"
+    },
+    {
+      "name": "Trousers of Embla",
+      "slot": "Legs",
+      "armor_by_quality": [
+        19,
+        21,
+        23,
+        25
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+50% Eitr regen; -2% Movement speed",
+      "set_name": "Embla Set",
+      "set_biome": "Ashlands",
+      "set_type": "Mage",
+      "image_file": "images/presets/armor/Trousers_of_Embla.png"
+    },
+    {
+      "name": "Trousers of Ask",
+      "slot": "Legs",
+      "armor_by_quality": [
+        28,
+        30,
+        32,
+        34
+      ],
+      "max_quality": 4,
+      "set_bonus": "Ask's Endurance (full set)",
+      "piece_effects": null,
+      "set_name": "Ask Set",
+      "set_biome": "Ashlands",
+      "set_type": "Light",
+      "image_file": "images/presets/armor/Trousers_of_Ask.png"
+    },
+    {
+      "name": "Flametal Greaves",
+      "slot": "Legs",
+      "armor_by_quality": [
+        38,
+        40,
+        42,
+        44
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "+20% Heat Resistance; -5% Movement speed",
+      "set_name": "Flametal Armor",
+      "set_biome": "Ashlands",
+      "set_type": "Heavy",
+      "image_file": "images/presets/armor/Flametal_Greaves.png"
+    }
+  ],
+  "capes": [
+    {
+      "name": "Cape of Odin",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Cape_of_Odin.png",
+      "associated_set": null
+    },
+    {
+      "name": "Deer hide cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Deer_hide_cape.png",
+      "associated_set": "Leather Armor"
+    },
+    {
+      "name": "Troll hide cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Troll_hide_cape.png",
+      "associated_set": "Troll Set"
+    },
+    {
+      "name": "Wolf fur cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Wolf_fur_cape.png",
+      "associated_set": "Wolf Armor"
+    },
+    {
+      "name": "Lox cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Lox_cape.png",
+      "associated_set": "Vilebone Set"
+    },
+    {
+      "name": "Linen cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": null,
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Linen_cape.png",
+      "associated_set": "Padded Armor"
+    },
+    {
+      "name": "Feather cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost; Very Weak (2x) vs. Fire; Fall damage: -100%; Limit fall speed: 5m/s; -20% jump stamina",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Feather_cape.png",
+      "associated_set": "Eitr-weave Set"
+    },
+    {
+      "name": "Asksvin cloak",
+      "slot": "Cape",
+      "armor_by_quality": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost; Wind Run; Dodge stamina usage: -15%",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Asksvin_cloak.png",
+      "associated_set": "Ask Set"
+    },
+    {
+      "name": "Ashen cape",
+      "slot": "Cape",
+      "armor_by_quality": [
+        12,
+        14,
+        16,
+        18
+      ],
+      "max_quality": 4,
+      "set_bonus": null,
+      "piece_effects": "Resistant(0.5x) VS Frost; Attack Stamina Usage: -10%; Block Stamina Usage: -20%",
+      "set_name": null,
+      "set_biome": null,
+      "set_type": null,
+      "image_file": "images/presets/armor/Ashen_cape.png",
+      "associated_set": "Flametal Armor"
+    }
+  ],
+  "sets": {
+    "Leather Armor": {
+      "biome": "Meadows",
+      "type": "Light",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Leather helmet",
+        "chest": "Leather tunic",
+        "legs": "Leather pants"
+      },
+      "total_armor_by_quality": [
+        6,
+        12,
+        18,
+        24
+      ]
+    },
+    "Troll Set": {
+      "biome": "Black Forest",
+      "type": "Light",
+      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
+      "pieces": {
+        "helmet": "Troll leather helmet",
+        "chest": "Troll leather tunic",
+        "legs": "Troll leather pants"
+      },
+      "total_armor_by_quality": [
+        18,
+        24,
+        30,
+        36
+      ]
+    },
+    "Bear Set": {
+      "biome": "Black Forest",
+      "type": "Light",
+      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
+      "pieces": {
+        "helmet": "Headdress of the Bear",
+        "chest": "Patterns of the Bear",
+        "legs": "Loincloth of the Bear"
+      },
+      "total_armor_by_quality": [
+        21,
+        27,
+        33,
+        39
+      ]
+    },
+    "Bronze Armor": {
+      "biome": "Black Forest",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Bronze helmet",
+        "chest": "Bronze plate cuirass",
+        "legs": "Bronze plate leggings"
+      },
+      "total_armor_by_quality": [
+        24,
+        30,
+        36,
+        42
+      ]
+    },
+    "Root Set": {
+      "biome": "Swamp",
+      "type": "Light",
+      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
+      "pieces": {
+        "helmet": "Root mask",
+        "chest": "Root harnesk",
+        "legs": "Root leggings"
+      },
+      "total_armor_by_quality": [
+        24,
+        30,
+        36,
+        42
+      ]
+    },
+    "Iron Armor": {
+      "biome": "Swamp",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Iron helmet",
+        "chest": "Iron scale mail",
+        "legs": "Iron greaves"
+      },
+      "total_armor_by_quality": [
+        42,
+        48,
+        54,
+        60
+      ]
+    },
+    "Fenris Set": {
+      "biome": "Mountain",
+      "type": "Light",
+      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
+      "pieces": {
+        "helmet": "Fenris hood",
+        "chest": "Fenris coat",
+        "legs": "Fenris leggings"
+      },
+      "total_armor_by_quality": [
+        30,
+        36,
+        42,
+        48
+      ]
+    },
+    "Wolf Armor": {
+      "biome": "Mountain",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Drake helmet",
+        "chest": "Wolf armor chest",
+        "legs": "Wolf armor legs"
+      },
+      "total_armor_by_quality": [
+        60,
+        66,
+        72,
+        78
+      ]
+    },
+    "Padded Armor": {
+      "biome": "Plains",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Padded helmet",
+        "chest": "Padded cuirass",
+        "legs": "Padded greaves"
+      },
+      "total_armor_by_quality": [
+        78,
+        84,
+        90,
+        96
+      ]
+    },
+    "Vilebone Set": {
+      "biome": "Plains",
+      "type": "Light",
+      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
+      "pieces": {
+        "helmet": "Vilebone Visage",
+        "chest": "Vilebone Cage",
+        "legs": "Vilebone Drapes"
+      },
+      "total_armor_by_quality": [
+        48,
+        54,
+        60,
+        66
+      ]
+    },
+    "Eitr-weave Set": {
+      "biome": "Mistlands",
+      "type": "Mage",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Eitr-weave hood",
+        "chest": "Eitr-weave robe",
+        "legs": "Eitr-weave trousers"
+      },
+      "total_armor_by_quality": [
+        48,
+        54,
+        60,
+        66
+      ]
+    },
+    "Carapace Armor": {
+      "biome": "Mistlands",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Carapace helmet",
+        "chest": "Carapace breastplate",
+        "legs": "Carapace greaves"
+      },
+      "total_armor_by_quality": [
+        96,
+        102,
+        108,
+        114
+      ]
+    },
+    "Embla Set": {
+      "biome": "Ashlands",
+      "type": "Mage",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Hood of Embla",
+        "chest": "Robes of Embla",
+        "legs": "Trousers of Embla"
+      },
+      "total_armor_by_quality": [
+        57,
+        63,
+        69,
+        75
+      ]
+    },
+    "Ask Set": {
+      "biome": "Ashlands",
+      "type": "Light",
+      "set_bonus": "Ask's Endurance (full set)",
+      "pieces": {
+        "helmet": "Hood of Ask",
+        "chest": "Breastplate of Ask",
+        "legs": "Trousers of Ask"
+      },
+      "total_armor_by_quality": [
+        84,
+        90,
+        96,
+        102
+      ]
+    },
+    "Flametal Armor": {
+      "biome": "Ashlands",
+      "type": "Heavy",
+      "set_bonus": null,
+      "pieces": {
+        "helmet": "Flametal helmet",
+        "chest": "Flametal breastplate",
+        "legs": "Flametal Greaves"
+      },
+      "total_armor_by_quality": [
+        114,
+        120,
+        126,
+        132
+      ]
+    },
+    "Rag Armor": {
+      "biome": "Meadows",
+      "type": "Light",
+      "set_bonus": null,
+      "pieces": {
+        "chest": "Rag tunic",
+        "legs": "Rag pants"
+      },
+      "total_armor_by_quality": [
+        2,
+        4,
+        null,
+        null
+      ]
+    }
+  }
+}

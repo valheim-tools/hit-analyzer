@@ -20,7 +20,7 @@ Overhaul the calculator to process per-type damage maps (`{ Blunt: 40, Fire: 20 
 ### 2. Copy data files into `src/data/`
 
 - Copy [`output/valheim_armor_stats.json`](output/valheim_armor_stats.json) into `src/data/shields.json`.
-- Copy [`output/valheim_mob_damage.json`](output/valheim_mob_damage.json) into `src/data/mob-attacks.json` (replaces [`mob-presets.json`](src/data/mob-presets.json)).
+- Copy [`output/valheim_mob_damage.json`](output/valheim_mob_damage.json) into `src/data/mob-attacks.json` (replaces [`mob-presets.json`](src/assets/data/mob-presets.json)).
 - Add both new JSON files to the build in [`build.js`](build.js) (`DEPLOY_FILES` entries + corresponding `PATH_REWRITES`).
 
 ### 3. Refactor the core pipeline in [`damage-calculator.js`](src/damage-calculator.js) to accept a `damageTypes` map

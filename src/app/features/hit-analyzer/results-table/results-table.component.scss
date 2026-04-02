@@ -92,10 +92,9 @@ tbody tr:last-child td:last-child  { border-bottom-right-radius: $radius-lg; }
   border-top: 1px solid #4a4020;
   padding-top: 0.72rem;
   padding-bottom: 0.72rem;
-  &:first-child { color: #b09848; }
 }
 
-.row-secondary td { font-size: 0.76rem; color: #a89870; &:first-child { font-size: 0.71rem; color: #726650; } }
+.row-secondary td { font-size: 0.76rem; color: #a89870; &:first-child { font-size: 0.83rem; color: #9a8a62; } }
 
 .dot-line { line-height: 1.6; white-space: nowrap; }
 .dot-line-sum {

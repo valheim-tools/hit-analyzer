@@ -1,70 +1,6 @@
 import { Injectable, computed } from '@angular/core';
 import { httpResource } from '@angular/common/http';
-import { ArmorPiece, ArmorPiecesData, ArmorSetInfo, ArmorSetPreset, ParsedResistanceEffect } from './armor-piece.model';
-import { DAMAGE_TYPE_NAMES, DamageTypeName } from '../../core/constants';
-
-/**
- * Resistance pattern in piece_effects / set_bonus strings:
- *   "Resistant(0.5x) VS Poison"
- *   "Weak(1.5x) VS Fire"
- *   "Very Weak (2x) vs. Fire"
- *   "Slightly weak (+25%) vs Blunt, Slash and Pierce"
- */
-const RESISTANCE_MULTIPLIER_REGEX =
-  /(?:Very Weak|Weak|Resistant|Slightly (?:weak|Resistant))\s*\(([^)]+)\)\s*(?:VS\.?|vs\.?)\s+([\w\s,]+)/gi;
-
-/**
- * Parse a multiplier string like "0.5x", "2x", "+25%" into a decimal multiplier.
- */
-function parseMultiplierToken(token: string): number {
-  const trimmed = token.trim();
-  if (trimmed.endsWith('x')) {
-    return parseFloat(trimmed.slice(0, -1));
-  }
-  if (trimmed.endsWith('%')) {
-    // "+25%" means "slightly weak" → 1.25x multiplier
-    const percentValue = parseFloat(trimmed.replace('+', ''));
-    return 1 + percentValue / 100;
-  }
-  return parseFloat(trimmed) || 1;
-}
-
-/**
- * Parse a damage type list string like "Poison", "Blunt, Slash and Pierce"
- * into an array of valid DamageTypeName values.
- */
-function parseDamageTypeList(typeString: string): DamageTypeName[] {
-  const damageTypeSet = new Set<string>(DAMAGE_TYPE_NAMES);
-  return typeString
-    .split(/[,]|\band\b/i)
-    .map(segment => segment.trim())
-    .filter((segment): segment is DamageTypeName => damageTypeSet.has(segment));
-}
-
-/**
- * Parse resistance effects from a piece_effects or set_bonus string.
- * Returns an array of { type, multiplier } for each damage type affected.
- */
-export function parseResistanceEffects(effectsString: string | null): ParsedResistanceEffect[] {
-  if (!effectsString) return [];
-
-  const results: ParsedResistanceEffect[] = [];
-  let match: RegExpExecArray | null;
-
-  // Reset regex state
-  RESISTANCE_MULTIPLIER_REGEX.lastIndex = 0;
-
-  while ((match = RESISTANCE_MULTIPLIER_REGEX.exec(effectsString)) !== null) {
-    const multiplier = parseMultiplierToken(match[1]);
-    const damageTypes = parseDamageTypeList(match[2]);
-
-    for (const damageType of damageTypes) {
-      results.push({ type: damageType, multiplier });
-    }
-  }
-
-  return results;
-}
+import { ArmorPiece, ArmorPiecesData, ArmorSetInfo, ArmorSetPreset } from './armor-piece.model';
 
 
 @Injectable({ providedIn: 'root' })
@@ -98,7 +34,6 @@ export class ArmorPieceService {
         setName,
         biome: setInfo.biome,
         type: setInfo.type,
-        setBonus: setInfo.set_bonus,
         iconFile: chestPiece?.image_file ?? null,
         totalArmorByQuality: setInfo.total_armor_by_quality,
         hasHelmet: !!setInfo.pieces['helmet'],

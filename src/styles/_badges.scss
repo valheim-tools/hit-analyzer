@@ -13,22 +13,20 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: $radius-md;
   font-size: 0.75rem;
   font-weight: bold;
   letter-spacing: 0.5px;
   white-space: nowrap;
 }
 
-.dt-blunt     { background: #5a5a5a; color: #e0d0b0; }
-.dt-slash     { background: #7a7a7a; color: #ede5d0; }
-.dt-pierce    { background: #6b4c2a; color: #e0d0b0; }
-.dt-fire      { background: #8b3a00; color: #ffcc80; }
-.dt-frost     { background: #1a5a6a; color: #b0e8f0; }
-.dt-lightning { background: #7a6a10; color: #fff080; }
-.dt-poison    { background: #2a5a20; color: #a0e090; }
-.dt-spirit    { background: #5a2a6a; color: #d0a0e0; }
+.dt-blunt     { color: #e0d0b0; }
+.dt-slash     { color: #ede5d0; }
+.dt-pierce    { color: #e0d0b0; }
+.dt-fire      { color: #ffcc80; }
+.dt-frost     { color: #b0e8f0; }
+.dt-lightning { color: #fff080; }
+.dt-poison    { color: #a0e090; }
+.dt-spirit    { color: #d0a0e0; }
 
 // ── Risk factor badge ────────────────────────────────────────────────────────
 

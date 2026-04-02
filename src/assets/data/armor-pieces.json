@@ -10,8 +10,7 @@
         null
       ],
       "max_quality": 1,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -27,8 +26,7 @@
         null
       ],
       "max_quality": 1,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -44,8 +42,7 @@
         7
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -61,8 +58,7 @@
         null
       ],
       "max_quality": 1,
-      "set_bonus": null,
-      "piece_effects": "Cone shaped light source",
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -78,8 +74,7 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -95,8 +90,7 @@
         8
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Leather Armor",
       "set_biome": "Meadows",
       "set_type": "Light",
@@ -112,8 +106,7 @@
         12
       ],
       "max_quality": 4,
-      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Troll Set",
       "set_biome": "Black Forest",
       "set_type": "Light",
@@ -129,8 +122,7 @@
         13
       ],
       "max_quality": 4,
-      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Bear Set",
       "set_biome": "Black Forest",
       "set_type": "Light",
@@ -146,8 +138,7 @@
         14
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Bronze Armor",
       "set_biome": "Black Forest",
       "set_type": "Heavy",
@@ -163,8 +154,16 @@
         14
       ],
       "max_quality": 4,
-      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
-      "piece_effects": "Resistant(0.5x) VS Poison; Weak(1.5x) VS Fire",
+      "resistances": [
+        {
+          "type": "Poison",
+          "multiplier": 0.5
+        },
+        {
+          "type": "Fire",
+          "multiplier": 1.5
+        }
+      ],
       "set_name": "Root Set",
       "set_biome": "Swamp",
       "set_type": "Light",
@@ -180,8 +179,7 @@
         20
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Iron Armor",
       "set_biome": "Swamp",
       "set_type": "Heavy",
@@ -197,8 +195,12 @@
         16
       ],
       "max_quality": 4,
-      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
-      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Fire",
+      "resistances": [
+        {
+          "type": "Fire",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": "Fenris Set",
       "set_biome": "Mountain",
       "set_type": "Light",
@@ -214,8 +216,7 @@
         26
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Wolf Armor",
       "set_biome": "Mountain",
       "set_type": "Heavy",
@@ -231,8 +232,7 @@
         32
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Padded Armor",
       "set_biome": "Plains",
       "set_type": "Heavy",
@@ -248,8 +248,7 @@
         18
       ],
       "max_quality": 4,
-      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Vilebone Set",
       "set_biome": "Plains",
       "set_type": "Light",
@@ -265,8 +264,7 @@
         22
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+20% Eitr regen",
+      "resistances": [],
       "set_name": "Eitr-weave Set",
       "set_biome": "Mistlands",
       "set_type": "Mage",
@@ -282,8 +280,7 @@
         38
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Carapace Armor",
       "set_biome": "Mistlands",
       "set_type": "Heavy",
@@ -299,8 +296,7 @@
         25
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+30% Eitr regen",
+      "resistances": [],
       "set_name": "Embla Set",
       "set_biome": "Ashlands",
       "set_type": "Mage",
@@ -316,8 +312,7 @@
         34
       ],
       "max_quality": 4,
-      "set_bonus": "Ask's Endurance (full set)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Ask Set",
       "set_biome": "Ashlands",
       "set_type": "Light",
@@ -333,8 +328,7 @@
         44
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Flametal Armor",
       "set_biome": "Ashlands",
       "set_type": "Heavy",
@@ -352,8 +346,7 @@
         null
       ],
       "max_quality": 2,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Rag Armor",
       "set_biome": "Meadows",
       "set_type": "Light",
@@ -369,8 +362,7 @@
         8
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Leather Armor",
       "set_biome": "Meadows",
       "set_type": "Light",
@@ -386,8 +378,7 @@
         12
       ],
       "max_quality": 4,
-      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Troll Set",
       "set_biome": "Black Forest",
       "set_type": "Light",
@@ -403,8 +394,7 @@
         13
       ],
       "max_quality": 4,
-      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Bear Set",
       "set_biome": "Black Forest",
       "set_type": "Light",
@@ -420,8 +410,7 @@
         14
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Bronze Armor",
       "set_biome": "Black Forest",
       "set_type": "Heavy",
@@ -437,8 +426,16 @@
         14
       ],
       "max_quality": 4,
-      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
-      "piece_effects": "-2% Movement speed; Resistant(0.5x) VS Pierce; Weak(1.5x) VS Fire",
+      "resistances": [
+        {
+          "type": "Pierce",
+          "multiplier": 0.5
+        },
+        {
+          "type": "Fire",
+          "multiplier": 1.5
+        }
+      ],
       "set_name": "Root Set",
       "set_biome": "Swamp",
       "set_type": "Light",
@@ -454,8 +451,7 @@
         20
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Iron Armor",
       "set_biome": "Swamp",
       "set_type": "Heavy",
@@ -471,8 +467,12 @@
         16
       ],
       "max_quality": 4,
-      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
-      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Frost",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": "Fenris Set",
       "set_biome": "Mountain",
       "set_type": "Light",
@@ -488,8 +488,12 @@
         26
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed; Resistant(0.5x) VS Frost",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": "Wolf Armor",
       "set_biome": "Mountain",
       "set_type": "Heavy",
@@ -505,8 +509,7 @@
         32
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Padded Armor",
       "set_biome": "Plains",
       "set_type": "Heavy",
@@ -522,8 +525,7 @@
         24
       ],
       "max_quality": 4,
-      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Vilebone Set",
       "set_biome": "Plains",
       "set_type": "Light",
@@ -539,8 +541,7 @@
         22
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+40% Eitr regen; -2% Movement speed",
+      "resistances": [],
       "set_name": "Eitr-weave Set",
       "set_biome": "Mistlands",
       "set_type": "Mage",
@@ -556,8 +557,7 @@
         38
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Carapace Armor",
       "set_biome": "Mistlands",
       "set_type": "Heavy",
@@ -573,8 +573,7 @@
         25
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+50% Eitr regen; -2% Movement speed",
+      "resistances": [],
       "set_name": "Embla Set",
       "set_biome": "Ashlands",
       "set_type": "Mage",
@@ -590,8 +589,7 @@
         34
       ],
       "max_quality": 4,
-      "set_bonus": "Ask's Endurance (full set)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Ask Set",
       "set_biome": "Ashlands",
       "set_type": "Light",
@@ -607,8 +605,7 @@
         44
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+20% Heat Resistance; -5% Movement speed",
+      "resistances": [],
       "set_name": "Flametal Armor",
       "set_biome": "Ashlands",
       "set_type": "Heavy",
@@ -626,8 +623,7 @@
         null
       ],
       "max_quality": 2,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Rag Armor",
       "set_biome": "Meadows",
       "set_type": "Light",
@@ -643,8 +639,7 @@
         8
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Leather Armor",
       "set_biome": "Meadows",
       "set_type": "Light",
@@ -660,8 +655,7 @@
         12
       ],
       "max_quality": 4,
-      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Troll Set",
       "set_biome": "Black Forest",
       "set_type": "Light",
@@ -677,8 +671,7 @@
         13
       ],
       "max_quality": 4,
-      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Bear Set",
       "set_biome": "Black Forest",
       "set_type": "Light",
@@ -694,8 +687,7 @@
         14
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Bronze Armor",
       "set_biome": "Black Forest",
       "set_type": "Heavy",
@@ -711,8 +703,12 @@
         14
       ],
       "max_quality": 4,
-      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
-      "piece_effects": "-2% Movement speed; Weak(1.5x) VS Fire",
+      "resistances": [
+        {
+          "type": "Fire",
+          "multiplier": 1.5
+        }
+      ],
       "set_name": "Root Set",
       "set_biome": "Swamp",
       "set_type": "Light",
@@ -728,8 +724,7 @@
         20
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Iron Armor",
       "set_biome": "Swamp",
       "set_type": "Heavy",
@@ -745,8 +740,12 @@
         16
       ],
       "max_quality": 4,
-      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
-      "piece_effects": "+3% Movement speed; Resistant(0.5x) VS Fire",
+      "resistances": [
+        {
+          "type": "Fire",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": "Fenris Set",
       "set_biome": "Mountain",
       "set_type": "Light",
@@ -762,8 +761,7 @@
         26
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Wolf Armor",
       "set_biome": "Mountain",
       "set_type": "Heavy",
@@ -779,8 +777,7 @@
         32
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Padded Armor",
       "set_biome": "Plains",
       "set_type": "Heavy",
@@ -796,8 +793,7 @@
         24
       ],
       "max_quality": 4,
-      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Vilebone Set",
       "set_biome": "Plains",
       "set_type": "Light",
@@ -813,8 +809,7 @@
         22
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+40% Eitr regen; -2% Movement speed",
+      "resistances": [],
       "set_name": "Eitr-weave Set",
       "set_biome": "Mistlands",
       "set_type": "Mage",
@@ -830,8 +825,7 @@
         38
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "-5% Movement speed",
+      "resistances": [],
       "set_name": "Carapace Armor",
       "set_biome": "Mistlands",
       "set_type": "Heavy",
@@ -847,8 +841,7 @@
         25
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+50% Eitr regen; -2% Movement speed",
+      "resistances": [],
       "set_name": "Embla Set",
       "set_biome": "Ashlands",
       "set_type": "Mage",
@@ -864,8 +857,7 @@
         34
       ],
       "max_quality": 4,
-      "set_bonus": "Ask's Endurance (full set)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": "Ask Set",
       "set_biome": "Ashlands",
       "set_type": "Light",
@@ -881,8 +873,7 @@
         44
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "+20% Heat Resistance; -5% Movement speed",
+      "resistances": [],
       "set_name": "Flametal Armor",
       "set_biome": "Ashlands",
       "set_type": "Heavy",
@@ -900,8 +891,7 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -918,8 +908,7 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -936,8 +925,7 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -954,8 +942,12 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "Resistant(0.5x) VS Frost",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -972,8 +964,12 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "Resistant(0.5x) VS Frost",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -990,8 +986,7 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": null,
+      "resistances": [],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -1008,8 +1003,16 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "Resistant(0.5x) VS Frost; Very Weak (2x) vs. Fire; Fall damage: -100%; Limit fall speed: 5m/s; -20% jump stamina",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        },
+        {
+          "type": "Fire",
+          "multiplier": 2
+        }
+      ],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -1026,8 +1029,12 @@
         4
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "Resistant(0.5x) VS Frost; Wind Run; Dodge stamina usage: -15%",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -1044,8 +1051,12 @@
         18
       ],
       "max_quality": 4,
-      "set_bonus": null,
-      "piece_effects": "Resistant(0.5x) VS Frost; Attack Stamina Usage: -10%; Block Stamina Usage: -20%",
+      "resistances": [
+        {
+          "type": "Frost",
+          "multiplier": 0.5
+        }
+      ],
       "set_name": null,
       "set_biome": null,
       "set_type": null,
@@ -1057,7 +1068,6 @@
     "Leather Armor": {
       "biome": "Meadows",
       "type": "Light",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Leather helmet",
         "chest": "Leather tunic",
@@ -1068,12 +1078,12 @@
         12,
         18,
         24
-      ]
+      ],
+      "resistances": []
     },
     "Troll Set": {
       "biome": "Black Forest",
       "type": "Light",
-      "set_bonus": "Troll Set bonus: +15 Sneak (Skill)",
       "pieces": {
         "helmet": "Troll leather helmet",
         "chest": "Troll leather tunic",
@@ -1084,12 +1094,12 @@
         24,
         30,
         36
-      ]
+      ],
+      "resistances": []
     },
     "Bear Set": {
       "biome": "Black Forest",
       "type": "Light",
-      "set_bonus": "Berserk: +30% Health regen; +15% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +10% Slash and Chop",
       "pieces": {
         "helmet": "Headdress of the Bear",
         "chest": "Patterns of the Bear",
@@ -1100,12 +1110,25 @@
         27,
         33,
         39
+      ],
+      "resistances": [
+        {
+          "type": "Blunt",
+          "multiplier": 1.25
+        },
+        {
+          "type": "Slash",
+          "multiplier": 1.25
+        },
+        {
+          "type": "Pierce",
+          "multiplier": 1.25
+        }
       ]
     },
     "Bronze Armor": {
       "biome": "Black Forest",
       "type": "Heavy",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Bronze helmet",
         "chest": "Bronze plate cuirass",
@@ -1116,12 +1139,12 @@
         30,
         36,
         42
-      ]
+      ],
+      "resistances": []
     },
     "Root Set": {
       "biome": "Swamp",
       "type": "Light",
-      "set_bonus": "Root Set bonus: +15 Bows (Skill)",
       "pieces": {
         "helmet": "Root mask",
         "chest": "Root harnesk",
@@ -1132,12 +1155,12 @@
         30,
         36,
         42
-      ]
+      ],
+      "resistances": []
     },
     "Iron Armor": {
       "biome": "Swamp",
       "type": "Heavy",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Iron helmet",
         "chest": "Iron scale mail",
@@ -1148,12 +1171,12 @@
         48,
         54,
         60
-      ]
+      ],
+      "resistances": []
     },
     "Fenris Set": {
       "biome": "Mountain",
       "type": "Light",
-      "set_bonus": "Fenris Set bonus: + 15 Fists (Skill)",
       "pieces": {
         "helmet": "Fenris hood",
         "chest": "Fenris coat",
@@ -1164,12 +1187,12 @@
         36,
         42,
         48
-      ]
+      ],
+      "resistances": []
     },
     "Wolf Armor": {
       "biome": "Mountain",
       "type": "Heavy",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Drake helmet",
         "chest": "Wolf armor chest",
@@ -1180,12 +1203,12 @@
         66,
         72,
         78
-      ]
+      ],
+      "resistances": []
     },
     "Padded Armor": {
       "biome": "Plains",
       "type": "Heavy",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Padded helmet",
         "chest": "Padded cuirass",
@@ -1196,12 +1219,12 @@
         84,
         90,
         96
-      ]
+      ],
+      "resistances": []
     },
     "Vilebone Set": {
       "biome": "Plains",
       "type": "Light",
-      "set_bonus": "Vilebone Wrath: +20% Health regen; +40% Stamina regen; Slightly weak (+25%) vs Blunt, Slash and Pierce; +20% Blunt; +20% Pierce",
       "pieces": {
         "helmet": "Vilebone Visage",
         "chest": "Vilebone Cage",
@@ -1212,12 +1235,25 @@
         54,
         60,
         66
+      ],
+      "resistances": [
+        {
+          "type": "Blunt",
+          "multiplier": 1.25
+        },
+        {
+          "type": "Slash",
+          "multiplier": 1.25
+        },
+        {
+          "type": "Pierce",
+          "multiplier": 1.25
+        }
       ]
     },
     "Eitr-weave Set": {
       "biome": "Mistlands",
       "type": "Mage",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Eitr-weave hood",
         "chest": "Eitr-weave robe",
@@ -1228,12 +1264,12 @@
         54,
         60,
         66
-      ]
+      ],
+      "resistances": []
     },
     "Carapace Armor": {
       "biome": "Mistlands",
       "type": "Heavy",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Carapace helmet",
         "chest": "Carapace breastplate",
@@ -1244,12 +1280,12 @@
         102,
         108,
         114
-      ]
+      ],
+      "resistances": []
     },
     "Embla Set": {
       "biome": "Ashlands",
       "type": "Mage",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Hood of Embla",
         "chest": "Robes of Embla",
@@ -1260,12 +1296,12 @@
         63,
         69,
         75
-      ]
+      ],
+      "resistances": []
     },
     "Ask Set": {
       "biome": "Ashlands",
       "type": "Light",
-      "set_bonus": "Ask's Endurance (full set)",
       "pieces": {
         "helmet": "Hood of Ask",
         "chest": "Breastplate of Ask",
@@ -1276,12 +1312,12 @@
         90,
         96,
         102
-      ]
+      ],
+      "resistances": []
     },
     "Flametal Armor": {
       "biome": "Ashlands",
       "type": "Heavy",
-      "set_bonus": null,
       "pieces": {
         "helmet": "Flametal helmet",
         "chest": "Flametal breastplate",
@@ -1292,12 +1328,12 @@
         120,
         126,
         132
-      ]
+      ],
+      "resistances": []
     },
     "Rag Armor": {
       "biome": "Meadows",
       "type": "Light",
-      "set_bonus": null,
       "pieces": {
         "chest": "Rag tunic",
         "legs": "Rag pants"
@@ -1307,7 +1343,8 @@
         4,
         null,
         null
-      ]
+      ],
+      "resistances": []
     }
   }
 }

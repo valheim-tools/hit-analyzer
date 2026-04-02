@@ -4,7 +4,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 
 import { FormStateService } from '../../core/form-state.service';
-import { ArmorPieceService, parseResistanceEffects } from './armor-piece.service';
+import { ArmorPieceService } from './armor-piece.service';
 import { ArmorPiece, ArmorSetPreset, EquippedSlot, ParsedResistanceEffect } from './armor-piece.model';
 import { MeadPresetService } from './mead-preset.service';
 import { MeadPreset, EquippedMeadSlot, MeadResistanceEntry } from './mead-preset.model';
@@ -201,12 +201,12 @@ export class ArmorBuilderComponent {
     return null;
   });
 
-  readonly activeSetBonus = computed<string | null>(() => {
+  readonly activeSetResistances = computed<ParsedResistanceEffect[]>(() => {
     const setName = this.activeSetName();
-    if (!setName) return null;
+    if (!setName) return [];
     const sets = this.armorPieceService.sets();
     const setInfo = sets[setName];
-    return setInfo?.set_bonus ?? null;
+    return setInfo?.resistances ?? [];
   });
 
   readonly isCapeMatchingSet = computed<boolean>(() => {
@@ -223,15 +223,13 @@ export class ArmorBuilderComponent {
 
     for (const slotKey of Object.keys(slots)) {
       const slot = slots[slotKey];
-      if (slot.piece?.piece_effects) {
-        allEffects.push(...parseResistanceEffects(slot.piece.piece_effects));
+      if (slot.piece?.resistances) {
+        allEffects.push(...slot.piece.resistances);
       }
     }
 
-    const setBonus = this.activeSetBonus();
-    if (setBonus) {
-      allEffects.push(...parseResistanceEffects(setBonus));
-    }
+    const setResistances = this.activeSetResistances();
+    allEffects.push(...setResistances);
 
     // Include mead resistances
     for (const meadSlot of this.equippedMeadSlots()) {
@@ -457,6 +455,15 @@ export class ArmorBuilderComponent {
 
   getMeadResistancePercent(resistanceEntry: MeadResistanceEntry): number {
     return Math.round(resistanceEntry.multiplier * 100);
+  }
+
+  getPieceResistanceEffects(slotKey: string): ParsedResistanceEffect[] {
+    const slot = this.equippedSlots()[slotKey];
+    return slot.piece?.resistances ?? [];
+  }
+
+  getResistancePercent(multiplier: number): number {
+    return Math.round(multiplier * 100);
   }
 
   resetEquipment(): void {

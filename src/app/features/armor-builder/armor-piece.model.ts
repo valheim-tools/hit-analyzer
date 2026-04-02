@@ -5,8 +5,7 @@ export interface ArmorPiece {
   slot: string;
   armor_by_quality: (number | null)[];
   max_quality: number;
-  set_bonus: string | null;
-  piece_effects: string | null;
+  resistances: ParsedResistanceEffect[];
   set_name: string | null;
   set_biome: string | null;
   set_type: string | null;
@@ -18,7 +17,7 @@ export interface ArmorPiece {
 export interface ArmorSetInfo {
   biome: string;
   type: string;
-  set_bonus: string | null;
+  resistances: ParsedResistanceEffect[];
   pieces: Record<string, string>;
   total_armor_by_quality: (number | null)[];
 }
@@ -45,7 +44,6 @@ export interface ArmorSetPreset {
   setName: string;
   biome: string;
   type: string;
-  setBonus: string | null;
   iconFile: string | null;
   totalArmorByQuality: (number | null)[];
   hasHelmet: boolean;

@@ -212,9 +212,13 @@
           </div>
         }
 
-        @if (equippedSlots()[slotConfig.key].piece!.piece_effects) {
-          <div class="equipped-effects">
-            {{ equippedSlots()[slotConfig.key].piece!.piece_effects }}
+        @if (equippedSlots()[slotConfig.key].piece!.resistances.length > 0) {
+          <div class="equipped-effects-badges">
+            @for (resistanceEffect of getPieceResistanceEffects(slotConfig.key); track resistanceEffect.type) {
+              <span class="damage-type-badge {{ DAMAGE_TYPE_CSS_CLASSES[resistanceEffect.type] }}">
+                {{ DAMAGE_TYPE_ICONS[resistanceEffect.type] }} {{ resistanceEffect.type }}: {{ getResistancePercent(resistanceEffect.multiplier) }}% ({{ getResistanceLabel(resistanceEffect.multiplier) }})
+              </span>
+            }
           </div>
         }
 
@@ -234,10 +238,16 @@
   }
 
   <!-- ── Set Bonus & Resistances ── -->
-  @if (activeSetBonus()) {
+  @if (activeSetResistances().length > 0) {
     <div class="set-bonus-banner">
       <span class="set-bonus-name">{{ activeSetName() }} — Set Bonus Active</span>
-      <span class="set-bonus-detail">{{ activeSetBonus() }}</span>
+      <div class="set-bonus-resistances">
+        @for (resistanceEffect of activeSetResistances(); track resistanceEffect.type) {
+          <span class="damage-type-badge {{ DAMAGE_TYPE_CSS_CLASSES[resistanceEffect.type] }}">
+            {{ DAMAGE_TYPE_ICONS[resistanceEffect.type] }} {{ resistanceEffect.type }}: {{ getResistancePercent(resistanceEffect.multiplier) }}% ({{ getResistanceLabel(resistanceEffect.multiplier) }})
+          </span>
+        }
+      </div>
     </div>
   }
 

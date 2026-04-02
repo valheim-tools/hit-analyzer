@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node tests/damage-calculator.test.js",
     "build": "node build.js",
+    "build:pages": "node build.js",
     "serve": "powershell -ExecutionPolicy Bypass -File serve.ps1"
   },
   "keywords": ["valheim", "damage", "calculator"],

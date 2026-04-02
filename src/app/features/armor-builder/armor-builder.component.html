@@ -118,6 +118,26 @@
           </button>
         </div>
       </div>
+
+      <!-- Row 3: Mead Slots -->
+      <div class="inventory-row mead-slot-row">
+        @for (meadSlot of equippedMeadSlots(); track $index) {
+          <div class="inventory-cell mead-cell">
+            <button
+              type="button"
+              class="slot-box slot-box--mead"
+              [class.is-filled]="meadSlot.mead"
+              (click)="openMeadPicker($index)"
+              title="Mead Slot"
+            >
+              @if (meadSlot.mead?.image_file) {
+                <img [src]="meadSlot.mead!.image_file!" [alt]="meadSlot.mead!.name">
+              }
+              <span class="slot-label slot-label--mead">🍺</span>
+            </button>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Total armor below the grid -->
@@ -125,6 +145,19 @@
       <span class="inventory-total-label">Total Armor</span>
       <span class="inventory-total-value">🛡 {{ totalArmor() }}</span>
     </div>
+
+    @if (hasResistanceEffects()) {
+      <div class="resistance-summary">
+        <span class="resistance-summary-label">Resistance Modifiers from Gear{{ hasAnyEquippedMead() ? ' & Meads' : '' }}</span>
+        <div class="resistance-summary-list">
+          @for (entry of mergedResistanceModifiers(); track entry.type) {
+            <span class="damage-type-badge {{ DAMAGE_TYPE_CSS_CLASSES[entry.type] }}">
+              {{ DAMAGE_TYPE_ICONS[entry.type] }} {{ entry.type }}: {{ entry.percent }}% ({{ getResistanceLabel(entry.percent / 100) }})
+            </span>
+          }
+        </div>
+      </div>
+    }
   </div>
 
   <!-- ── All Quality buttons + Quality selectors for equipped pieces ── -->
@@ -210,18 +243,38 @@
     </div>
   }
 
-  @if (hasResistanceEffects()) {
-    <div class="resistance-summary">
-      <span class="resistance-summary-label">Resistance Modifiers from Gear</span>
-      <div class="resistance-summary-list">
-        @for (entry of mergedResistanceModifiers(); track entry.type) {
-          <span class="resistance-tag" [class.is-weakness]="entry.percent > 100" [class.is-resistance]="entry.percent < 100">
-            <span class="resistance-tag-icon">{{ DAMAGE_TYPE_ICONS[entry.type] }}</span>
-            {{ entry.type }}: {{ entry.percent }}% ({{ getResistanceLabel(entry.percent / 100) }})
-          </span>
-        }
-      </div>
+  <!-- ── Equipped Meads ── -->
+  @if (hasAnyEquippedMead()) {
+    <div class="equipped-section-header">
+      <span class="equipped-section-label">Equipped Meads</span>
     </div>
+    @for (meadSlot of equippedMeadSlots(); track $index) {
+      @if (meadSlot.mead) {
+        <div class="equipped-detail equipped-detail--mead">
+          <div class="equipped-detail-header">
+            @if (meadSlot.mead.image_file) {
+              <img
+                class="equipped-detail-icon"
+                [src]="meadSlot.mead.image_file"
+                [alt]="meadSlot.mead.name"
+              >
+            }
+            <div class="equipped-detail-info">
+              <span class="equipped-detail-name">{{ meadSlot.mead.name }}</span>
+              <span class="equipped-detail-meta-mead">{{ meadSlot.mead.duration }} · {{ meadSlot.mead.cooldown }} cd</span>
+            </div>
+            <button type="button" class="equipped-remove-button" (click)="removeMead($index)" title="Remove">✕</button>
+          </div>
+          <div class="equipped-mead-resistances">
+            @for (resistanceEntry of meadSlot.mead.resistances; track resistanceEntry.type) {
+              <span class="damage-type-badge {{ DAMAGE_TYPE_CSS_CLASSES[resistanceEntry.type] }}">
+                {{ DAMAGE_TYPE_ICONS[resistanceEntry.type] }} {{ resistanceEntry.type }}: {{ getMeadResistancePercent(resistanceEntry) }}% ({{ getResistanceLabel(resistanceEntry.multiplier) }})
+              </span>
+            }
+          </div>
+        </div>
+      }
+    }
   }
 </div>
 
@@ -276,21 +329,58 @@
   </div>
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- ── Mead Picker Overlay ── -->
+@if (openMeadPickerIndex() !== null) {
+  <div class="picker-backdrop" (click)="onMeadBackdropClick($event)">
+    <div class="picker-panel">
+      <div class="picker-header">
+        <span class="picker-title">Select Mead</span>
+        <button type="button" class="picker-close" (click)="closeMeadPicker()">✕</button>
+      </div>
+      <input
+        type="text"
+        class="picker-search"
+        placeholder="Search meads…"
+        autocomplete="off"
+        [value]="meadPickerSearchQuery()"
+        (input)="onMeadPickerSearchInput($event)"
+        (keydown.escape)="closeMeadPicker()"
+      >
+      <div class="picker-list">
+        <button
+          type="button"
+          class="picker-item picker-item-none"
+          [class.is-selected]="!equippedMeadSlots()[openMeadPickerIndex()!]?.mead"
+          (click)="selectMead(openMeadPickerIndex()!, null)"
+        >
+          <div class="picker-item-icon-empty">—</div>
+          <span class="picker-item-name">None</span>
+        </button>
+        @for (mead of filteredMeadPickerItems(); track mead.name) {
+          <button
+            type="button"
+            class="picker-item"
+            [class.is-selected]="isSelectedMead(openMeadPickerIndex()!, mead)"
+            (click)="selectMead(openMeadPickerIndex()!, mead)"
+          >
+            @if (mead.image_file) {
+              <img class="picker-item-icon" [src]="mead.image_file" [alt]="mead.name">
+            } @else {
+              <div class="picker-item-icon-empty">🍺</div>
+            }
+            <div class="picker-item-mead-info">
+              <span class="picker-item-name">{{ mead.name }}</span>
+              <span class="picker-item-mead-resistances">
+                @for (resistanceEntry of mead.resistances; track resistanceEntry.type) {
+                  <span class="damage-type-badge picker-mead-tag {{ DAMAGE_TYPE_CSS_CLASSES[resistanceEntry.type] }}">
+                    {{ DAMAGE_TYPE_ICONS[resistanceEntry.type] }} {{ resistanceEntry.type }}: {{ getMeadResistancePercent(resistanceEntry) }}%
+                  </span>
+                }
+              </span>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

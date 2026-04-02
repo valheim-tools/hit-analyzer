@@ -6,8 +6,10 @@ import { Router, RouterLink } from '@angular/router';
 import { FormStateService } from '../../core/form-state.service';
 import { ArmorPieceService, parseResistanceEffects } from './armor-piece.service';
 import { ArmorPiece, ArmorSetPreset, EquippedSlot, ParsedResistanceEffect } from './armor-piece.model';
+import { MeadPresetService } from './mead-preset.service';
+import { MeadPreset, EquippedMeadSlot, MeadResistanceEntry } from './mead-preset.model';
 import { ResistanceModifierEntry, DamageTypeName } from '../../core/models';
-import { DAMAGE_TYPE_ICONS } from '../../core/constants';
+import { DAMAGE_TYPE_ICONS, DAMAGE_TYPE_CSS_CLASSES } from '../../core/constants';
 
 interface SlotConfig {
   readonly key: string;
@@ -24,13 +26,23 @@ const SLOT_CONFIGS: readonly SlotConfig[] = [
 
 const ARMOR_BUILDER_STORAGE_KEY = 'valheim-armor-builder';
 
+const MAX_MEAD_SLOTS = 3;
+const DEFAULT_MEAD_SLOT_COUNT = 3;
+
 interface SavedSlotEntry {
   pieceName: string | null;
   slotType: string;
   quality: number;
 }
 
-type SavedArmorBuilderState = Record<string, SavedSlotEntry>;
+interface SavedMeadSlotEntry {
+  meadName: string | null;
+}
+
+interface SavedArmorBuilderState {
+  armorSlots: Record<string, SavedSlotEntry>;
+  meadSlots?: SavedMeadSlotEntry[];
+}
 
 const EMPTY_EQUIPPED_SLOTS: Record<string, EquippedSlot> = {
   helmet: { piece: null, quality: 1 },
@@ -38,6 +50,10 @@ const EMPTY_EQUIPPED_SLOTS: Record<string, EquippedSlot> = {
   legs: { piece: null, quality: 1 },
   cape: { piece: null, quality: 1 },
 };
+
+function createEmptyMeadSlots(count: number): EquippedMeadSlot[] {
+  return Array.from({ length: count }, () => ({ mead: null }));
+}
 
 @Component({
   selector: 'app-armor-builder',
@@ -50,18 +66,26 @@ export class ArmorBuilderComponent {
   private readonly formStateService = inject(FormStateService);
   private readonly elementRef = inject(ElementRef);
   readonly armorPieceService = inject(ArmorPieceService);
+  readonly meadPresetService = inject(MeadPresetService);
 
   readonly pickerListElement = viewChild<ElementRef>('pickerList');
   readonly pickerSearchElement = viewChild<ElementRef>('pickerSearchInput');
 
   readonly SLOT_CONFIGS = SLOT_CONFIGS;
   readonly DAMAGE_TYPE_ICONS = DAMAGE_TYPE_ICONS;
+  readonly DAMAGE_TYPE_CSS_CLASSES = DAMAGE_TYPE_CSS_CLASSES;
+  readonly MAX_MEAD_SLOTS = MAX_MEAD_SLOTS;
 
   readonly equippedSlots = signal<Record<string, EquippedSlot>>({ ...EMPTY_EQUIPPED_SLOTS });
+  readonly equippedMeadSlots = signal<EquippedMeadSlot[]>(createEmptyMeadSlots(DEFAULT_MEAD_SLOT_COUNT));
 
   /** Which slot's picker is open, or null if closed. */
   readonly openPickerSlot = signal<string | null>(null);
   readonly pickerSearchQuery = signal('');
+
+  /** Which mead slot index is being picked, or null if closed. */
+  readonly openMeadPickerIndex = signal<number | null>(null);
+  readonly meadPickerSearchQuery = signal('');
 
   readonly filteredPickerPieces = computed<ArmorPiece[]>(() => {
     const slotKey = this.openPickerSlot();
@@ -77,8 +101,32 @@ export class ArmorBuilderComponent {
     return allPieces.filter(piece => piece.name.toLowerCase().includes(query));
   });
 
+  readonly filteredMeadPickerItems = computed<MeadPreset[]>(() => {
+    const index = this.openMeadPickerIndex();
+    if (index === null) return [];
+
+    // Collect names of meads already equipped in other slots (meads don't stack)
+    const equippedMeadNames = new Set<string>();
+    const meadSlots = this.equippedMeadSlots();
+    for (let slotIndex = 0; slotIndex < meadSlots.length; slotIndex++) {
+      if (slotIndex !== index && meadSlots[slotIndex].mead) {
+        equippedMeadNames.add(meadSlots[slotIndex].mead!.name);
+      }
+    }
+
+    let availableMeads = this.meadPresetService.allMeads()
+      .filter(mead => !equippedMeadNames.has(mead.name));
+
+    const query = this.meadPickerSearchQuery().toLowerCase().trim();
+    if (query) {
+      availableMeads = availableMeads.filter(mead => mead.name.toLowerCase().includes(query));
+    }
+
+    return availableMeads;
+  });
+
   constructor() {
-    // Restore saved state once armor data has loaded
+    // Restore saved armor state once armor data has loaded
     effect(() => {
       const isLoaded = this.armorPieceService.isLoaded();
       if (!isLoaded) return;
@@ -88,10 +136,21 @@ export class ArmorBuilderComponent {
       }
     }, { allowSignalWrites: true });
 
-    // Persist to localStorage whenever equipped slots change
+    // Restore saved mead state once mead data has loaded
+    effect(() => {
+      const isLoaded = this.meadPresetService.isLoaded();
+      if (!isLoaded) return;
+      const restoredMeads = this.loadMeadSlotsFromStorage();
+      if (restoredMeads) {
+        this.equippedMeadSlots.set(restoredMeads);
+      }
+    }, { allowSignalWrites: true });
+
+    // Persist to localStorage whenever equipped slots or mead slots change
     effect(() => {
       const slots = this.equippedSlots();
-      this.saveToStorage(slots);
+      const meadSlots = this.equippedMeadSlots();
+      this.saveToStorage(slots, meadSlots);
     });
 
     // Auto-scroll to selected item when picker opens
@@ -172,6 +231,18 @@ export class ArmorBuilderComponent {
     const setBonus = this.activeSetBonus();
     if (setBonus) {
       allEffects.push(...parseResistanceEffects(setBonus));
+    }
+
+    // Include mead resistances
+    for (const meadSlot of this.equippedMeadSlots()) {
+      if (meadSlot.mead) {
+        for (const resistanceEntry of meadSlot.mead.resistances) {
+          allEffects.push({
+            type: resistanceEntry.type,
+            multiplier: resistanceEntry.multiplier,
+          });
+        }
+      }
     }
 
     return allEffects;
@@ -309,6 +380,7 @@ export class ArmorBuilderComponent {
   onBackdropClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).classList.contains('picker-backdrop')) {
       this.closePicker();
+      this.closeMeadPicker();
     }
   }
 
@@ -317,6 +389,57 @@ export class ArmorBuilderComponent {
     if (!slotKey) return '';
     const config = SLOT_CONFIGS.find(slotConfig => slotConfig.key === slotKey);
     return config?.label ?? '';
+  }
+
+  // ── Mead Picker ─────────────────────────────────────────────────────────
+
+  openMeadPicker(slotIndex: number): void {
+    if (this.openMeadPickerIndex() === slotIndex) {
+      this.closeMeadPicker();
+      return;
+    }
+    this.meadPickerSearchQuery.set('');
+    this.openMeadPickerIndex.set(slotIndex);
+  }
+
+  closeMeadPicker(): void {
+    this.openMeadPickerIndex.set(null);
+    this.meadPickerSearchQuery.set('');
+  }
+
+  onMeadPickerSearchInput(event: Event): void {
+    this.meadPickerSearchQuery.set((event.target as HTMLInputElement).value);
+  }
+
+  selectMead(slotIndex: number, mead: MeadPreset | null): void {
+    this.equippedMeadSlots.update(slots => {
+      const updated = [...slots];
+      updated[slotIndex] = { mead };
+      return updated;
+    });
+    this.closeMeadPicker();
+  }
+
+  removeMead(slotIndex: number): void {
+    this.equippedMeadSlots.update(slots => {
+      const updated = [...slots];
+      updated[slotIndex] = { mead: null };
+      return updated;
+    });
+  }
+
+  isSelectedMead(slotIndex: number, mead: MeadPreset): boolean {
+    return this.equippedMeadSlots()[slotIndex]?.mead?.name === mead.name;
+  }
+
+  readonly hasAnyEquippedMead = computed(() =>
+    this.equippedMeadSlots().some(slot => slot.mead !== null)
+  );
+
+  onMeadBackdropClick(event: MouseEvent): void {
+    if ((event.target as HTMLElement).classList.contains('picker-backdrop')) {
+      this.closeMeadPicker();
+    }
   }
 
   getResistanceLabel(multiplier: number): string {
@@ -332,6 +455,10 @@ export class ArmorBuilderComponent {
     return `${percent}%`;
   }
 
+  getMeadResistancePercent(resistanceEntry: MeadResistanceEntry): number {
+    return Math.round(resistanceEntry.multiplier * 100);
+  }
+
   resetEquipment(): void {
     this.equippedSlots.set({
       helmet: { piece: null, quality: 1 },
@@ -339,6 +466,7 @@ export class ArmorBuilderComponent {
       legs: { piece: null, quality: 1 },
       cape: { piece: null, quality: 1 },
     });
+    this.equippedMeadSlots.set(createEmptyMeadSlots(DEFAULT_MEAD_SLOT_COUNT));
   }
 
   applyArmorAndNavigateBack(): void {
@@ -370,17 +498,26 @@ export class ArmorBuilderComponent {
 
   // ── LocalStorage persistence ────────────────────────────────────────────
 
-  private saveToStorage(slots: Record<string, EquippedSlot>): void {
+  private saveToStorage(slots: Record<string, EquippedSlot>, meadSlots: EquippedMeadSlot[]): void {
     try {
-      const savedState: SavedArmorBuilderState = {};
+      const armorSlots: Record<string, SavedSlotEntry> = {};
       for (const slotConfig of SLOT_CONFIGS) {
         const slot = slots[slotConfig.key];
-        savedState[slotConfig.key] = {
+        armorSlots[slotConfig.key] = {
           pieceName: slot.piece?.name ?? null,
           slotType: slotConfig.slotType,
           quality: slot.quality,
         };
       }
+
+      const savedMeadSlots: SavedMeadSlotEntry[] = meadSlots.map(meadSlot => ({
+        meadName: meadSlot.mead?.name ?? null,
+      }));
+
+      const savedState: SavedArmorBuilderState = {
+        armorSlots,
+        meadSlots: savedMeadSlots,
+      };
       localStorage.setItem(ARMOR_BUILDER_STORAGE_KEY, JSON.stringify(savedState));
     } catch {
       // localStorage not available — ignore
@@ -391,13 +528,18 @@ export class ArmorBuilderComponent {
     try {
       const saved = localStorage.getItem(ARMOR_BUILDER_STORAGE_KEY);
       if (!saved) return null;
-      const parsed = JSON.parse(saved) as SavedArmorBuilderState;
+      const parsed = JSON.parse(saved) as SavedArmorBuilderState | Record<string, SavedSlotEntry>;
+
+      // Support both new format (with armorSlots key) and legacy format (flat record)
+      const armorEntries = ('armorSlots' in parsed && parsed.armorSlots)
+        ? parsed.armorSlots as Record<string, SavedSlotEntry>
+        : parsed as Record<string, SavedSlotEntry>;
 
       const restoredSlots: Record<string, EquippedSlot> = {};
       let hasAnyPiece = false;
 
       for (const slotConfig of SLOT_CONFIGS) {
-        const entry = parsed[slotConfig.key];
+        const entry = armorEntries[slotConfig.key] as SavedSlotEntry | undefined;
         if (entry?.pieceName) {
           const piece = this.armorPieceService.findPieceByName(slotConfig.slotType, entry.pieceName);
           if (piece) {
@@ -411,6 +553,41 @@ export class ArmorBuilderComponent {
       }
 
       return hasAnyPiece ? restoredSlots : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private loadMeadSlotsFromStorage(): EquippedMeadSlot[] | null {
+    try {
+      const saved = localStorage.getItem(ARMOR_BUILDER_STORAGE_KEY);
+      if (!saved) return null;
+      const parsed = JSON.parse(saved) as SavedArmorBuilderState;
+
+      if (!parsed.meadSlots || !Array.isArray(parsed.meadSlots)) return null;
+
+      const restoredMeadSlots: EquippedMeadSlot[] = [];
+      let hasAnyMead = false;
+
+      for (const savedMeadSlot of parsed.meadSlots) {
+        if (savedMeadSlot.meadName) {
+          const mead = this.meadPresetService.findMeadByName(savedMeadSlot.meadName);
+          if (mead) {
+            restoredMeadSlots.push({ mead });
+            hasAnyMead = true;
+            continue;
+          }
+        }
+        restoredMeadSlots.push({ mead: null });
+      }
+
+      // Always pad or trim to exactly MAX_MEAD_SLOTS
+      while (restoredMeadSlots.length < MAX_MEAD_SLOTS) {
+        restoredMeadSlots.push({ mead: null });
+      }
+      restoredMeadSlots.length = MAX_MEAD_SLOTS;
+
+      return hasAnyMead ? restoredMeadSlots : null;
     } catch {
       return null;
     }

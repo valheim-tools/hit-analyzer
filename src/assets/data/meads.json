@@ -1,0 +1,40 @@
+[
+  {
+    "name": "Fire resistance barley wine",
+    "duration": "10m",
+    "cooldown": "10m",
+    "resistances": [
+      { "type": "Fire", "multiplier": 0.5 }
+    ],
+    "image_file": "images/presets/meads/Fire_resistance_barley_wine.png"
+  },
+  {
+    "name": "Frost resistance mead",
+    "duration": "10m",
+    "cooldown": "10m",
+    "resistances": [
+      { "type": "Frost", "multiplier": 0.5 }
+    ],
+    "image_file": "images/presets/meads/Frost_resistance_mead.png"
+  },
+  {
+    "name": "Poison resistance mead",
+    "duration": "10m",
+    "cooldown": "10m",
+    "resistances": [
+      { "type": "Poison", "multiplier": 0.25 }
+    ],
+    "image_file": "images/presets/meads/Poison_resistance_mead.png"
+  },
+  {
+    "name": "Berserkir mead",
+    "duration": "20s",
+    "cooldown": "2m",
+    "resistances": [
+      { "type": "Slash", "multiplier": 1.5 },
+      { "type": "Blunt", "multiplier": 1.5 },
+      { "type": "Pierce", "multiplier": 1.5 }
+    ],
+    "image_file": "images/presets/meads/Berserkir_mead.png"
+  }
+]

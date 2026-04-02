@@ -298,6 +298,87 @@ $slot-size: 80px;
   line-height: 1.3;
 }
 
+// ── Mead Slots (below armor grid) ───────────────────────────────────────────
+
+$mead-slot-size: 60px;
+
+.mead-slot-row {
+  justify-content: center;
+  margin-top: 2px;
+  max-width: calc(#{$slot-size} * 2 + 6px);
+  align-self: center;
+}
+
+.mead-cell {
+  width: $mead-slot-size;
+  height: $mead-slot-size;
+  position: relative;
+}
+
+.slot-box--mead {
+  width: $mead-slot-size;
+  height: $mead-slot-size;
+  border-style: dashed;
+
+  &.is-filled {
+    border-style: solid;
+    border-color: #6a5a30;
+    background: #1e1c14;
+  }
+}
+
+.slot-label--mead {
+  font-size: 0.9rem;
+  top: auto;
+  bottom: 2px;
+  opacity: 0.5;
+
+  .is-filled & {
+    opacity: 0.3;
+  }
+}
+
+// ── Equipped Mead Detail ────────────────────────────────────────────────────
+
+.equipped-detail--mead {
+  border-color: #4a4020;
+}
+
+.equipped-detail-meta-mead {
+  font-size: 0.62rem;
+  color: $color-text-muted;
+}
+
+// ── Mead Picker Item ────────────────────────────────────────────────────────
+
+.picker-item-mead-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.picker-item-mead-resistances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.picker-mead-tag {
+  font-size: 0.6rem;
+  padding: 0.1rem 0.4rem;
+}
+
+// ── Equipped Mead Resistances ───────────────────────────────────────────────
+
+.equipped-mead-resistances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
 // ── Total below grid ────────────────────────────────────────────────────────
 
 .inventory-total {
@@ -518,6 +599,7 @@ $slot-size: 80px;
   border: 1px solid $color-gold-darker;
   border-radius: $radius-lg;
   padding: 0.7rem 0.9rem;
+  margin-top: 0.8rem;
   margin-bottom: 0.8rem;
 }
 
@@ -536,34 +618,6 @@ $slot-size: 80px;
   gap: 0.4rem;
 }
 
-.resistance-tag {
-  font-size: 0.72rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: $radius-sm;
-  background: #2a3028;
-  color: #a0d0a0;
-  border: 1px solid #405030;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-
-  &.is-weakness {
-    background: #302820;
-    color: #d0a060;
-    border-color: #604820;
-  }
-
-  &.is-resistance {
-    background: #202830;
-    color: #70a0d0;
-    border-color: #305060;
-  }
-}
-
-.resistance-tag-icon {
-  font-size: 0.82rem;
-  line-height: 1;
-}
 
 // ── Picker Overlay ──────────────────────────────────────────────────────────
 

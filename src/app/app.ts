@@ -107,6 +107,7 @@ export class App implements OnInit {
         blockArmor: formState.blockArmor,
         armor: formState.armor,
         hasRiskFactor: riskFactorValue > 0,
+        riskFactorValue,
       });
     } catch (error) {
       this.calculationError.set((error as Error).message);
@@ -120,7 +121,6 @@ export class App implements OnInit {
     this.calculationError.set(null);
     this.calculationFormState.set(null);
     this.riskFactor.set(0);
-    this.analyticsService.trackFormReset();
   }
 
   onRiskFactorChange(event: Event): void {

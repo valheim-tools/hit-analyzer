@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormStateService } from '../../core/form-state.service';
 import { ShieldPresetService } from './shield-preset.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { DamageTypeName, FormState, ResistanceModifierEntry, ParryMultiplierMode } from '../../core/models';
 import {
   DAMAGE_TYPE_NAMES, DAMAGE_TYPE_ICONS, INSTANT_DAMAGE_TYPE_NAMES, DOT_DAMAGE_TYPE_NAMES,
@@ -51,6 +52,7 @@ interface PlayerDefenseFormControls {
 export class PlayerDefenseFormComponent {
   private readonly formStateService = inject(FormStateService);
   private readonly shieldPresetService = inject(ShieldPresetService);
+  private readonly analyticsService = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   private formSubscriptions = new Subscription();
@@ -292,6 +294,10 @@ export class PlayerDefenseFormComponent {
       return Number(this.form.controls.parryMultiplierCustom.value) || 1.5;
     }
     return Number(presetValue) || 1.5;
+  }
+
+  onArmorBuilderLinkClick(): void {
+    this.analyticsService.trackArmorBuilderOpened();
   }
 
   private syncToService(): void {

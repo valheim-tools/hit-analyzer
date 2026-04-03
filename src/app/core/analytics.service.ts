@@ -22,6 +22,7 @@ export interface HitCalculatedEventParams {
   blockArmor: number;
   armor: number;
   hasRiskFactor: boolean;
+  riskFactorValue: number;
 }
 
 export interface TabSwitchedEventParams {
@@ -30,11 +31,22 @@ export interface TabSwitchedEventParams {
 
 export interface MobPresetSelectedEventParams {
   presetId: string;
+  mobName: string;
 }
 
 export interface PageViewEventParams {
   pagePath: string;
   pageTitle: string;
+}
+
+export interface GearsetSelectedEventParams {
+  setName: string;
+}
+
+export interface SimulatorHitEventParams {
+  /** 'base' for deterministic median hit, 'random' for RNG-sampled hit. */
+  hitType: 'base' | 'random';
+  scenarioKey: string;
 }
 
 // ── Service ────────────────────────────────────────────────────────────────
@@ -80,6 +92,7 @@ export class AnalyticsService {
   /**
    * Track each time the user clicks "Hit" to run a damage calculation.
    * Captures the key input parameters so we can understand which scenarios are analysed.
+   * riskFactorValue is 0 when not used; hasRiskFactor flags it explicitly for easy filtering.
    */
   trackHitCalculated(params: HitCalculatedEventParams): void {
     this.sendEvent('hit_calculated', {
@@ -88,14 +101,8 @@ export class AnalyticsService {
       block_armor: params.blockArmor,
       armor: params.armor,
       has_risk_factor: params.hasRiskFactor,
+      risk_factor_value: params.riskFactorValue,
     });
-  }
-
-  /**
-   * Track when the user resets all form inputs back to defaults.
-   */
-  trackFormReset(): void {
-    this.sendEvent('form_reset');
   }
 
   /**
@@ -105,9 +112,40 @@ export class AnalyticsService {
   trackMobPresetSelected(params: MobPresetSelectedEventParams): void {
     this.sendEvent('mob_preset_selected', {
       preset_id: params.presetId,
+      mob_name: params.mobName,
+    });
+  }
+
+  /**
+   * Track when the user opens the Armor Builder via the gear (⚙) button.
+   */
+  trackArmorBuilderOpened(): void {
+    this.sendEvent('armor_builder_opened');
+  }
+
+  /**
+   * Track which armor set preset the user equips in the Armor Builder.
+   * Helps identify the most popular armor sets.
+   */
+  trackGearsetSelected(params: GearsetSelectedEventParams): void {
+    this.sendEvent('gearset_selected', {
+      set_name: params.setName,
+    });
+  }
+
+  /**
+   * Track each hit in the Hit Simulator.
+   * hitType distinguishes deterministic base hits from RNG-sampled random hits.
+   * scenarioKey records whether the player was blocking, parrying, or unshielded.
+   */
+  trackSimulatorHit(params: SimulatorHitEventParams): void {
+    this.sendEvent('sim_hit', {
+      hit_type: params.hitType,
+      scenario_key: params.scenarioKey,
     });
   }
 }
+
 
 
 

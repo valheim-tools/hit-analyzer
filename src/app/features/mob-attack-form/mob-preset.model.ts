@@ -21,6 +21,7 @@ export interface MobAttackData {
 export interface FlatMobPreset extends MobAttack {
   _id: string;
   _label: string;
+  _mobName: string;
   _mobPrefab: string;
   _mobIconFile: string;
 }

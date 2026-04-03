@@ -37,6 +37,7 @@ export class MobPresetService {
             ...attack,
             _id: attack.attack_type,
             _label: label,
+            _mobName: mob.mob_name,
             _mobPrefab: mob.prefab,
             _mobIconFile: mob.icon_file,
           });

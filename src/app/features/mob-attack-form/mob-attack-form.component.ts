@@ -202,7 +202,7 @@ export class MobAttackFormComponent {
     for (const entry of damageTypes) {
       this.damageTypesArray.push(this.buildDamageTypeRow(entry.type, entry.value));
     }
-    this.analyticsService.trackMobPresetSelected({ presetId });
+    this.analyticsService.trackMobPresetSelected({ presetId, mobName: preset._mobName });
     this.syncToService();
   }
 

@@ -4,6 +4,7 @@ import {
 import { HitSimulatorService } from '../../../core/hit-simulator.service';
 import { DamageCalculatorService } from '../../../core/damage-calculator.service';
 import { FormStateService } from '../../../core/form-state.service';
+import { AnalyticsService } from '../../../core/analytics.service';
 import {
   SimLogEntry, HitLogEntry, DotTickLogEntry, DotBreakdown, ScenarioResult,
   SimScenarioKey,
@@ -24,6 +25,7 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
   private readonly hitSimulatorService = inject(HitSimulatorService);
   private readonly damageCalculatorService = inject(DamageCalculatorService);
   private readonly formStateService = inject(FormStateService);
+  private readonly analyticsService = inject(AnalyticsService);
 
   readonly simulatorState = this.hitSimulatorService.state;
   readonly scenarioKeys: readonly SimScenarioKey[] = SIM_SCENARIO_KEYS;
@@ -113,11 +115,13 @@ export class CombatArenaComponent implements OnInit, OnDestroy {
   }
 
   onBaseHit(): void {
+    this.analyticsService.trackSimulatorHit({ hitType: 'base', scenarioKey: this.selectedScenario() });
     this.performHit(null);
   }
 
   onRandomHit(): void {
     const rng = this.damageCalculatorService.sampleRng();
+    this.analyticsService.trackSimulatorHit({ hitType: 'random', scenarioKey: this.selectedScenario() });
     this.performHit(rng);
   }
 

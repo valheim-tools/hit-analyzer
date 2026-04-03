@@ -9,6 +9,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { FormStateService } from '../../core/form-state.service';
 import { MobPresetService } from './mob-preset.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { DamageTypeName, FormState, DamageTypeEntry, DifficultyKey } from '../../core/models';
 import {
   DAMAGE_TYPE_NAMES, DAMAGE_TYPE_ICONS, INSTANT_DAMAGE_TYPE_NAMES, DOT_DAMAGE_TYPE_NAMES,
@@ -42,6 +43,7 @@ interface MobAttackFormControls {
 export class MobAttackFormComponent {
   private readonly formStateService = inject(FormStateService);
   private readonly mobPresetService = inject(MobPresetService);
+  private readonly analyticsService = inject(AnalyticsService);
   private readonly destroyRef = inject(DestroyRef);
 
   private valueChangesSubscription: Subscription | null = null;
@@ -200,6 +202,7 @@ export class MobAttackFormComponent {
     for (const entry of damageTypes) {
       this.damageTypesArray.push(this.buildDamageTypeRow(entry.type, entry.value));
     }
+    this.analyticsService.trackMobPresetSelected({ presetId, mobName: preset._mobName });
     this.syncToService();
   }
 

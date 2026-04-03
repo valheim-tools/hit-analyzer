@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal, effect, isDevMode } from '@angular/c
 import { FormStateService } from './core/form-state.service';
 import { DamageCalculatorService } from './core/damage-calculator.service';
 import { HitSimulatorService } from './core/hit-simulator.service';
+import { AnalyticsService } from './core/analytics.service';
 import { CalculationResult, FormState } from './core/models';
 import { getPercentileRng } from './core/damage-calculator';
 
@@ -32,6 +33,7 @@ export class App implements OnInit {
   private readonly formStateService = inject(FormStateService);
   private readonly damageCalculatorService = inject(DamageCalculatorService);
   private readonly hitSimulatorService = inject(HitSimulatorService);
+  private readonly analyticsService = inject(AnalyticsService);
 
   readonly isDevMode = isDevMode();
   readonly activeTab = signal<ActiveTab>('simulator');
@@ -58,6 +60,7 @@ export class App implements OnInit {
 
   switchTab(tab: ActiveTab): void {
     this.activeTab.set(tab);
+    this.analyticsService.trackTabSwitched({ tabName: tab });
   }
 
   onHit(): void {
@@ -98,6 +101,14 @@ export class App implements OnInit {
       this.calculationResult.set(result);
       this.calculationFormState.set(formState);
       this.hitSimulatorService.syncMaxHealth(formState.maxHealth);
+      this.analyticsService.trackHitCalculated({
+        difficulty: formState.difficulty,
+        starLevel: formState.starLevel,
+        blockArmor: formState.blockArmor,
+        armor: formState.armor,
+        hasRiskFactor: riskFactorValue > 0,
+        riskFactorValue,
+      });
     } catch (error) {
       this.calculationError.set((error as Error).message);
       this.calculationResult.set(null);

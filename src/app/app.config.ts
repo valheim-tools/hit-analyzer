@@ -1,7 +1,8 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, inject } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter, withViewTransitions } from '@angular/router';
 import { routes } from './app.routes';
+import { AnalyticsService } from './core/analytics.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,6 +20,12 @@ export const appConfig: ApplicationConfig = {
           transition.finished.then(() => {
             document.documentElement.classList.remove('navigating-forward', 'navigating-back');
           });
+
+          // Track page view for each route transition
+          const analyticsService = inject(AnalyticsService);
+          const pagePath = '/' + targetUrl;
+          const pageTitle = pagePath.includes('armor-builder') ? 'Armor Builder' : 'Hit Analyzer';
+          analyticsService.trackPageView({ pagePath, pageTitle });
         },
       }),
     ),

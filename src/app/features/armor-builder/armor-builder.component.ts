@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { FormStateService } from '../../core/form-state.service';
 import { ArmorPieceService } from './armor-piece.service';
+import { AnalyticsService } from '../../core/analytics.service';
 import { ArmorPiece, ArmorSetPreset, EquippedSlot, ParsedResistanceEffect } from './armor-piece.model';
 import { MeadPresetService } from './mead-preset.service';
 import { MeadPreset, EquippedMeadSlot, MeadResistanceEntry } from './mead-preset.model';
@@ -64,6 +65,7 @@ function createEmptyMeadSlots(count: number): EquippedMeadSlot[] {
 export class ArmorBuilderComponent {
   private readonly router = inject(Router);
   private readonly formStateService = inject(FormStateService);
+  private readonly analyticsService = inject(AnalyticsService);
   private readonly elementRef = inject(ElementRef);
   readonly armorPieceService = inject(ArmorPieceService);
   readonly meadPresetService = inject(MeadPresetService);
@@ -294,6 +296,8 @@ export class ArmorBuilderComponent {
       legs: { piece: resolvedPieces['legs'] ?? null, quality: 1 },
       cape: { piece: resolvedPieces['cape'] ?? null, quality: 1 },
     });
+
+    this.analyticsService.trackGearsetSelected({ setName });
   }
 
   onPresetsWheel(event: WheelEvent): void {

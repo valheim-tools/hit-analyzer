@@ -1,0 +1,127 @@
+<div class="table-scroll">
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        @for (header of columnHeaders(); track $index) {
+          <th>{{ header }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- Instant damage (conditional) -->
+      @if (hasInstantDamage()) {
+        <tr>
+          <td>Instant damage</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td>
+              @for (line of scenario.instantDamageLines; track $index) {
+                <div [class]="line.cssClass">{{ line.text }}</div>
+              }
+              @if (scenario.instantDamageSumText) {
+                <div class="dot-line dot-line-sum">{{ scenario.instantDamageSumText }}</div>
+              }
+            </td>
+          }
+        </tr>
+      }
+
+      <!-- DoT damage (conditional) -->
+      @if (hasDoT()) {
+        <tr>
+          <td>DoT damage</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td>
+              @for (line of scenario.dotDamageLines; track $index) {
+                <div [class]="line.cssClass">{{ line.text }}</div>
+              }
+              @if (scenario.dotDamageSumText) {
+                <div class="dot-line dot-line-sum">{{ scenario.dotDamageSumText }}</div>
+              }
+            </td>
+          }
+        </tr>
+
+        <tr>
+          <td>DoT ticks</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td>
+              @for (line of scenario.dotTickLines; track $index) {
+                <div [class]="line.cssClass">{{ line.text }}</div>
+              }
+            </td>
+          }
+        </tr>
+
+        <!-- Remaining health before DoT -->
+        <tr class="row-key-result">
+          <td>Remaining health before DoT</td>
+          @for (scenario of scenarioDisplayValues(); track $index) {
+            <td>
+              @if (scenario.isRemainingHealthBeforeDoTLethal) {
+                <span class="skull-wrap tip-wrap">
+                  <span class="skull-icon">💀</span>
+                  <span class="tip-text">{{ scenario.remainingHealthBeforeDoTText }}</span>
+                </span>
+              } @else {
+                {{ scenario.remainingHealthBeforeDoTText }}
+              }
+            </td>
+          }
+        </tr>
+      }
+
+      <!-- Remaining health -->
+      <tr class="row-key-result">
+        <td>Remaining health</td>
+        @for (scenario of scenarioDisplayValues(); track $index) {
+          <td>
+            @if (scenario.isRemainingHealthLethal) {
+              <span class="skull-wrap tip-wrap">
+                <span class="skull-icon">💀</span>
+                <span class="tip-text">{{ scenario.remainingHealthText }}</span>
+              </span>
+            } @else {
+              {{ scenario.remainingHealthText }}
+            }
+          </td>
+        }
+      </tr>
+
+      <!-- Staggered -->
+      <tr class="row-secondary">
+        <td>Staggered</td>
+        @for (scenario of scenarioDisplayValues(); track $index) {
+          <td><span [class]="scenario.staggeredCssClass">{{ scenario.staggeredText }}</span></td>
+        }
+      </tr>
+
+      <!-- Block bypassed -->
+      <tr class="row-secondary">
+        <td>Block bypassed</td>
+        @for (scenario of scenarioDisplayValues(); track $index) {
+          <td><span [class]="scenario.blockBypassedCssClass">{{ scenario.blockBypassedText }}</span></td>
+        }
+      </tr>
+
+      <!-- Min health to avoid block bypass -->
+      <tr class="row-secondary">
+        <td>Min health to avoid block bypass</td>
+        @for (scenario of scenarioDisplayValues(); track $index) {
+          <td><span [class]="scenario.minHealthBlockBypassCssClass">{{ scenario.minHealthBlockBypassText }}</span></td>
+        }
+      </tr>
+
+      <!-- Min health to avoid stagger -->
+      <tr class="row-secondary">
+        <td>Min health to avoid stagger</td>
+        @for (scenario of scenarioDisplayValues(); track $index) {
+          <td><span [class]="scenario.minHealthStaggerCssClass">{{ scenario.minHealthStaggerText }}</span></td>
+        }
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+

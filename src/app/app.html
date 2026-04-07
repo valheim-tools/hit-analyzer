@@ -64,7 +64,7 @@
     <div id="error" style="display:block">{{ calculationError() }}</div>
   }
   @if (calculationResult()) {
-    <app-results-table [result]="calculationResult()" [formState]="calculationFormState()" [riskFactor]="riskFactor()" />
+    <app-results-table [result]="calculationResult()" [formState]="calculationFormState()" [riskFactor]="riskFactor()" [rangeDamageResult]="rangeDamageResult()" />
     <app-step-analysis [result]="calculationResult()" [formState]="calculationFormState()" [riskFactor]="riskFactor()" />
   }
 </div>

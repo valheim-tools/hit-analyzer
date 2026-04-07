@@ -18,6 +18,40 @@
 .health-safe    { color: #60a060; }
 .health-warning { color: $color-gold; }
 
+// ── Risk view percentage colours ─────────────────────────────────────────────
+
+.risk-percent-high { color: #e06060; }
+.risk-percent-mid  { color: $color-gold; }
+.risk-percent-low  { color: #60a060; }
+
+// ── View mode toggle ─────────────────────────────────────────────────────────
+
+.view-mode-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 0.75rem;
+}
+
+.view-mode-btn {
+  padding: 0.35rem 1rem;
+  font-size: 0.78rem;
+  background: #1e1b14;
+  color: #9a8a62;
+  border: 1px solid $color-gold-darker;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+
+  &:first-child { border-radius: $radius-md 0 0 $radius-md; }
+  &:last-child  { border-radius: 0 $radius-md $radius-md 0; border-left: none; }
+  &:hover { background: #2a2618; }
+  &.active {
+    background: #272210;
+    color: $color-gold;
+    border-color: $color-gold;
+  }
+}
+
 // ── Damage summary & modifier line ──────────────────────────────────────────
 
 .damage-summary {

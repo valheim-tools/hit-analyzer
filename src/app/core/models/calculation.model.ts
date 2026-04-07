@@ -77,3 +77,25 @@ export interface CalculationResult {
   parry: ScenarioResult;
 }
 
+export interface RangeDamageScenarioResult {
+  instantDamageMin: number;
+  instantDamageMax: number;
+  instantMapMin: DamageMap;
+  instantMapMax: DamageMap;
+  dotDamageMin: number;
+  dotDamageMax: number;
+  dotBreakdownMin: DotBreakdown;
+  dotBreakdownMax: DotBreakdown;
+  remainingHealthBeforeDoTMin: number;
+  remainingHealthBeforeDoTMax: number;
+  remainingHealthMin: number;
+  remainingHealthMax: number;
+  staggerPercent: number;
+  blockBypassPercent: number;
+}
+
+export interface RangeDamageResult {
+  noShield: RangeDamageScenarioResult;
+  block: RangeDamageScenarioResult;
+  parry: RangeDamageScenarioResult;
+}

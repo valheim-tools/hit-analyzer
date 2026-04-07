@@ -28,6 +28,8 @@ import {
   DotTick,
   DotBreakdown,
   ResistanceModifiers,
+  RangeDamageResult,
+  RangeDamageScenarioResult,
 } from './models';
 
 
@@ -387,7 +389,7 @@ function calculateScenario(
   // Min health to avoid stagger:
   //   no shield → avoid armor-phase stagger
   //   shield + successful block → avoid combined (block + armor) stagger
-  //   shield + guard break → avoid block-phase stagger threshold (same value as minHealthForNoBlockStagger)
+  //   shield + guard break → avoid block-phase stagger (same value as minHealthForNoBlockStagger)
   let minHealthToAvoidStagger: number;
   if (!useShield) {
     minHealthToAvoidStagger = armorStaggerDamage > 0 ? Math.floor(armorStaggerDamage / 0.4) + 1 : 0;
@@ -537,3 +539,119 @@ export function calculate(
   };
 }
 
+/* ── Risk view — damage ranges & stagger/block-bypass probabilities ── */
+
+type ScenarioKey = 'noShield' | 'block' | 'parry';
+
+const BINARY_SEARCH_ITERATIONS = 40;
+
+/**
+ * Binary-searches for the RNG threshold where `predicate` flips from false to true.
+ * Returns the critical RNG value. The predicate should return true for "bad outcome"
+ * (e.g. staggered) and false for "safe outcome".
+ *
+ * Assumes the predicate is monotonic: false for low RNG, true for high RNG.
+ */
+function findThresholdRng(
+  inputs: CalculationInputs,
+  scenarioKey: ScenarioKey,
+  predicate: (scenario: ScenarioResult) => boolean,
+): number {
+  let low = RNG_MIN;
+  let high = RNG_MAX;
+  for (let iteration = 0; iteration < BINARY_SEARCH_ITERATIONS; iteration++) {
+    const midpoint = (low + high) / 2;
+    const result = calculate(inputs, { rng: midpoint });
+    if (predicate(result[scenarioKey])) {
+      high = midpoint;
+    } else {
+      low = midpoint;
+    }
+  }
+  return (low + high) / 2;
+}
+
+function computeRangeDamageScenarioPercent(
+  inputs: CalculationInputs,
+  scenarioKey: ScenarioKey,
+  predicate: (scenario: ScenarioResult) => boolean,
+  isActiveAtMin: boolean,
+  isActiveAtMax: boolean,
+): number {
+  if (isActiveAtMin && isActiveAtMax) return 100;
+  if (!isActiveAtMin && !isActiveAtMax) return 0;
+  const thresholdRng = findThresholdRng(inputs, scenarioKey, predicate);
+  return Math.max(0, Math.min(100, (RNG_MAX - thresholdRng) / (RNG_MAX - RNG_MIN) * 100));
+}
+
+function sumDotTotals(dotBreakdown: DotBreakdown): number {
+  let total = 0;
+  for (const key of ['fire', 'spirit', 'poison'] as const) {
+    const dotData = dotBreakdown[key];
+    if (dotData.ticks.length > 0) {
+      total += dotData.total;
+    }
+  }
+  return total;
+}
+
+function buildRangeDamageScenario(
+  inputs: CalculationInputs,
+  scenarioAtMin: ScenarioResult,
+  scenarioAtMax: ScenarioResult,
+  scenarioKey: ScenarioKey,
+): RangeDamageScenarioResult {
+  const isStaggeredAtMin = scenarioAtMin.stagger === 'YES';
+  const isStaggeredAtMax = scenarioAtMax.stagger === 'YES';
+  const isBlockBypassedAtMin = scenarioAtMin.staggeredOnBlock;
+  const isBlockBypassedAtMax = scenarioAtMax.staggeredOnBlock;
+
+  const staggerPercent = computeRangeDamageScenarioPercent(
+    inputs, scenarioKey,
+    (scenario) => scenario.stagger === 'YES',
+    isStaggeredAtMin, isStaggeredAtMax,
+  );
+
+  const blockBypassPercent = scenarioKey === 'noShield'
+    ? 0
+    : computeRangeDamageScenarioPercent(
+        inputs, scenarioKey,
+        (scenario) => scenario.staggeredOnBlock,
+        isBlockBypassedAtMin, isBlockBypassedAtMax,
+      );
+
+  const dotDamageMin = sumDotTotals(scenarioAtMin.dotBreakdown);
+  const dotDamageMax = sumDotTotals(scenarioAtMax.dotBreakdown);
+
+  return {
+    instantDamageMin: scenarioAtMin.instantDamage,
+    instantDamageMax: scenarioAtMax.instantDamage,
+    instantMapMin: scenarioAtMin.instantMap,
+    instantMapMax: scenarioAtMax.instantMap,
+    dotDamageMin,
+    dotDamageMax,
+    dotBreakdownMin: scenarioAtMin.dotBreakdown,
+    dotBreakdownMax: scenarioAtMax.dotBreakdown,
+    remainingHealthBeforeDoTMin: scenarioAtMax.remainingHealthBeforeDoT,
+    remainingHealthBeforeDoTMax: scenarioAtMin.remainingHealthBeforeDoT,
+    remainingHealthMin: scenarioAtMax.remainingHealth,
+    remainingHealthMax: scenarioAtMin.remainingHealth,
+    staggerPercent,
+    blockBypassPercent,
+  };
+}
+
+/**
+ * Computes range-damage data: damage ranges and stagger/block-bypass probabilities
+ * across the full RNG range [0.75, 1.0].
+ */
+export function calculateRangeDamage(inputs: CalculationInputs): RangeDamageResult {
+  const resultAtMin = calculate(inputs, { rng: RNG_MIN });
+  const resultAtMax = calculate(inputs, { rng: RNG_MAX });
+
+  return {
+    noShield: buildRangeDamageScenario(inputs, resultAtMin.noShield, resultAtMax.noShield, 'noShield'),
+    block:    buildRangeDamageScenario(inputs, resultAtMin.block,    resultAtMax.block,    'block'),
+    parry:    buildRangeDamageScenario(inputs, resultAtMin.parry,    resultAtMax.parry,    'parry'),
+  };
+}

@@ -539,7 +539,7 @@ export function calculate(
   };
 }
 
-/* ── Risk view — damage ranges & stagger/block-bypass probabilities ── */
+/* ── Range damage — damage ranges & stagger/block-bypass probabilities ── */
 
 type ScenarioKey = 'noShield' | 'block' | 'parry';
 

@@ -156,9 +156,9 @@ export class RangeDamageTableComponent {
   }
 
   private getPercentCssClass(percent: number): string {
-    if (percent >= 100) return 'risk-percent-high';
-    if (percent > 0) return 'risk-percent-mid';
-    return 'risk-percent-low';
+    if (percent >= 100) return 'range-percent-high';
+    if (percent > 0) return 'range-percent-mid';
+    return 'range-percent-low';
   }
 }
 

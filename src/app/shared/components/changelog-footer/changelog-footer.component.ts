@@ -1,0 +1,80 @@
+import { Component } from '@angular/core';
+
+export interface ChangelogEntry {
+  date: string;
+  items: string[];
+}
+
+@Component({
+  selector: 'app-changelog-footer',
+  template: `
+    <footer class="changelog-footer">
+      <h4 class="changelog-title">Changelog</h4>
+      @for (entry of changelogEntries; track entry.date) {
+        <div class="changelog-group">
+          <span class="changelog-date">{{ entry.date }}</span>
+          <ul class="changelog-list">
+            @for (item of entry.items; track item) {
+              <li class="changelog-item">{{ item }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </footer>
+  `,
+  styles: [`
+    @use '../../../../styles/variables' as *;
+
+    .changelog-footer {
+      margin-top: 3rem;
+      padding: 1rem 1.2rem;
+      border-top: 1px solid $color-gold-darker;
+      text-align: center;
+    }
+
+    .changelog-title {
+      font-size: 0.68rem;
+      color: $color-gold-dark;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.5rem;
+    }
+
+    .changelog-group {
+      margin-bottom: 0.4rem;
+    }
+
+    .changelog-date {
+      color: $color-gold-dark;
+      font-size: 0.7rem;
+    }
+
+    .changelog-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.2rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .changelog-item {
+      font-size: 0.75rem;
+      color: $color-text-muted;
+    }
+  `],
+})
+export class ChangelogFooterComponent {
+  readonly changelogEntries: ChangelogEntry[] = [
+    {
+      date: '2026-04-07',
+      items: [
+        'Add Range damage view to Hit Analyzer result table',
+        'Fix multiplicative scaling for star level, difficulty, and extra damage modifiers (it was wrongly additive)',
+      ],
+    },
+  ];
+}
+
+
+

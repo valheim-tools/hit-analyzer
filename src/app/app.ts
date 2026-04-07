@@ -13,6 +13,7 @@ import { CombatArenaComponent } from './features/hit-simulator/combat-arena/comb
 import { ResultsTableComponent } from './features/hit-analyzer/results-table/results-table.component';
 import { StepAnalysisComponent } from './features/hit-analyzer/step-analysis/step-analysis.component';
 import { DevTestCaseLoaderComponent } from './features/dev-test-case-loader/dev-test-case-loader.component';
+import { ChangelogFooterComponent } from './shared/components/changelog-footer/changelog-footer.component';
 
 type ActiveTab = 'simulator' | 'hit-analyzer';
 
@@ -25,6 +26,7 @@ type ActiveTab = 'simulator' | 'hit-analyzer';
     ResultsTableComponent,
     StepAnalysisComponent,
     DevTestCaseLoaderComponent,
+    ChangelogFooterComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

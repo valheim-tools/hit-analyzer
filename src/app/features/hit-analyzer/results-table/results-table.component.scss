@@ -18,11 +18,11 @@
 .health-safe    { color: #60a060; }
 .health-warning { color: $color-gold; }
 
-// ── Risk view percentage colours ─────────────────────────────────────────────
+// ── Range damage percentage colours ─────────────────────────────────────────
 
-.risk-percent-high { color: #e06060; }
-.risk-percent-mid  { color: $color-gold; }
-.risk-percent-low  { color: #60a060; }
+.range-percent-high { color: #e06060; }
+.range-percent-mid  { color: $color-gold; }
+.range-percent-low  { color: #60a060; }
 
 // ── View mode toggle ─────────────────────────────────────────────────────────
 

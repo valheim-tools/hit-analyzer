@@ -67,6 +67,12 @@ export interface ChangelogEntry {
 export class ChangelogFooterComponent {
   readonly changelogEntries: ChangelogEntry[] = [
     {
+      date: '2026-04-08',
+      items: [
+        'Add shareable calculation links — click "Copy" to generate a URL that restores all mob, defense, and risk factor inputs for anyone who opens it',
+      ],
+    },
+    {
       date: '2026-04-07',
       items: [
         'Fix "Min health to avoid stagger" showing incorrect value when guard break occurs — now correctly accounts for combined (block + armor) stagger on the hypothetical successful-block path',

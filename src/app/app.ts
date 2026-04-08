@@ -167,7 +167,7 @@ export class App implements OnInit {
     if (wasCopied) {
       this.isShareLinkCopied.set(true);
       this.analyticsService.trackShareLinkCopied();
-      setTimeout(() => this.isShareLinkCopied.set(false), 2000);
+      setTimeout(() => this.isShareLinkCopied.set(false), 1500);
     }
   }
 }

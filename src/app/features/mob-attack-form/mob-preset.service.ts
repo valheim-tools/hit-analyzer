@@ -35,7 +35,7 @@ export class MobPresetService {
           const label = `${mob.mob_name} — ${attack.attack_name} (${typeSummary})`;
           result.push({
             ...attack,
-            _id: attack.attack_type,
+            _id: `${mob.prefab}::${attack.attack_type}`,
             _label: label,
             _mobName: mob.mob_name,
             _mobPrefab: mob.prefab,

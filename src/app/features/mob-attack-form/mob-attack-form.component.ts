@@ -100,7 +100,7 @@ export class MobAttackFormComponent {
               .map(typeName => `${attack[typeName]} ${typeName}`);
             const typeSummary = typeEntries.join(' + ');
             return {
-              id: attack.attack_type,
+              id: `${mob.prefab}::${attack.attack_type}`,
               label: `${attack.attack_name} (${typeSummary})`,
               triggerLabel: `${mob.mob_name} — ${attack.attack_name} (${typeSummary})`,
             };

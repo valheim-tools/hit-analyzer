@@ -5,7 +5,7 @@ import { DIFFICULTY_KEYS } from './constants';
 const LOCAL_STORAGE_KEY = 'valheim-form';
 
 const DEFAULTS: FormState = {
-  mobPreset: '_manual_log_swing_v',
+  mobPreset: 'Troll::_manual_log_swing_v',
   damageTypes: [{ type: 'Blunt', value: 70 }],
   starLevel: 0,
   difficulty: 'NORMAL',
@@ -75,6 +75,11 @@ export class FormStateService {
 
   private mergeWithDefaults(saved: Partial<FormState>): FormState {
     const merged: FormState = { ...DEFAULTS, ...saved };
+
+    // Migrate legacy mobPreset IDs that lack the prefab:: prefix
+    if (merged.mobPreset && !merged.mobPreset.includes('::')) {
+      merged.mobPreset = '';
+    }
 
     // Migrate legacy baseDamage → damageTypes
     if (!merged.damageTypes || merged.damageTypes.length === 0) {

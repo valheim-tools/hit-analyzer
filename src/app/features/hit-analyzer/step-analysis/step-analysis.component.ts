@@ -155,10 +155,15 @@ export class StepAnalysisComponent {
     const afterBlockMap = scenarioData.damageBreakdown.afterBlock;
 
     const blockTypeBreakdowns: TypeBreakdownEntry[] = [];
+    const blockStaggerTerms: StaggerTermEntry[] = [];
     if (isShield && afterBlockMap) {
       const activeTypes = DAMAGE_TYPE_NAMES.filter(typeName => (inputDamageMap[typeName] || 0) > DAMAGE_DISPLAY_THRESHOLD);
+      const blockDamageRatio = scaledEffectiveDamage > 0 ? afterBlockDamage / scaledEffectiveDamage : 0;
+      // The per-type breakdown table only renders for multi-type attacks (single-type has nothing
+      // to break down). The stagger-term equation, on the other hand, must always reflect every
+      // stagger-contributing damage type so the tooltip can spell out the sum even for single-type
+      // attacks (e.g. pure Pierce).
       if (activeTypes.length > 1) {
-        const blockDamageRatio = scaledEffectiveDamage > 0 ? afterBlockDamage / scaledEffectiveDamage : 0;
         for (const typeName of activeTypes) {
           const beforeValue = inputDamageMap[typeName] || 0;
           blockTypeBreakdowns.push({
@@ -175,6 +180,14 @@ export class StepAnalysisComponent {
           });
         }
       }
+      for (const typeName of activeTypes) {
+        if (!(STAGGER_DAMAGE_TYPE_NAMES as readonly string[]).includes(typeName)) continue;
+        const beforeValue = inputDamageMap[typeName] || 0;
+        blockStaggerTerms.push({
+          variableName: `block${typeName}StaggerDamage`,
+          value: beforeValue * blockDamageRatio,
+        });
+      }
     }
 
     const blockReducedDamageStep: BlockReducedDamageStepAnalysis = {
@@ -187,12 +200,7 @@ export class StepAnalysisComponent {
       afterBlockDamage,
       staggeredOnBlock: scenarioData.staggeredOnBlock,
       blockStaggerDamage: scenarioData.blockStaggerDamage,
-      blockStaggerTerms: blockTypeBreakdowns
-        .filter(typeBreakdown => typeBreakdown.isStaggerType)
-        .map(typeBreakdown => ({
-          variableName: `block${typeBreakdown.typeName}StaggerDamage`,
-          value: typeBreakdown.afterValue,
-        } as StaggerTermEntry)),
+      blockStaggerTerms,
       staggerThreshold,
       maxHealth: formState.maxHealth,
       typeBreakdowns: blockTypeBreakdowns,
@@ -248,6 +256,7 @@ export class StepAnalysisComponent {
     const staggerOccurred = scenarioData.stagger === 'YES' && !scenarioData.staggeredOnBlock;
 
     const armorTypeBreakdowns: TypeBreakdownEntry[] = [];
+    const armorStaggerTerms: StaggerTermEntry[] = [];
     const activeArmorTypes = DAMAGE_TYPE_NAMES.filter(typeName => (armorInputMap[typeName] || 0) > DAMAGE_DISPLAY_THRESHOLD);
     if (activeArmorTypes.length > 1) {
       const ratio = armorInputDamage > 0 ? scenarioData.armorReducedDamage / armorInputDamage : 0;
@@ -265,13 +274,15 @@ export class StepAnalysisComponent {
         });
       }
     }
-
-    const armorStaggerTerms: StaggerTermEntry[] = armorTypeBreakdowns
-      .filter(typeBreakdown => typeBreakdown.isStaggerType)
-      .map(typeBreakdown => ({
-        variableName: `armor${typeBreakdown.typeName}StaggerDamage`,
-        value: typeBreakdown.afterValue,
-      } as StaggerTermEntry));
+    // Build stagger terms independently so the tooltip can spell out the armor-stagger sum even
+    // for single-damage-type attacks (where the per-type breakdown table is omitted).
+    for (const typeName of activeArmorTypes) {
+      if (!(STAGGER_DAMAGE_TYPE_NAMES as readonly string[]).includes(typeName)) continue;
+      armorStaggerTerms.push({
+        variableName: `armor${typeName}StaggerDamage`,
+        value: afterArmorMap[typeName] || 0,
+      });
+    }
 
     const armorReducedDamageStep: ArmorReducedDamageStepAnalysis = {
       armorInputDamage,
